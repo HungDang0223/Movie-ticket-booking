@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_tickets/core/constants/my_const.dart';
-import 'package:movie_tickets/features/booking/presentation/pages/movie_booking.dart';
+import 'package:movie_tickets/features/booking/presentation/pages/showing_movie_booking.dart';
 import 'package:movie_tickets/features/home/presentation/pages/home_page.dart';
 import 'package:movie_tickets/features/movies/presentation/pages/movie_detail.dart';
 import 'package:movie_tickets/injection.dart';
@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
         //       return HomePage();
         //     },
           // )
-        home: MovieBookingScreen()
+        home: ShowingMovieBookingScreen()
       ),
     );
   }

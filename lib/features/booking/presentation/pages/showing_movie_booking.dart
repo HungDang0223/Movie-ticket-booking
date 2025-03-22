@@ -5,8 +5,8 @@ import 'package:movie_tickets/core/constants/app_color.dart';
 import 'package:movie_tickets/core/extensions/date_time_ext.dart';
 import 'package:movie_tickets/features/booking/presentation/pages/seat_booking.dart';
 
-class MovieBookingScreen extends StatelessWidget {
-  const MovieBookingScreen({super.key});
+class ShowingMovieBookingScreen extends StatelessWidget {
+  const ShowingMovieBookingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

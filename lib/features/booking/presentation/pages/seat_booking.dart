@@ -75,7 +75,35 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
   }
 
   void resetZoom() {
-    _transformationController.value = Matrix4.identity();
+    // Calculate scale to fit all content
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final renderBox = context.findRenderObject() as RenderBox;
+      final viewportSize = renderBox.size;
+      final viewportWidth = viewportSize.width;
+      final viewportHeight = viewportSize.height * 0.7; // Adjust for bottom area
+      
+      // Estimate the content size based on seat layout
+      final maxSeatsInRow = seatLayout.values.map((seats) => seats.length).reduce((a, b) => a > b ? a : b);
+      final rowCount = seatLayout.length;
+      
+      // Calculate content width and height (with some padding)
+      final contentWidth = maxSeatsInRow * 52.0 + 50.0; // 52 = seat width + margins
+      final contentHeight = rowCount * 48.0 + 150.0; // 48 = row height, 150 for screen and margins
+      
+      // Calculate scale to fit
+      final scaleX = viewportWidth / contentWidth;
+      final scaleY = viewportHeight / contentHeight;
+      final scale = scaleX < scaleY ? scaleX : scaleY;
+      
+      // Apply scale with slight adjustment for better fit
+      final adjustedScale = scale * 0.9;
+      
+      // Set the transformation
+      final Matrix4 matrix = Matrix4.identity()
+        ..scale(adjustedScale, adjustedScale);
+      
+      _transformationController.value = matrix;
+    });
   }
 
   Future<void> fetchSeatLayout() async {
@@ -182,9 +210,9 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
 
   Widget _buildScreen() {
     return Container(
-      width: double.infinity,
+      width: 300, // Fixed width to ensure the screen is centered
       height: 40,
-      margin: EdgeInsets.only(bottom: 10),
+      margin: EdgeInsets.only(top: 20, bottom: 40), // Add more space below the screen
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -214,24 +242,62 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
     );
   }
 
+  // Seat legend with wrap that prioritizes horizontal layout
+  Widget _buildLegend() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Calculate if items can fit in a single row
+          final itemWidth = 90.0; // Estimated width per legend item
+          final availableWidth = constraints.maxWidth;
+          final itemsPerRow = (availableWidth / itemWidth).floor();
+          
+          // If we can fit all 5 items in a row, use Row, otherwise use a specific split
+          if (itemsPerRow >= 5) {
+            // All items in one row
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildLegendItem(Color(0xFF4CAF50), 'Đang chọn'),
+                _buildLegendItem(Colors.grey.shade400, 'Đã đặt'),
+                _buildLegendItem(Color(0xFFF5E6E8), 'Thường'),
+                _buildLegendItem(Color(0xFFE8F5E9), 'VIP'),
+                _buildLegendItem(Color(0xFFFFF3E0), 'Sweet Box'),
+              ],
+            );
+          } else {
+            // Split 3 items on first row, 2 items on second row
+            return Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildLegendItem(Color(0xFF4CAF50), 'Đang chọn'),
+                    SizedBox(width: 16),
+                    _buildLegendItem(Colors.grey.shade400, 'Đã đặt'),
+                    SizedBox(width: 16),
+                    _buildLegendItem(Color(0xFFF5E6E8), 'Thường'),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildLegendItem(Color(0xFFE8F5E9), 'VIP'),
+                    SizedBox(width: 16),
+                    _buildLegendItem(Color(0xFFFFF3E0), 'Sweet Box'),
+                  ],
+                ),
+              ],
+            );
+          }
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Calculate the total width needed for seats
-    final maxSeatsInRow = seatLayout.values.map((seats) => seats.length).reduce((a, b) => a > b ? a : b);
-    final seatWidth = 32.0;
-    final seatMargin = 4.0;
-    final wayWidth = 48.0;
-    final wayMargin = 4.0;
-    final waysCount = seatLayout.values.length;
-    
-    // Calculate total width including seats, ways, and margins
-    final totalWidth = (maxSeatsInRow * (seatWidth + seatMargin)) + 
-                      (waysCount * (wayWidth + wayMargin));
-    
-    // Calculate scale factor to fit the screen
-    final screenWidth = MediaQuery.of(context).size.width;
-    final scaleFactor = (screenWidth - 64) / totalWidth; // 64 for row labels and padding
-
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: PreferredSize(
@@ -293,35 +359,44 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
             )
           : Column(
               children: [
-                // Screen indicator and seat layout container
+                // Seat layout container
                 Expanded(
                   child: Stack(
                     children: [
-                      // Seat layout
                       InteractiveViewer(
                         transformationController: _transformationController,
                         minScale: 0.5,
                         maxScale: 2.0,
-                        boundaryMargin: EdgeInsets.all(double.infinity),
-                        child: Column(
-                          children: [
-                            // Screen
-                            _buildScreen(),
-                            // Row labels and seats
-                            Expanded(
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.vertical,
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Row labels column
-                                    Container(
-                                      width: 32,
-                                      padding: EdgeInsets.symmetric(vertical: 8),
-                                      child: Column(
+                        boundaryMargin: EdgeInsets.all(150),
+                        constrained: false,
+                        onInteractionEnd: (_) {
+                          setState(() {}); // Refresh state to update minimap
+                        },
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          physics: NeverScrollableScrollPhysics(),
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                // Screen indicator
+                                _buildScreen(),
+                                SizedBox(height: 20),
+                                // Seat layout
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Row labels column
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: seatLayout.keys.map((row) => Container(
-                                          height: 32,
+                                          height: 44,
+                                          width: 25,
                                           margin: EdgeInsets.symmetric(vertical: 2),
+                                          alignment: Alignment.center,
                                           child: Text(
                                             row,
                                             style: TextStyle(
@@ -333,10 +408,11 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                                           ),
                                         )).toList(),
                                       ),
-                                    ),
-                                    // Seats grid
-                                    Expanded(
-                                      child: Column(
+                                      SizedBox(width: 10),
+                                      // Seats grid
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: seatLayout.entries.map((entry) {
                                           return Padding(
                                             padding: EdgeInsets.symmetric(vertical: 2),
@@ -344,73 +420,7 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                                           );
                                         }).toList(),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Mini screen indicator (overlay)
-                      Positioned(
-                        left: 16,
-                        top: 16,
-                        child: Transform.scale(
-                          scale: _transformationController.value.getMaxScaleOnAxis(),
-                          child: Container(
-                            width: 80,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Color(0xFF4CAF50), width: 2),
-                              color: Colors.black.withOpacity(0.8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xFF4CAF50).withOpacity(0.3),
-                                  blurRadius: 8,
-                                  offset: Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: double.infinity,
-                                  padding: EdgeInsets.symmetric(vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFF4CAF50).withOpacity(0.1),
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(6),
-                                      topRight: Radius.circular(6),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'MÀN HÌNH',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Color(0xFF4CAF50),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: GridView.builder(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 8,
-                                      mainAxisSpacing: 1,
-                                      crossAxisSpacing: 1,
-                                    ),
-                                    itemCount: 64,
-                                    itemBuilder: (context, index) {
-                                      return Container(
-                                        width: 2,
-                                        height: 2,
-                                        color: index < 48 ? Colors.white : Colors.pink,
-                                      );
-                                    },
+                                    ],
                                   ),
                                 ),
                               ],
@@ -418,24 +428,15 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                           ),
                         ),
                       ),
+                      
+                      // Mini-map in top-left corner that shows a scaled view of the seats
+                      _buildMiniMap(),
                     ],
                   ),
                 ),
                 
                 // Seat legend
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildLegendItem(Color(0xFF4CAF50), 'Đang chọn'),
-                      _buildLegendItem(Colors.grey.shade400, 'Đã đặt'),
-                      _buildLegendItem(Color(0xFFF5E6E8), 'Thường'),
-                      _buildLegendItem(Color(0xFFE8F5E9), 'VIP'),
-                      _buildLegendItem(Color(0xFFFFF3E0), 'Sweet Box'),
-                    ],
-                  ),
-                ),
+                _buildLegend(),
                 
                 // Movie info and booking button
                 Container(
@@ -507,10 +508,9 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
 
   Widget _buildLegendItem(Color color, String label) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
@@ -541,50 +541,184 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
   }
 
   Widget _buildSeatRow(String row, List<Seat> seats) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: seats.map((seat) {
-          return GestureDetector(
-            onTap: () => toggleSeatSelection(seat.id),
-            child: AnimatedContainer(
-              duration: Duration(milliseconds: 200),
-              width: 32,
-              height: 32,
-              margin: EdgeInsets.symmetric(horizontal: 2),
-              decoration: BoxDecoration(
-                color: getSeatColor(row, seat.id),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: selectedSeats.contains(seat.id)
-                      ? Color(0xFF4CAF50)
-                      : Colors.grey.shade300,
-                  width: 1.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  ),
-                ],
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: seats.map((seat) {
+        return GestureDetector(
+          onTap: () => toggleSeatSelection(seat.id),
+          child: Container(
+            width: 44,
+            height: 44,
+            margin: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            decoration: BoxDecoration(
+              color: getSeatColor(row, seat.id),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: selectedSeats.contains(seat.id)
+                    ? Color(0xFF4CAF50)
+                    : Colors.grey.shade300,
+                width: 1.5,
               ),
-              child: Center(
-                child: Text(
-                  seat.id,
-                  style: TextStyle(
-                    color: selectedSeats.contains(seat.id)
-                        ? Colors.white
-                        : Colors.black87,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                  ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                seat.id,
+                style: TextStyle(
+                  color: selectedSeats.contains(seat.id)
+                      ? Colors.white
+                      : Colors.black87,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-          );
-        }).toList(),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  // Mini-map in top-left corner that shows a scaled view of the seats
+  Widget _buildMiniMap() {
+    // Calculate the current visible area based on transformation
+    final Matrix4 transform = _transformationController.value;
+    final double scale = transform.getMaxScaleOnAxis();
+    
+    // Simplified view - just show the seats with current position highlighted
+    return Positioned(
+      left: 16,
+      top: 16,
+      child: Container(
+        width: 120,
+        height: 150,
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.7),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: Colors.grey.shade700,
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Mini screen
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  width: 80,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.grey.shade800,
+                        Colors.grey.shade900,
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'MÀN HÌNH',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 6,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 8),
+              // Current view scale indicator
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: Colors.red.withOpacity(0.5), width: 0.5),
+                  ),
+                  child: Text(
+                    'Scale: ${scale.toStringAsFixed(1)}x',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 6,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 4),
+              // Mini seat layout
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Row headers and seats
+                      ...seatLayout.entries.map((entry) => Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          // Row label
+                          Container(
+                            width: 8,
+                            height: 7,
+                            alignment: Alignment.center,
+                            child: Text(
+                              entry.key,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 5,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 2),
+                          // Seats
+                          ...entry.value.map((seat) => Container(
+                            width: 5,
+                            height: 5,
+                            margin: EdgeInsets.all(1),
+                            decoration: BoxDecoration(
+                              color: selectedSeats.contains(seat.id)
+                                  ? Color(0xFF4CAF50)
+                                  : getSeatColor(entry.key, seat.id),
+                              borderRadius: BorderRadius.circular(1),
+                            ),
+                          )),
+                        ],
+                      )),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
