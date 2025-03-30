@@ -7,6 +7,8 @@ import 'package:movie_tickets/core/constants/my_const.dart';
 import 'package:movie_tickets/features/booking/presentation/pages/showing_movie_booking.dart';
 import 'package:movie_tickets/features/home/presentation/pages/home_page.dart';
 import 'package:movie_tickets/features/movies/presentation/pages/movie_detail.dart';
+import 'package:movie_tickets/features/payment/presentation/pages/payment_page.dart';
+import 'package:movie_tickets/features/venues/presentation/pages/venues_page.dart';
 import 'package:movie_tickets/injection.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/login_bloc/bloc/bloc.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/signup_bloc/bloc.dart';
@@ -57,7 +59,15 @@ class MyApp extends StatelessWidget {
         //       return HomePage();
         //     },
           // )
-        home: ShowingMovieBookingScreen()
+          home: PaymentPage(
+              movieTitle: "movieTitle",
+              theaterName: "theaterName",
+              showDate: "23/02/2025",
+              showTime: "10:00",
+              selectedSeats: ["1", "2", "3"],
+              ticketPrice: 100000,
+              selectedSnacks: {"Snack1": 100000, "Snack2": 100000},
+              snacksPrice: 100000)
       ),
     );
   }

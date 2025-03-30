@@ -2,13 +2,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:movie_tickets/app.dart';
 import 'package:movie_tickets/config/firebase_options.dart';
 import 'package:movie_tickets/core/utils/simple_bloc_observer.dart';
 import 'package:movie_tickets/injection.dart' as di;
+import 'package:movie_tickets/core/configs/payment_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Stripe
+  Stripe.publishableKey = PaymentConfig.stripePublishableKey;
+  
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await di.init();
   Bloc.observer = SimpleBlocObserver();
