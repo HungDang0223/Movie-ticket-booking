@@ -1,8 +1,9 @@
 import 'dart:developer';
 
 import 'package:movie_tickets/core/services/local/ticket_dao.dart';
-import 'package:movie_tickets/features/booking/data/models/ticket.dart';
 import 'package:sqflite/sqflite.dart';
+
+import '../../../features/booking/data/models/models.dart';
 
 class DbHelper {
   static late Database _db;
@@ -22,16 +23,80 @@ class DbHelper {
       onCreate: _onCreate,
     );
 
-   await TicketDAO.insert(Ticket(
-     1,
-     'King Kong',
-     '10:40',
-     "D:/KLTN/movie_tickets/assets/images/movie/61d30e82f43b1cab9f49e576ae457086@2x.png",
-     DateTime.now().millisecondsSinceEpoch,
-     'BHD Star Cineplex',
-     'G4;G9;G12',
-   ));
+    // Sample data for Showing
+    final showing1 = Showing(
+      showingId: 1,
+      movieName: "Avengers: Endgame",
+      cinemaName: "CGV Aeon Mall",
+      screenName: "Screen 1",
+      startTime: DateTime.now(),
+      endTime: DateTime.now().add(const Duration(hours: 3)),
+      language: "English",
+      subtitleLanguage: "Vietnamese",
+      showingFormat: "2D",
+      showingDate: DateTime.now(),
+    );
 
+    // Sample data for seats
+    const seats1 = BookingSeat(
+      showingId: "1",
+      seats: [
+        Seat(
+          seatId: 1,
+          seatType: "Regular",
+          screenName: "Screen 1",
+          rowName: "G",
+          seatNumber: "4"
+        ),
+        Seat(
+          seatId: 2,
+          seatType: "Regular",
+          screenName: "Screen 1",
+          rowName: "G",
+          seatNumber: "5"
+        ),
+      ]
+    );
+
+    // Sample data for snacks
+    final snacks1 = BookingSnack(
+      bookingId: 1,
+      snack: Snack(
+        snackId: 1,
+        name: "Popcorn Large",
+        description: "Fresh popcorn",
+        price: 5.99,
+        imageUrl: "assets/images/popcorn.jpg"
+      ),
+      quantity: 2
+    );
+
+    // Sample data for combos
+    const combos1 = BookingCombo(
+      bookingId: 1,
+      combo: Combo(
+        comboId: 1,
+        comboName: "Family Pack",
+        imageUrl: "assets/images/combo1.jpg",
+        description: "2 Popcorn + 2 Coke",
+        price: 15
+      ),
+      quantity: 1
+    );
+
+    // Insert ticket
+    await TicketDAO.insert(Ticket(
+      bookingId: 1,
+      userId: "user123",
+      showing: showing1,
+      bookTime: DateTime.now(),
+      amount: 50,
+      seats: seats1,
+      snacks: snacks1,
+      combos: combos1
+    ));
+
+    // Retrieve and log all tickets
     var result = await TicketDAO.getAll();
     log(result.toString());
   }

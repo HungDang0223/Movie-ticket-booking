@@ -3,14 +3,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:movie_tickets/features/payment/domain/services/vnpay_payment_service.dart';
 import 'package:movie_tickets/features/payment/domain/services/zalopay_payment_service.dart';
+import 'package:movie_tickets/features/payment/presentation/bloc/bloc.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'payment_success_page.dart';
 import '../widgets/payment_card_bottom_sheet.dart';
-import '../../domain/models/payment_card.dart';
+import '../../data/models/payment_card.dart';
 import '../../domain/services/card_service.dart';
 import '../../domain/services/stripe_payment_service.dart';
 
@@ -115,6 +117,7 @@ class _PaymentPageState extends State<PaymentPage> {
   @override
   void initState() {
     super.initState();
+    // platform.invokeMethod('startFragmentHostActivity');
     if (Platform.isIOS) {
       eventChannel.receiveBroadcastStream().listen(
         (dynamic event) => _onEvent(event as Map<dynamic, dynamic>),
@@ -193,15 +196,138 @@ class _PaymentPageState extends State<PaymentPage> {
     });
   }
 
-  void progressStripePayment() async {
-    // If card payment method is selected but no card is selected
-    if ((selectedPaymentMethod == 'card' || selectedPaymentMethod == 'visa') && selectedCard == null) {
-      _showCardSelectionBottomSheet();
-      return;
-    }
-  }
+//   void processPayment(BuildContext context) async {
+//     if (selectedPaymentMethod == null) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(
+//           content: Text('Vui lòng chọn phương thức thanh toán'),
+//           backgroundColor: Colors.red,
+//         ),
+//       );
+//       return;
+//     }
 
-  void processPayment(BuildContext context) async {
+//     setState(() {
+//       isProcessing = true;
+//     });
+//     bool paymentSuccess = false;
+//     try {
+      
+      
+//       // Process payment based on the selected method
+//       if (selectedPaymentMethod == 'card' || selectedPaymentMethod == 'visa') {
+//         // final card = await PaymentCardBottomSheet.show(context, totalAmount);
+//         // if (card != null) {
+//         //   // Payment was successful in the bottom sheet
+//         //   final String transactionId = 'CGV${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
+//         //   Navigator.pushReplacement(
+//         //     context,
+//         //     MaterialPageRoute(
+//               // builder: (context) => PaymentSuccessPage(
+//               //   movieTitle: widget.movieTitle,
+//               //   theaterName: widget.theaterName,
+//               //   showDate: widget.showDate,
+//               //   showTime: widget.showTime,
+//               //   selectedSeats: widget.selectedSeats,
+//               //   transactionId: transactionId,
+//               // ),
+//         //     ),
+//         //   );
+//         //   return;
+//         // }
+//         await StripePaymentService.instance.processPaymentWithSheet(totalAmount);
+//         return;
+//       } 
+//       if (selectedPaymentMethod == 'zalopay') {
+//   setState(() {
+//     isProcessing = true; // Show loading indicator while creating order
+//   });
+
+//   try {
+//     // Step 1: Create the order
+//     final order = await ZalopayPaymentService.instance.createOrder(totalAmount.round());
+
+//     if (order != null && order.zptranstoken != null) {
+//       final zpTransToken = order.zptranstoken;
+
+//       // Step 2: Start payment via native Android (invoke MethodChannel)
+//       final result = await platform.invokeMethod('payOrder', {
+//         "zptoken": zpTransToken,
+//       });
+
+//       // Step 3: Handle result
+//       print("payOrder Result: '$result'.");
+
+//       if (result == "Payment Success") {
+//         paymentSuccess = true;
+//         // Navigate to success screen or show dialog
+//         print("✅ Payment success");
+//       } else if (result == "User Canceled") {
+//         print("⚠️ User canceled the payment");
+//       } else {
+//         print("❌ Payment failed");
+//       }
+//     } else {
+//       print("❌ Failed to create order or missing token.");
+//     }
+//   } catch (e) {
+//     print("Exception during ZaloPay flow: $e");
+//   } finally {
+//     setState(() {
+//       isProcessing = false; // Always hide loading
+//     });
+//   }
+// }
+
+//       if (selectedPaymentMethod == 'vnpay') {
+//         final paymentUrl = VNPAYPaymentService.instance.generatePaymentUrl(
+//             version: "2.1.0",
+//             tmnCode: "8PT36G81",
+//             txnRef: DateTime.now().millisecondsSinceEpoch.toString(),
+//             amount: 30000,
+//             returnUrl: "https://d670-2001-ee0-4c0e.ngrok-free.app/api/vnpay/return",
+//             ipAdress: "192.168.1.168",
+//             vnpayHashKey: "GTY1T76QPSOLJ6TTSE3II4QFKU0M8Q0S",
+//             vnPayHashType: VNPayHashType.HMACSHA512,
+//             vnpayExpireDate: DateTime.now().add(Duration(days: 1)));
+//         await show(paymentUrl: paymentUrl, context: context,
+//           onPaymentSuccess: (params) {
+//             print("Payment success: '$params'.");
+//           },
+//           onPaymentError: (params) {
+//             print("Payment error: '$params'.");
+//           },
+//           );
+//           return;
+//       }
+
+      
+//     } catch (e) {
+//       setState(() {
+//         isProcessing = false;
+//       });
+      
+//       if (e is StripeException) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(
+//             content: Text(e.error.localizedMessage ?? 'Payment failed'),
+//             backgroundColor: Colors.red,
+//           ),
+//         );
+//       } else {
+//         print((e));
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(
+//             content: Text('An error occurred: ${e.toString()}'),
+//             backgroundColor: Colors.red,
+//           ),
+//         );
+//       }
+//     }
+    
+//   }
+
+void processPayment(BuildContext context) async {
     if (selectedPaymentMethod == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -211,118 +337,32 @@ class _PaymentPageState extends State<PaymentPage> {
       );
       return;
     }
-    if (selectedPaymentMethod == 'zalopay') {
-      try {
-        var order = await ZalopayPaymentService.instance.createOrder(totalAmount.round());
-        if (order != null) {
-          zpTransToken = order.zptranstoken;
-          final result = await platform.invokeMethod('payOrder', {"zptoken": zpTransToken});
-          
-          print("payOrder Result: '$result'.");
-        }
-        
-      } on PlatformException catch (e) {
-          print("Failed to Invoke: '${e.message}'.");
-          print("Thanh toán thất bại");
-        }
-    }
-
-    if (selectedPaymentMethod == 'vnpay') {
-      try {
-        final paymentUrl = VNPAYPaymentService.instance.generatePaymentUrl(
-            version: "2.1.0",
-            tmnCode: "8PT36G81",
-            txnRef: DateTime.now().millisecondsSinceEpoch.toString(),
-            amount: 30000,
-            returnUrl: "https://localhost",
-            ipAdress: "192.168.1.168",
-            vnpayHashKey: "GTY1T76QPSOLJ6TTSE3II4QFKU0M8Q0S",
-            vnPayHashType: VNPayHashType.HMACSHA512,
-            vnpayExpireDate: DateTime.now().add(Duration(days: 1)));
-        await show(paymentUrl: paymentUrl, context: context,
-          onPaymentSuccess: (params) {
-            print("Payment success: '$params'.");
-          },
-          onPaymentError: (params) {
-            print("Payment error: '$params'.");
-          },
-          );
-        
-      } on PlatformException catch (e) {
-          print("Failed to Invoke: '${e.message}'.");
-          print("Thanh toán thất bại");
-        }
-      catch (e) {
-        print("Failed to Invoke: '${e.toString()}'.");
-        print("Thanh toán thất bại");
-      }
-    }
 
     setState(() {
       isProcessing = true;
     });
 
     try {
-      bool paymentSuccess = false;
+      // Dispatch event based on selected payment method
+      if (selectedPaymentMethod == 'zalopay') {
+        // Call the ZaloPay payment processing BLoC event
+        BlocProvider.of<PaymentBloc>(context).add(ProcessZaloPayPayment(totalAmount));
+      } else if (selectedPaymentMethod == 'card' || selectedPaymentMethod == 'visa') {
+        // Process Stripe payment
+        await StripePaymentService.instance.processPaymentWithSheet(totalAmount);
+        return;
+      } 
+      // Add other payment processing logic (like MoMo, VNPay, etc.) here...
       
-      // Process payment based on the selected method
-      if (selectedPaymentMethod == 'card' || selectedPaymentMethod == 'visa') {
-        // Process card payment through Stripe
-        if (selectedCard != null) {
-          final result = await StripePaymentService.instance.processPayment(
-            selectedCard!, 
-            totalAmount,
-          );
-          paymentSuccess = result['status'] == 'succeeded';
-        } else {
-          // This shouldn't happen as we check for card selection above
-          throw Exception('No card selected');
-        }
-      } else {
-        // For other payment methods, just simulate success
-        // In a real app, you would integrate with respective payment gateways
-        await Future.delayed(Duration(seconds: 2));
-        paymentSuccess = true;
-      }
-      
-      if (paymentSuccess) {
-        // Generate a transaction ID (in a real app, this would come from the backend)
-        final String transactionId = 'CGV${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
-        
-        // Navigate to success page
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PaymentSuccessPage(
-              movieTitle: widget.movieTitle,
-              theaterName: widget.theaterName,
-              showDate: widget.showDate,
-              showTime: widget.showTime,
-              selectedSeats: widget.selectedSeats,
-              transactionId: transactionId,
-            ),
-          ),
-        );
-      } else {
-        setState(() {
-          isProcessing = false;
-        });
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Thanh toán thất bại. Vui lòng thử lại sau.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
     } catch (e) {
       setState(() {
         isProcessing = false;
       });
-      
+
+      // Handle exceptions accordingly
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Có lỗi xảy ra: ${e.toString()}'),
+          content: Text('An error occurred: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -351,88 +391,95 @@ class _PaymentPageState extends State<PaymentPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        title: Text(
-          'Thanh toán',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text('Thanh toán', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Colors.red),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: isProcessing
-        ? Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4CAF50)),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Đang xử lý thanh toán...',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
+      body: BlocListener<PaymentBloc, PaymentState>(
+        listener: (context, state) {
+          if (state is PaymentProcessing) {
+            setState(() {
+              isProcessing = true; // Show loading indicator
+            });
+          } else if (state is PaymentSuccess) {
+            setState(() {
+              isProcessing = false;
+              // Navigate to success page
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentSuccessPage(
+                    movieTitle: widget.movieTitle,
+                    theaterName: widget.theaterName,
+                    showDate: widget.showDate,
+                    showTime: widget.showTime,
+                    selectedSeats: widget.selectedSeats,
+                    transactionId: state.transactionId,
                   ),
                 ),
-              ],
-            ),
-          )
-        : SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Ticket information card
-                  _buildTicketInfoCard(),
-                  SizedBox(height: 20),
-                  
-                  // Voucher/Coupon Section
-                  _buildVoucherSection(),
-                  SizedBox(height: 20),
-                  
-                  // Payment methods
-                  Text(
-                    'Phương thức thanh toán',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  _buildPaymentMethodsList(),
-                  SizedBox(height: 20),                    
-                  // Checkout button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => processPayment(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF4CAF50),
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+              );
+            });
+          } else if (state is PaymentFailure) {
+            setState(() {
+              isProcessing = false; // Hide loading indicator
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Payment failed: ${state.error}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          } else if (state is PaymentCanceled) {
+            setState(() {
+              isProcessing = false; // Hide loading indicator
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Payment canceled'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+        },
+        child: isProcessing
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Build the ticket information card
+                    _buildTicketInfoCard(),
+                    SizedBox(height: 20),
+                    // Build voucher section
+                    _buildVoucherSection(),
+                    SizedBox(height: 20),
+                    // Build payment methods list
+                    Text('Phương thức thanh toán', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 10),
+                    _buildPaymentMethodsList(),
+                    SizedBox(height: 20),
+                    // Checkout button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => processPayment(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF4CAF50),
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                      ),
-                      child: Text(
-                        'THANH TOÁN ${totalAmount.toStringAsFixed(0)} đ',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        child: Text('THANH TOÁN ${totalAmount.toStringAsFixed(0)} đ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
+      ),
     );
   }
 
@@ -641,9 +688,6 @@ class _PaymentPageState extends State<PaymentPage> {
           ),
           child: InkWell(
             onTap: () {
-              if (method['id'] == 'card' || method['id'] == 'visa') {
-                progressStripePayment();
-              }
               setState(() {
                 selectedPaymentMethod = method['id'];
                 // Clear selected card when changing payment method
@@ -675,6 +719,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     ),
                   ),
                   SizedBox(width: 16),
+                  
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -743,6 +788,17 @@ Future<void> show({
                   }
                 }
                 Navigator.of(context).pop();
+              }
+            },
+            onPageFinished: (String url) {
+              print(url);
+              // Kiểm tra nếu URL chứa `vnp_ReturnUrl`
+              if (url.contains("vnp_ReturnUrl")) {
+                Uri uri = Uri.parse(url);
+                String responseCode = uri.queryParameters["vnp_ResponseCode"] ?? "99";
+
+                // Đóng WebView và trả về kết quả
+                Navigator.pop(context, responseCode == "00" ? "success" : "failed");
               }
             },
           ),

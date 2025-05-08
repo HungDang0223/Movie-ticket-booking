@@ -8,7 +8,6 @@ import 'package:movie_tickets/injection.dart';
 import 'package:movie_tickets/features/authentication/data/models/auth_response.dart';
 import 'package:movie_tickets/features/authentication/data/models/user_model.dart';
 import 'package:movie_tickets/features/authentication/domain/repositories/auth_repository.dart';
-import 'package:movie_tickets/user_remote_resource.dart';
 
 class LoginUseCase implements UseCase<LoginResponse, SignInParams> {
   final AuthRepository _repository;

@@ -25,8 +25,9 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
       await Future.delayed(Duration(seconds: 2));
 
       if (isSignedIn) {
-        final name = authRepository.getCurrentUser().data!.fullName;
-        emit(Authenticated(name ?? 'name'));
+        final result = await authRepository.getCurrentUser();
+        final name = result.data!.fullName;
+        emit(Authenticated(name));
       } else {
         emit(Unauthenticated());
       }
@@ -36,9 +37,10 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
   }
 
   Future<void> _onLoggedIn(LoggedIn event, Emitter<AuthenticationState> emit) async {
-    final name = authRepository.getCurrentUser().data!.fullName;
-    print(authRepository.getCurrentUser().data!.fullName);
-    emit(Authenticated(name ?? "name"));
+    final result = await authRepository.getCurrentUser();
+    final name = result.data!.fullName;
+    print(name);
+    emit(Authenticated(name));
   }
 
   void _onLoggedOut(LoggedOut event, Emitter<AuthenticationState> emit) {

@@ -5,21 +5,23 @@ import '../../data/models/payment_card.dart';
 import '../../domain/services/card_service.dart';
 import '../../domain/services/stripe_payment_service.dart';
 import '../../../../core/configs/payment_config.dart';
+import 'package:flutter/cupertino.dart';
 
 class PaymentCardBottomSheet extends StatefulWidget {
   final Function(PaymentCard) onCardSelected;
   final double amount;
+  
 
-  const PaymentCardBottomSheet({
-    Key? key,
+  PaymentCardBottomSheet({
+    super.key,
     required this.onCardSelected,
     required this.amount,
-  }) : super(key: key);
+  });
 
   static Future<PaymentCard?> show(BuildContext context, double amount) async {
     // On web platform, we'll use a simulated card for demo purposes
     if (kIsWeb) {
-      return PaymentCard(
+      return const PaymentCard(
         id: 'web_demo_card',
         cardNumber: '4242424242424242',
         expiryDate: '12/25',
@@ -59,7 +61,9 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
   final _cardFormKey = GlobalKey<FormState>();
   final _cardFormController = CardFormEditController();
   final _cardHolderNameController = TextEditingController();
-  bool _isProcessing = false;
+  bool _isPaymentProcessing = false;
+
+  final scaffoldMessenger = GlobalKey<ScaffoldMessengerState>();
 
   @override
   void initState() {
@@ -94,50 +98,35 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
     }
   }
 
-  Future<void> _handlePayment() async {
-    if (!_cardFormKey.currentState!.validate()) return;
-
-    setState(() {
-      _isProcessing = true;
-    });
-
-    try {
-      final cardDetails = _cardFormController.details;
-      final card = PaymentCard(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        cardNumber: cardDetails.number ?? '',
-        expiryDate: '${cardDetails.expiryMonth}/${cardDetails.expiryYear}',
-        cardHolderName: _cardHolderNameController.text,
-        cvvCode: cardDetails.cvc ?? '',
-      );
-
-      if (_saveCard) {
-        await _cardService.saveCard(card);
-      }
-
-      widget.onCardSelected(card);
-      Navigator.pop(context);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error processing payment: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      setState(() {
-        _isProcessing = false;
-      });
-    }
+  Future<bool> _confirmCancel() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('Cancel Payment?'),
+        content: const Text('Are you sure you want to cancel this payment?'),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('No'),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: const Text('Yes'),
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.85,
+        maxHeight: MediaQuery.of(context).size.height * 0.45,
       ),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.black,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
@@ -147,13 +136,26 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildHeader(),
+          _isPaymentProcessing
+              ? _buildProcessingHeader()
+              : _buildHeader(),
           Flexible(
-            child: _isLoading
-                ? _buildLoadingIndicator()
-                : _showAddCard
-                    ? _buildCardForm()
-                    : _buildSavedCards(),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+              },
+              child: _isPaymentProcessing
+                  ? _buildProcessingPayment()
+                  : _isLoading
+                      ? _buildLoadingIndicator()
+                      : _showAddCard
+                          ? _buildCardForm()
+                          : _buildSavedCards(),
+            ),
           ),
         ],
       ),
@@ -162,143 +164,56 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            _showAddCard ? 'Add Payment Card' : 'Select Payment Card',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Row(
-            children: [
-              if (!_showAddCard)
-                TextButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _showAddCard = true;
-                    });
-                  },
-                  icon: Icon(Icons.add, color: Colors.green),
-                  label: Text(
-                    'New',
-                    style: TextStyle(color: Colors.green),
-                  ),
-                ),
-              if (_showAddCard && _savedCards.isNotEmpty)
-                TextButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _showAddCard = false;
-                    });
-                  },
-                  icon: Icon(Icons.credit_card, color: Colors.blue),
-                  label: Text(
-                    'Saved',
-                    style: TextStyle(color: Colors.blue),
-                  ),
-                ),
-              IconButton(
-                icon: Icon(Icons.close, color: Colors.white),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLoadingIndicator() {
-    return Center(
-      child: CircularProgressIndicator(),
-    );
-  }
-
-  Widget _buildCardForm() {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16),
-      child: Form(
-        key: _cardFormKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: SingleChildScrollView(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            TextField(
-              controller: _cardHolderNameController,
-              style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                labelText: 'Card Holder Name',
-                labelStyle: TextStyle(color: Colors.grey),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey.shade800),
-                  borderRadius: BorderRadius.circular(8),
+            Flexible(
+              child: Text(
+                _showAddCard ? 'Add Payment Card' : 'Select Payment Card',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue),
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-            SizedBox(height: 16),
-            CardFormField(
-              controller: _cardFormController,
-              style: CardFormStyle(
-                textColor: Colors.white,
-                placeholderColor: Colors.grey,
-                backgroundColor: Colors.grey.shade900,
-                borderColor: Colors.grey.shade800,
-              ),
-            ),
-            SizedBox(height: 16),
             Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Checkbox(
-                  value: _saveCard,
-                  onChanged: (value) {
-                    setState(() {
-                      _saveCard = value ?? false;
-                    });
-                  },
-                ),
-                Text(
-                  'Save card for future payments',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
+                if (!_showAddCard)
+                  TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _showAddCard = true;
+                      });
+                    },
+                    icon: const Icon(Icons.add, color: Colors.green),
+                    label: const Text(
+                      'New',
+                      style: TextStyle(color: Colors.green),
+                    ),
                   ),
+                if (_showAddCard && _savedCards.isNotEmpty)
+                  TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _showAddCard = false;
+                      });
+                    },
+                    icon: const Icon(Icons.credit_card, color: Colors.blue),
+                    label: const Text(
+                      'Saved',
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                  ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
                 ),
               ],
-            ),
-            SizedBox(height: 24),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF4CAF50),
-                padding: EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              onPressed: _isProcessing ? null : _handlePayment,
-              child: _isProcessing
-                  ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : Text(
-                      'PAY ${widget.amount.toStringAsFixed(0)} đ',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
             ),
           ],
         ),
@@ -306,9 +221,96 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
     );
   }
 
+  Widget _buildLoadingIndicator() {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _buildCardForm() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TextField(
+            controller: _cardHolderNameController,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              labelText: 'Card Holder Name',
+              labelStyle: const TextStyle(color: Colors.grey),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey.shade800),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: const BorderSide(color: Colors.blue),
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          CardFormField(
+            controller: _cardFormController,
+            style: CardFormStyle(
+              textColor: Colors.white,
+              placeholderColor: Colors.grey,
+              backgroundColor: Colors.grey.shade900,
+              borderColor: Colors.grey.shade800,
+            ),
+            enablePostalCode: false,
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Checkbox(
+                value: _saveCard,
+                onChanged: (value) {
+                  setState(() {
+                    _saveCard = value ?? false;
+                  });
+                },
+                fillColor: WidgetStateProperty.resolveWith(
+                  (states) => states.contains(WidgetState.selected) 
+                      ? const Color(0xFF4CAF50) 
+                      : Colors.grey,
+                ),
+              ),
+              const Text(
+                'Save card for future payments',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF4CAF50),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: _isPaymentProcessing ? null : _handlePayment,
+            child: Text(
+              'PAY ${widget.amount.toStringAsFixed(0)} đ',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSavedCards() {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: _savedCards.map((card) => _buildCardItem(card)).toList(),
       ),
@@ -317,12 +319,12 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
 
   Widget _buildCardItem(PaymentCard card) {
     return Container(
-      margin: EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: card.isDefault
-              ? [Color(0xFF1E3C72), Color(0xFF2A5298)]
-              : [Color(0xFF363636), Color(0xFF1C1C1C)],
+              ? [const Color(0xFF1E3C72), const Color(0xFF2A5298)]
+              : [const Color(0xFF363636), const Color(0xFF1C1C1C)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -333,10 +335,10 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
         ),
       ),
       child: InkWell(
-        onTap: () => widget.onCardSelected(card),
+        onTap: () => _handleSavedCardPayment(card),
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -346,7 +348,7 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
                   Expanded(
                     child: Text(
                       card.cardHolderName,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -356,22 +358,22 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text(
                 card.maskedCardNumber,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   letterSpacing: 2,
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Expires: ${card.expiryDate}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 14,
                     ),
@@ -379,7 +381,7 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
                   Row(
                     children: [
                       if (card.isDefault)
-                        Chip(
+                        const Chip(
                           label: Text(
                             'Default',
                             style: TextStyle(
@@ -397,7 +399,7 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
                             await _cardService.setDefaultCard(card.id);
                             _loadSavedCards();
                           },
-                          child: Text(
+                          child: const Text(
                             'Set Default',
                             style: TextStyle(
                               color: Colors.blue,
@@ -405,19 +407,19 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
                             ),
                           ),
                           style: TextButton.styleFrom(
-                            minimumSize: Size(0, 0),
-                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            minimumSize: const Size(0, 0),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                         ),
                       IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red, size: 20),
+                        icon: const Icon(Icons.delete, color: Colors.red, size: 20),
                         onPressed: () async {
                           await _cardService.deleteCard(card.id);
                           _loadSavedCards();
                         },
-                        constraints: BoxConstraints(),
-                        padding: EdgeInsets.all(4),
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(4),
                       ),
                     ],
                   ),
@@ -428,5 +430,204 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
         ),
       ),
     );
+  }
+
+  Widget _buildProcessingHeader() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey.shade800,
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Thanh toán',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (await _confirmCancel()) {
+                if (mounted) {
+                  setState(() {
+                    _isPaymentProcessing = false;
+                  });
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Payment cancelled'),
+                      backgroundColor: Colors.orange,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text(
+              'Hủy',
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProcessingPayment() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(
+            width: 48,
+            height: 48,
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              strokeWidth: 3,
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'Processing your payment...',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handlePayment() async {
+    final cardDetails = _cardFormController.details;
+    
+    if (!cardDetails.complete) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please complete all card details'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    if (_cardHolderNameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter card holder name'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isPaymentProcessing = true;
+    });
+
+    try {
+      // Create card object
+      final card = PaymentCard(
+        id: 'card_${DateTime.now().millisecondsSinceEpoch}',
+        cardNumber: cardDetails.number ?? '',
+        expiryDate: '${cardDetails.expiryMonth}/${cardDetails.expiryYear}',
+        cardHolderName: _cardHolderNameController.text.trim(),
+        cvvCode: cardDetails.cvc ?? '',
+      );
+
+      // Process payment
+      final result = await StripePaymentService.instance.processPayment(
+        card,
+        widget.amount,
+      );
+
+      if (result['status'] == 'succeeded') {
+        // Save card if checkbox is checked
+        if (_saveCard) {
+          await _cardService.saveCard(card);
+        }
+
+        if (mounted) {
+          Navigator.pop(context, card);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Payment successful!'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } else {
+        throw Exception('Payment failed');
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Payment failed: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleSavedCardPayment(PaymentCard card) async {
+    setState(() {
+      _isPaymentProcessing = true;
+    });
+
+    try {
+      final result = await StripePaymentService.instance.processPayment(
+        card,
+        widget.amount,
+      );
+
+      if (result['status'] == 'succeeded') {
+        if (mounted) {
+          Navigator.pop(context, card);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Payment successful!'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } else {
+        throw Exception('Payment failed');
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Payment failed: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 } 

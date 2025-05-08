@@ -3,10 +3,8 @@ import 'package:movie_tickets/core/constants/my_const.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_tickets/features/authentication/domain/repositories/auth_repository.dart';
-import 'package:movie_tickets/features/authentication/presentation/bloc/auth_bloc/authentication_bloc.dart';
-
 import '../../widgets/widgets.dart';
-import '../../bloc/login_bloc/bloc/bloc.dart';
+import '../../bloc/login_bloc/bloc.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -34,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
           color: AppColor.DEFAULT,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
+            children: [
               Flexible(
                 flex: 2,
                 child: Center(child: _buildTopWelcome(),),

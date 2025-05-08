@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:movie_tickets/app.dart';
-import 'package:movie_tickets/config/firebase_options.dart';
+import 'package:movie_tickets/core/configs/firebase_options.dart';
 import 'package:movie_tickets/core/utils/simple_bloc_observer.dart';
 import 'package:movie_tickets/injection.dart' as di;
 import 'package:movie_tickets/core/configs/payment_config.dart';
@@ -14,6 +14,7 @@ void main() async {
   
   // Initialize Stripe
   Stripe.publishableKey = PaymentConfig.stripePublishableKey;
+  await Stripe.instance.applySettings();
   
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await di.init();

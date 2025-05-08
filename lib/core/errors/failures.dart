@@ -3,6 +3,10 @@ abstract class Failure {
   Failure(this.message);
 }
 
+class DioExceptionFailure extends Failure {
+  DioExceptionFailure(super.message);
+}
+
 class ServerFailure extends Failure {
   ServerFailure(super.message);
 }

@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_stripe/flutter_stripe.dart';
-import '../models/payment_card.dart';
+import '../../data/models/payment_card.dart';
 import '../../../../core/configs/payment_config.dart';
 
 class StripePaymentService {
@@ -16,39 +16,32 @@ class StripePaymentService {
   static StripePaymentService get instance => _instance;
 
   final Dio _dio = Dio(
-  BaseOptions(
-    baseUrl: 'https://api.stripe.com/v1',
-    headers: {
-      'Authorization': 'Bearer ${PaymentConfig.stripeSecretKey}',
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    contentType: 'application/x-www-form-urlencoded',
-  ),
-);
-
-// Create Payment Intent
-Future<String?> createPaymentIntent(double amount, String currency) async {
-  _dio.interceptors.add(
-    LogInterceptor(
-      request: true,
-      requestBody: true,
-      responseBody: true,
+    BaseOptions(
+      baseUrl: 'https://api.stripe.com/v1',
+      headers: {
+        'Authorization': 'Bearer ${PaymentConfig.stripeSecretKey}',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      contentType: 'application/x-www-form-urlencoded',
     ),
   );
 
-  final data = {
-    'amount': amount.round().toString(),  // Stripe expects amount in cents
-    'currency': currency,
-    'payment_method_types[]': 'card',  // Encode array as indexed keys
-  };
-
+// Create Payment Intent
+Future<String?> createPaymentIntent(double amount, String currency) async {
   try {
-    final response = await _dio.post('/payment_intents', data: data);
+    final response = await _dio.post(
+      '/payment_intents',
+      data: {
+        'amount': amount.round().toString(), // Convert to smallest currency unit
+        'currency': currency,
+        'payment_method_types[]': 'card',
+      },
+    );
 
     return response.data['client_secret'];
   } catch (e) {
     print('Error creating payment intent: $e');
-    return null;
+    rethrow;
   }
 }
 
@@ -62,7 +55,7 @@ Future<String?> createPaymentIntent(double amount, String currency) async {
       
       // Step 1: Create a payment intent
       final clientSecret = await createPaymentIntent(amount, currency);
-      
+      print('Client secret: $clientSecret');
       // Step 2: Confirm payment with the card details
       // In a real app, you'd use the card collected by the payment sheet
       final billingDetails = BillingDetails(
@@ -78,6 +71,7 @@ Future<String?> createPaymentIntent(double amount, String currency) async {
           ),
         ),
       );
+      print('Payment method: $paymentMethod');
       
       // Confirm the payment with the created payment method
       final result = await Stripe.instance.confirmPayment(
@@ -103,7 +97,7 @@ Future<String?> createPaymentIntent(double amount, String currency) async {
   }
   
   // Process payment using the PaymentSheet (recommended way)
-  Future processPaymentWithSheet(double amount, {String currency = 'vnd'}) async {
+  Future<PaymentIntent?> processPaymentWithSheet(double amount, {String currency = 'vnd'}) async {
     try {
       
       // Step 1: Create a payment intent
@@ -113,11 +107,13 @@ Future<String?> createPaymentIntent(double amount, String currency) async {
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: clientSecret,
           merchantDisplayName: PaymentConfig.merchantName,
+          customFlow: true,
+          allowsDelayedPaymentMethods: false,
           intentConfiguration: IntentConfiguration(
             paymentMethodTypes: [
               'card',
             ],
-            mode: IntentMode.paymentMode(currencyCode: currency, amount: amount.round()),
+            mode: IntentMode.paymentMode(currencyCode: currency, amount: amount.round(), setupFutureUsage: IntentFutureUsage.OffSession),
           ),
           appearance: PaymentSheetAppearance(
             colors: PaymentSheetAppearanceColors(
@@ -137,11 +133,14 @@ Future<String?> createPaymentIntent(double amount, String currency) async {
         )
       );
 
-      final a = await Stripe.instance.confirmPayment(
+      await Stripe.instance.confirmPaymentSheetPayment();
+
+      final intent = await Stripe.instance.confirmPayment(
         paymentIntentClientSecret: clientSecret!,
       );
 
-      print(a.status.name);
+      print(intent.status.name);
+      return intent;
     } catch (e) {
       print('Error presenting payment sheet: $e');
       
@@ -149,5 +148,6 @@ Future<String?> createPaymentIntent(double amount, String currency) async {
         print('StripeException: ${e.error.message}');
         }
       }
+      return null;
     }
   }

@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:movie_tickets/core/configs/size_config.dart';
+import 'package:movie_tickets/core/extensions/date_time_ext.dart';
+import 'package:movie_tickets/core/extensions/num_ext.dart';
 import 'package:movie_tickets/core/utils/multi_devices.dart';
+import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
 
 import '../../../../core/constants/my_const.dart';
 
 class MovieDescription extends StatelessWidget {
   const MovieDescription({
     super.key,
-    required this.movieInfo,
+    required this.movie,
   });
 
-  final List<Map<String, String>> movieInfo;
+  final MovieModel movie;
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +34,8 @@ class MovieDescription extends StatelessWidget {
                         width: MultiDevices.getValueByScale(SizeConfig.screenWidth! * 0.28),
                         height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.22),
                         decoration: BoxDecoration(
-                          image: const DecorationImage(
-                            image: NetworkImage(tempNetwordImage),
+                          image: DecorationImage(
+                            image: NetworkImage(movie.posterUrl ?? tempNetwordImage),
                             fit: BoxFit.cover,
                           ),
                           borderRadius: BorderRadius.circular(10),
@@ -46,17 +49,19 @@ class MovieDescription extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(left: 10),
+                        margin: EdgeInsets.only(left: 10, right: 10),
+                        
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.11),
+                                height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.10),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     Text(
-                                      "Bộ tứ báo thủ".toUpperCase(),
+                                      movie.title,
+                                      overflow: TextOverflow.ellipsis,
                                       style: MultiDevices.getStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
@@ -77,30 +82,30 @@ class MovieDescription extends StatelessWidget {
                                         padding: const EdgeInsets.all(2),
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(5),
-                                          border: Border.all(width: 1, color: AppColor.BLACK_30),
+                                          border: Border.all(width: 1, color: AppColor.WHITE),
                                         ),
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            const Icon(Icons.calendar_month_outlined, color: AppColor.BLACK, size: 15),
+                                            const Icon(Icons.calendar_month_outlined, color: AppColor.WHITE, size: 14),
                                             const SizedBox(width: 5),
-                                            Text("29/01/2025", style: MultiDevices.getStyle(fontSize: 14)),
+                                            Text(movie.releaseDate.toFormattedString(), style: MultiDevices.getStyle(fontSize: 12)),
                                           ],
                                         ),
                                       ),
-                                      const SizedBox(width: 10),
+                                      const SizedBox(width: 5),
                                       Container(
                                         padding: const EdgeInsets.all(2),
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(5),
-                                          border: Border.all(width: 1, color: AppColor.BLACK_30),
+                                          border: Border.all(width: 1, color: AppColor.WHITE),
                                         ),
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            const Icon(Icons.access_time, color: AppColor.BLACK, size: 15),
+                                            const Icon(Icons.access_time, color: AppColor.WHITE, size: 14),
                                             const SizedBox(width: 5),
-                                            Text("2 giờ 12 phút", style: MultiDevices.getStyle(fontSize: 14)),
+                                            Text(movie.duration.formatDuration(), style: MultiDevices.getStyle(fontSize: 12)),
                                           ],
                                         ),
                                       ),
@@ -112,7 +117,7 @@ class MovieDescription extends StatelessWidget {
                                     children: [
                                       const Icon(Icons.favorite_border_outlined, color: AppColor.DEFAULT, size: 17),
                                       const SizedBox(width: 5),
-                                      const Text("5139", style: TextStyle(color: AppColor.BLACK)),
+                                      const Text("5139", style: TextStyle(color: AppColor.WHITE)),
                                       const SizedBox(width: 10),
                                       InkWell(
                                         onTap: () {},
@@ -133,9 +138,9 @@ class MovieDescription extends StatelessWidget {
           ],
         ),
         SizedBox(height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.11) + 10),
-        const Text(
-          "Bộ tứ báo thù bao gồm Chết-Xi-Cà, Dì Bốn, Cậu Mười Một, Con Kiều chính thức xuất hiện cùng với phi vụ báo thù thế kỉ...",
-          style: TextStyle(fontSize: 14, color: Colors.black),
+        Text(
+          movie.synopsis,
+          style: TextStyle(fontSize: 15, color: AppColor.WHITE),
           textAlign: TextAlign.justify,
           maxLines: 4,
           overflow: TextOverflow.clip,
@@ -146,20 +151,20 @@ class MovieDescription extends StatelessWidget {
             0: FlexColumnWidth(1),
             1: FlexColumnWidth(2),
           },
-          children: movieInfo.map((info) {
-            return TableRow(
-              children: [
-                Text(
-                  info["title"]!,
-                  style: MultiDevices.getStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(right: 15, bottom: 4),
-                  child: Text(info["value"]!, textAlign: TextAlign.start),
-                ),
-              ],
-            );
-          }).toList(),
+          children: movie.movieInfo().entries.map((entry) {
+              return TableRow(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(entry.key, style: TextStyle(fontWeight: FontWeight.bold, color: AppColor.WHITE)),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(entry.value.toString(), style: MultiDevices.getStyle(),),
+                  ),
+                ],
+              );
+            }).toList(),
         ),
       ],
     );

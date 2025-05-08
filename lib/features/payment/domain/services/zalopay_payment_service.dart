@@ -14,7 +14,7 @@ class ZalopayPaymentService {
 
   static ZalopayPaymentService get instance => _instance;
   
-  Future<ZalopayOrderResponse?> createOrder(int price) async {
+  Future<ZalopayOrderResponse?> createOrder(int amount) async {
     var header = <String, String>{};
     header["Content-Type"] = "application/x-www-form-urlencoded";
 
@@ -22,7 +22,7 @@ class ZalopayPaymentService {
     body["app_id"] = ZaloPayConfig.appId;
     body["app_user"] = ZaloPayConfig.appUser;
     body["app_time"] = DateTime.now().millisecondsSinceEpoch.toString();
-    body["amount"] = price.toStringAsFixed(0);
+    body["amount"] = amount.toStringAsFixed(0);
     body["app_trans_id"] = getAppTransId();
     body["embed_data"] = "{}";
     body["item"] = "[]";

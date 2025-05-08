@@ -1,6 +1,6 @@
 import 'package:movie_tickets/core/utils/multi_devices.dart';
 import 'package:movie_tickets/core/utils/validators.dart';
-import 'package:movie_tickets/features/home/presentation/pages/home_page.dart';
+import 'package:movie_tickets/features/movies/presentation/pages/home_page.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/auth_bloc/bloc.dart';
 import 'package:movie_tickets/injection.dart';
 import 'package:movie_tickets/core/constants/my_const.dart';
@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_tickets/features/authentication/presentation/widgets/widget_btn_social.dart';
 
-import '../bloc/login_bloc/bloc/bloc.dart';
+import '../bloc/login_bloc/bloc.dart';
 
 class WidgetLoginForm extends StatefulWidget {
   @override
@@ -21,7 +21,7 @@ class _WidgetLoginFormState extends State<WidgetLoginForm> {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>(); // Form key for validation
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -38,12 +38,13 @@ class _WidgetLoginFormState extends State<WidgetLoginForm> {
         print("Current state: $state");
         if (state is LoginSuccess) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.of(context).pushNamed('/home');
+            Navigator.of(context).pushReplacementNamed('/home');
           });
         }
     
         if (state is LoginFailed) {
-          ScaffoldMessenger.of(context)
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context)
             ..removeCurrentSnackBar()
             ..showSnackBar(
               SnackBar(
@@ -51,18 +52,18 @@ class _WidgetLoginFormState extends State<WidgetLoginForm> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text('Đăng nhập thất bại.\n${state.message}'),
-                    const Icon(Icons.error),
+                    const Icon(Icons.error, color: Colors.red),
                   ],
                 ),
-                backgroundColor: AppColor.DEFAULT,
+                backgroundColor: AppColor.WHITE,
               ),
             );
+          });
+          
         }
         if (state is LoginLoading) {
           return Container(
-            height: double.infinity,
-            width: double.infinity,
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withOpacity(0.3),
             child: const Center(child: CircularProgressIndicator()),
           );
       }
@@ -169,7 +170,7 @@ class _WidgetLoginFormState extends State<WidgetLoginForm> {
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             context.read<LoginBloc>().add(LoginSubmitEmailPasswordEvent(
-              email: _emailController.text,
+              emailPhone: _emailController.text,
               password: _passwordController.text,
             ));
           }

@@ -13,8 +13,7 @@ abstract class AuthRepository {
     DateTime? dateOfBirth,
     String? gender
   );
-  Future<Result<UserModel>> logInWithGoogle();
   Future<void> logOut();
   Future<bool> isSignedIn();
-  Result<UserModel> getCurrentUser();
+  Future<Result<UserModel>> getCurrentUser();
 }

@@ -34,6 +34,7 @@
         </activity>
         <activity
             android:name=".FragmentHostActivity"
+            exported = "true"
             android:launchMode="singleTop"
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="adjustResize"/>

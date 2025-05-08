@@ -9,12 +9,14 @@ class BookingButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushNamed('/showing_movie_booking');
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColor.DEFAULT,
               padding: const EdgeInsets.symmetric(vertical: 4),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(20),
               ),
             ),
             child: Text(

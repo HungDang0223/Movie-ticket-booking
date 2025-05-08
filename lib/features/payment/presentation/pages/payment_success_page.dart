@@ -212,7 +212,7 @@ class PaymentSuccessPage extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.of(context).pushNamed('/home');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF4CAF50),

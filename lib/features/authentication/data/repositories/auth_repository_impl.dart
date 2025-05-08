@@ -17,6 +17,9 @@ import 'package:movie_tickets/features/authentication/data/models/auth_response.
 import 'package:movie_tickets/features/authentication/data/models/user_model.dart';
 import 'package:movie_tickets/features/authentication/domain/repositories/auth_repository.dart';
 
+String accessToken = "";
+String refreshToken = "";
+
 class AuthReposImpl implements AuthRepository {
   
   final _prefs = sl<SharedPrefService>();
@@ -24,6 +27,7 @@ class AuthReposImpl implements AuthRepository {
   final String isLoggedInKey = "is_logged_in";
   final dio = sl<Dio>();
   final AuthRemoteDatasource _authRemoteDataSource = AuthRemoteDatasource(sl<Dio>());
+  final AuthLocalDataSource _authLocalDataSource = AuthLocalDataSource();
 
   @override
   Future<Result<SignupResponse>> signUpWithUserInfo(String fullName, String email, String phone, String password, String address, DateTime? birthDate, String? gender) async {
@@ -40,7 +44,7 @@ class AuthReposImpl implements AuthRepository {
         "dateOfBirth": formattedDateOfBirth,
         "address": address
       };
-      log("Data: $body", name: "Sign up UC");
+      log("Body: $body", name: "Sign up UC");
       final httpResponse = await _authRemoteDataSource.signUpWithUserInfo(body);
       log("Response: ${httpResponse.data}", name: "Sign up UC");
       if (httpResponse.response.statusCode == HttpStatus.ok) {
@@ -61,27 +65,35 @@ class AuthReposImpl implements AuthRepository {
     } on NetworkException catch (e) {
       return Result.fromFailure(NetworkFailure(e.message));
     } on DioException catch (e) {
-      return Result.fromFailure(ServerFailure("DioException: ${e.message}"));
+      return Result.fromFailure(DioExceptionFailure("DioException: ${e.message}"));
     } catch (e) {
       return Result.fromFailure(ServerFailure("Unexpected error occurred: $e"));
     }
   }
   
   @override
-  Result<UserModel> getCurrentUser() {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-    final GoogleSignInAccount? account = googleSignIn.currentUser;
-    if (account == null) {
-      return Result.fromFailure(ServerFailure("No user is currently signed in"));
+  Future<Result<UserModel>> getCurrentUser() async   {
+    final savedUser = await _authLocalDataSource.getUserData();
+    if (savedUser != null) {
+      return Result.success(savedUser);
     }
-    final user = UserModel.fromGoogleSignInAccount(account);
-    
-    return Result.success(user);
+    return Result.fromFailure(ServerFailure("No user is currently signed in"));
   }
   
   @override
   Future<bool> isSignedIn() async {
-    bool isSignedIn = await _prefs.getValue(isLoggedInKey, type: bool) ?? false;
+    bool isSignedIn = await _authLocalDataSource.isLoggedIn();
+    print("fsmdfosdmf"+isSignedIn.toString());
+    if (isSignedIn) {
+      final isExpired = await _authLocalDataSource.isLoginSessionExpired();
+      if (isExpired) {
+        await logOut();
+        isSignedIn = false;
+      } else {
+        final user = await getCurrentUser();
+        refreshToken = user.data?.refreshToken ?? "";
+      }
+    }
     return isSignedIn;
   }
   
@@ -89,21 +101,15 @@ class AuthReposImpl implements AuthRepository {
   Future<Result<LoginResponse>> logInWithEmailOrPhoneAndPassword(String emailOrPhone, String password) async {
     try {
       final body = {"emailOrPhone": emailOrPhone, "password": password};
-      
-      // final response = await dio.post("http://192.168.1.2:5000/api/v1/Auth/login", data: body);
-      // final data = response.data;
-      // print(data);
-      // final authRes = LoginResponse.fromJson(response.data);
-      // return Result.success(authRes); // run correct
       try {
         final httpResponse = await _authRemoteDataSource.logInWithEmailOrPhoneAndPassword(body);
+        
         log("Response: ${httpResponse.response.statusCode}", name: "Log in UC");
 
         if (httpResponse.response.statusCode == HttpStatus.ok) {
           final loginRes = httpResponse.data;
           final user = loginRes.user;
-          await _prefs.saveValue(_userKey, user.toJson());
-          await _prefs.saveValue(isLoggedInKey, true);
+          await _authLocalDataSource.saveUserData(user);
           return Result.success(loginRes);
         } else {
           return Result.fromFailure(ServerFailure(httpResponse.response.statusMessage ?? "Unknown error"));
@@ -111,7 +117,7 @@ class AuthReposImpl implements AuthRepository {
       } on DioException catch (e) {
         log("DioException: ${e.response?.statusCode} - ${e.type.toPrettyDescription()} - ${e.message}", name: "Log in UC");
         
-        return Result.fromFailure(ServerFailure(e.type.toPrettyDescription()));
+        return Result.fromFailure(DioExceptionFailure(e.type.toPrettyDescription()));
       } catch (e) {
         log("Unknown Error: $e", name: "Log in UC");
         return Result.fromFailure(ServerFailure("Unknown Error: $e"));
@@ -122,39 +128,18 @@ class AuthReposImpl implements AuthRepository {
     } on NetworkException catch (e) {
       return Result.fromFailure(NetworkFailure(e.message));
     } on DioException catch (e) {
-      return Result.fromFailure(ServerFailure("DioExceptionnnn: ${e.message}"));
+      return Result.fromFailure(DioExceptionFailure("DioExceptionnnn: ${e.message}"));
     } catch (e) {
       return Result.fromFailure(ServerFailure("Unexpected error occurred: $e"));
     }
   }
   
   @override
-  Future<Result<UserModel>> logInWithGoogle() async {
-    final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email']);
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-    if (googleUser == null) {
-      throw Exception("Google Sign-In was canceled");
-    }
-
-    // Retrieve authentication details
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
-    if (googleAuth.idToken == null || googleAuth.accessToken == null) {
-      return Result.fromFailure(ServerFailure("Google Sign-In failed"));
-    }
-
-    final user = UserModel.fromGoogleSignInAccount(googleUser);
-    await _prefs.saveValue(_userKey, user.toJson());
-    await _prefs.saveValue(isLoggedInKey, true);
-    return Result.success(user);
-  }
-  
-  @override
   Future<void> logOut() async {
     final GoogleSignIn googleSignIn = GoogleSignIn();
     await googleSignIn.signOut();
+    await _authLocalDataSource.logout();
     await _prefs.removeValue(_userKey);
-    await _prefs.saveValue(isLoggedInKey, false);
   }
   
 }

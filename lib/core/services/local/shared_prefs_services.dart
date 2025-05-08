@@ -21,8 +21,13 @@ class SharedPrefService {
       await _prefs!.setBool(key, value);
     } else if (value is double) {
       await _prefs!.setDouble(key, value);
+    } else if (value is DateTime) {
+      // Convert DateTime to ISO string format
+      await _prefs!.setString(key, value.toIso8601String());
     } else if (value is Map<String, dynamic>) {
-      String jsonString = jsonEncode(value);
+      // Convert any DateTime values in the map to ISO strings
+      final encodableMap = _makeEncodable(value);
+      String jsonString = jsonEncode(encodableMap);
       await _prefs!.setString(key, jsonString);
     } else {
       throw Exception("Unsupported type");
@@ -41,6 +46,9 @@ class SharedPrefService {
       return _prefs!.getBool(key);
     } else if (type == double) {
       return _prefs!.getDouble(key);
+    } else if (type == DateTime) {
+      final dateStr = _prefs!.getString(key);
+      return dateStr != null ? DateTime.parse(dateStr) : null;
     } else if (type == Map<String, dynamic>) {
       String? jsonString = _prefs!.getString(key);
       return jsonString != null ? jsonDecode(jsonString) : null;
@@ -59,5 +67,15 @@ class SharedPrefService {
   Future<void> clearAll() async {
     if (_prefs == null) await init();
     await _prefs!.clear();
+  }
+
+  // Helper method to make map encodable
+  Map<String, dynamic> _makeEncodable(Map<String, dynamic> map) {
+    return map.map((key, value) {
+      if (value is DateTime) {
+        return MapEntry(key, value.toIso8601String());
+      }
+      return MapEntry(key, value);
+    });
   }
 }

@@ -1,48 +1,50 @@
-import 'package:json_annotation/json_annotation.dart';
-import 'package:equatable/equatable.dart';
+import 'package:movie_tickets/features/booking/data/models/booking_combo.dart';
+import 'package:movie_tickets/features/booking/data/models/booking_seat.dart';
+import 'package:movie_tickets/features/booking/data/models/booking_snack.dart';
+import 'package:movie_tickets/features/booking/data/models/showing.dart';
 
-part 'ticket.g.dart';
+class Ticket {
+  final int bookingId;
+  final String userId;
+  final Showing showing;
+  final DateTime bookTime;
+  final int amount;
+  final BookingSeat seats;
+  final BookingSnack snacks;
+  final BookingCombo combos;
 
-@JsonSerializable()
-class Ticket extends Equatable {
-  int id;
-
-  @JsonKey(name: "show_name")
-  String showName;
-
-  @JsonKey(name: "show_banner")
-  String showBanner;
-
-  @JsonKey(name: "show_time_slot")
-  String showTimeSlot;
-
-  @JsonKey(name: "book_time")
-  int bookTime;
-
-  @JsonKey(name: "cine_name")
-  String cineName;
-
-  String seat;
-
-  Ticket(
-    this.id,
-    this.showName,
-    this.showBanner,
-    this.showTimeSlot,
-    this.bookTime,
-    this.cineName,
-    this.seat,
-  );
-
-  factory Ticket.fromJson(Map<String, dynamic> json) => _$TicketFromJson(json);
-
-  Map<String, dynamic> toJson() => _$TicketToJson(this);
-
-  @override
-  List<Object> get props => [id];
-
-  @override
-  String toString() {
-    return 'Ticket{id: $id, showName: $showName, seat: $seat}';
+  const Ticket({
+    required this.bookingId,
+    required this.userId,
+    required this.showing,
+    required this.bookTime,
+    required this.amount,
+    required this.seats,
+    required this.snacks,
+    required this.combos,
+  });
+  factory Ticket.fromJson(Map<String, dynamic> json) {
+    return Ticket(
+      bookingId: json['bookingId'] as int,
+      userId: json['userId'] as String,
+      showing: Showing.fromJson(json['showing'] as Map<String, dynamic>),
+      bookTime: DateTime.parse(json['bookTime'] as String),
+      amount: json['amount'] as int,
+      seats: BookingSeat.fromJson(json['seats'] as Map<String, dynamic>),
+      snacks: BookingSnack.fromJson(json['snacks'] as Map<String, dynamic>),
+      combos: BookingCombo.fromJson(json['combos'] as Map<String, dynamic>),
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'bookingId': bookingId,
+      'userId': userId,
+      'showing': showing.toJson(),
+      'bookTime': bookTime.toIso8601String(),
+      'amount': amount,
+      'seats': seats.toJson(),
+      'snacks': snacks.toJson(),
+      'combos': combos.toJson(),
+    };
   }
 }

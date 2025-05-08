@@ -1,4 +1,5 @@
 import 'package:movie_tickets/core/services/local/db_helper.dart';
+import 'package:movie_tickets/features/booking/data/models/booking_seat.dart';
 import 'package:movie_tickets/features/booking/data/models/ticket.dart';
 
 class TicketDAO {
