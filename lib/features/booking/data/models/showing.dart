@@ -1,18 +1,21 @@
-class Showing {
+import 'dart:async';
+
+class ShowingMovie {
   final int showingId;
-  final String movieName;
+  final int screenId;
   final String cinemaName;
   final String screenName;
-  final DateTime startTime;
-  final DateTime endTime;
+  final String startTime;
+  final String endTime;
   final String language;
   final String subtitleLanguage;
   final String showingFormat;
   final DateTime showingDate;
+  final int seatCount;
 
-  const Showing({
+  const ShowingMovie({
     required this.showingId,
-    required this.movieName,
+    required this.screenId,
     required this.cinemaName,
     required this.screenName,
     required this.startTime,
@@ -21,34 +24,37 @@ class Showing {
     required this.subtitleLanguage,
     required this.showingFormat,
     required this.showingDate,
+    required this.seatCount,
   });
-  factory Showing.fromJson(Map<String, dynamic> json) {
-    return Showing(
+  factory ShowingMovie.fromJson(Map<String, dynamic> json) {
+    return ShowingMovie(
       showingId: json['showingId'] as int,
-      movieName: json['movieName'] as String,
+      screenId: json['screenId'] as int,
       cinemaName: json['cinemaName'] as String,
       screenName: json['screenName'] as String,
-      startTime: DateTime.parse(json['startTime'] as String),
-      endTime: DateTime.parse(json['endTime'] as String),
+      startTime: json['startTime'] as String,
+      endTime: json['endTime'] as String,
       language: json['language'] as String,
       subtitleLanguage: json['subtitleLanguage'] as String,
       showingFormat: json['showingFormat'] as String,
       showingDate: DateTime.parse(json['showingDate'] as String),
+      seatCount: json['seatCount'] as int,
     );
   }
   
   Map<String, dynamic> toJson() {
     return {
       'showingId': showingId,
-      'movieName': movieName,
+      'screenId': screenId,
       'cinemaName': cinemaName,
       'screenName': screenName,
-      'startTime': startTime.toIso8601String(),
-      'endTime': endTime.toIso8601String(),
+      'startTime': startTime,
+      'endTime': endTime,
       'language': language,
       'subtitleLanguage': subtitleLanguage,
       'showingFormat': showingFormat,
       'showingDate': showingDate.toIso8601String(),
+      'seatCount': seatCount,
     };
   }
 }

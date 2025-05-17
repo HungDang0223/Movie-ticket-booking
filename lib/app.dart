@@ -1,3 +1,4 @@
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:movie_tickets/core/commons/app_nav_bar.dart';
 import 'package:movie_tickets/core/configs/routes.dart';
 import 'package:movie_tickets/core/configs/size_config.dart';
@@ -5,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_tickets/core/constants/my_const.dart';
-import 'package:movie_tickets/features/booking/presentation/pages/showing_movie_booking.dart';
+import 'package:movie_tickets/core/constants/app_color.dart';
+import 'package:movie_tickets/features/booking/presentation/bloc/showing_movie_bloc/showing_movie_bloc.dart';
+import 'package:movie_tickets/features/booking/presentation/pages/booking_showing_movie.dart';
 import 'package:movie_tickets/features/movies/presentation/bloc/movie_bloc/movie_bloc.dart';
 import 'package:movie_tickets/features/movies/presentation/bloc/movie_bloc/movie_event.dart';
 import 'package:movie_tickets/features/movies/presentation/pages/home_page.dart';
@@ -14,13 +17,15 @@ import 'package:movie_tickets/features/payment/presentation/bloc/payment_bloc.da
 import 'package:movie_tickets/features/payment/presentation/pages/payment_page.dart';
 import 'package:movie_tickets/features/setting/domain/repositories/settings_repository.dart';
 import 'package:movie_tickets/features/setting/presentation/bloc/settings_bloc.dart';
+import 'package:movie_tickets/features/setting/presentation/bloc/setting_event.dart';
+import 'package:movie_tickets/features/setting/presentation/bloc/settings_state.dart';
 import 'package:movie_tickets/features/setting/presentation/pages/setting_page.dart';
 import 'package:movie_tickets/features/venues/presentation/pages/venues_page.dart';
 import 'package:movie_tickets/injection.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/login_bloc/bloc.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/signup_bloc/bloc.dart';
-import 'package:movie_tickets/features/authentication/presentation/pages/login/login_page.dart';
-import 'package:movie_tickets/features/authentication/presentation/pages/register/signup_page.dart';
+import 'package:movie_tickets/features/authentication/presentation/pages/login_page.dart';
+import 'package:movie_tickets/features/authentication/presentation/pages/signup_page.dart';
 import 'package:movie_tickets/features/sc_splash.dart';
 
 import 'features/authentication/presentation/bloc/auth_bloc/bloc.dart';
@@ -39,46 +44,66 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<LoginBloc>()),
         BlocProvider(create: (context) => sl<SignupBloc>()),
         BlocProvider(create: (context) => sl<PaymentBloc>()),
-        BlocProvider(create: (context) => sl<SettingsBloc>()),
-        BlocProvider(create: (context) => sl<MovieBloc>()..add(const GetListShowingMoviesEvent()),),
-      ], // Get bloc from GetIt
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        onGenerateRoute: AppRoutes.onGenerateRoutes,
-        title: 'Movie Ticket Booking',
-        theme: ThemeData(
-          brightness: Brightness.light,
-          primaryColor: AppColor.DEFAULT,
-          colorScheme: ColorScheme.fromSwatch().copyWith(secondary: AppColor.DEFAULT),
-          hoverColor: AppColor.GREEN,
-          fontFamily: 'Poppins',
-        ),
-        // supportedLocales: [
-        //   Locale('vi', 'VN'),
-        //   Locale('en', 'US')
-        // ],
-        home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-            builder: (context, state) {
-              // if (state is Uninitialized) {
-              //   return LoginPage();
-              // } else if (state is Unauthenticated) {
-              //   return LoginPage();
-              // } else if (state is Authenticated) {
-              //   return MainScreen();
-              // }
-              return MainScreen();
-            },
-          )
-          // home: PaymentPage(
-          //     movieTitle: "movieTitle",
-          //     theaterName: "theaterName",
-          //     showDate: "23/02/2025",
-          //     showTime: "10:00",
-          //     selectedSeats: ["1", "2", "3"],
-          //     ticketPrice: 100000,
-          //     selectedSnacks: {"Snack1": 100000, "Snack2": 100000},
-          //     snacksPrice: 100000)
-          // home: LoginPage(),
+        BlocProvider(create: (context) => sl<SettingsBloc>()..add(LoadSettings())),
+        BlocProvider(create: (context) => sl<MovieBloc>()),
+        BlocProvider(create: (context) => sl<ShowingMovieBloc>()),
+      ],
+      child: BlocBuilder<SettingsBloc, SettingsState>(
+        builder: (context, state) {
+          final isDarkMode = state is SettingsLoaded ? state.isDarkMode : false;
+          
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            onGenerateRoute: AppRoutes.onGenerateRoutes,
+            title: 'Movie Ticket Booking',
+            theme: ThemeData(
+              primarySwatch: Colors.pink,
+              brightness: Brightness.light,
+              primaryColor: AppColor.DEFAULT,
+              scaffoldBackgroundColor: Colors.white,
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.white,
+                elevation: 0,
+                iconTheme: IconThemeData(color: Colors.black),
+                titleTextStyle: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+            darkTheme: ThemeData(
+              primarySwatch: Colors.pink,
+              brightness: Brightness.dark,
+              primaryColor: AppColor.DEFAULT,
+              scaffoldBackgroundColor: Colors.grey[900],
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.black12,
+                elevation: 0,
+                iconTheme: IconThemeData(color: Colors.white),
+                titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+            themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            supportedLocales: const [
+              Locale('vi', 'VN'), // Vietnamese
+            ],
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            locale: const Locale('vi', 'VN'),
+            home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+              builder: (context, state) {
+                // if (state is Uninitialized) {
+                //   return LoginPage();
+                // } else if (state is Unauthenticated) {
+                //   return LoginPage();
+                // } else if (state is Authenticated) {
+                //   return MainScreen();
+                // }
+                return MainScreen();
+              },
+            ),
+          );
+        },
       ),
     );
   }
@@ -106,15 +131,15 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     HomePage(),
     VenuesPage(),
-    PaymentPage(
+    const PaymentPage(
       movieTitle: "movieTitle",
       theaterName: "theaterName",
       showDate: "23/02/2025",
       showTime: "10:00",
       selectedSeats: ["1", "2", "3"],
-      ticketPrice: 100000,
-      selectedSnacks: {"Snack1": 100000, "Snack2": 100000},
-      snacksPrice: 100000),
+      ticketPrice: 10000,
+      selectedSnacks: {"Snack1": 10000, "Snack2": 10000},
+      snacksPrice: 10000),
     HomePage(), // Replace with GroupPage when available
     SettingPage(),
   ];

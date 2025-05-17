@@ -39,9 +39,12 @@ class MovieRepositoryImpl extends MovieRepository {
       return Result.fromFailure(ServerFailure(e.message));
     } on NetworkException catch (e) {
       return Result.fromFailure(NetworkFailure(e.message));
-    } on TimeoutException catch (e) {
-      return Result.fromFailure(NetworkFailure("Timeout: ${e.message}. Please try again later."));
     } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.sendTimeout) {
+        throw ServerException(message: 'Connection timeout. Please check your internet connection.');
+      }
       return Result.fromFailure(ServerFailure("DioException: ${e.message}"));
     } catch (e) {
       return Result.fromFailure(ServerFailure("Unexpected error occurred: $e"));

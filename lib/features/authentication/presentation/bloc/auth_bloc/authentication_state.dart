@@ -24,3 +24,19 @@ class Authenticated extends AuthenticationState {
 }
 
 class Unauthenticated extends AuthenticationState {}
+
+class EmailVerificationInitial extends AuthenticationState {}
+
+class EmailRequestSentSuccessfully extends AuthenticationState {}
+
+class SendEmailRequestFailed extends AuthenticationState {
+  final String message;
+  const SendEmailRequestFailed(this.message);
+}
+
+class EmailVerificatedSuccessfully extends AuthenticationState {}
+
+class EmailVerificateFailed extends AuthenticationState {
+  final String message;
+  const EmailVerificateFailed(this.message);
+}

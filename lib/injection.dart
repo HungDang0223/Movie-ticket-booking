@@ -15,6 +15,14 @@ import 'package:movie_tickets/features/authentication/data/repositories/auth_rep
 import 'package:movie_tickets/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/login_bloc/bloc.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/signup_bloc/bloc.dart';
+import 'package:movie_tickets/features/booking/data/datasources/booking_seat_remote_data_source.dart';
+import 'package:movie_tickets/features/booking/data/datasources/showing_movie_remote_data_source.dart';
+import 'package:movie_tickets/features/booking/data/repositories/booking_seat_repository_impl.dart';
+import 'package:movie_tickets/features/booking/data/repositories/showing_movie_repository_impl.dart';
+import 'package:movie_tickets/features/booking/domain/repositories/booking_seat_repository.dart';
+import 'package:movie_tickets/features/booking/domain/repositories/showing_movie_repository.dart';
+import 'package:movie_tickets/features/booking/presentation/bloc/bloc.dart';
+import 'package:movie_tickets/features/booking/presentation/bloc/booking_seat_bloc/booking_seat_bloc.dart';
 import 'package:movie_tickets/features/movies/data/datasources/movie_remote_datasource.dart';
 import 'package:movie_tickets/features/movies/data/datasources/review_remote_datasource.dart';
 import 'package:movie_tickets/features/movies/data/repositories/movie_repository_impl.dart';
@@ -55,9 +63,10 @@ Future<void> init() async {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
       'ngrok-skip-browser-warning':'true',
-      'Authorization': 'Bearer $accessToken',
     },
-    connectTimeout: const Duration(seconds: 15),
+    connectTimeout: const Duration(seconds: 30),
+    receiveTimeout: const Duration(seconds: 30),
+    sendTimeout: const Duration(seconds: 5),
   ))..interceptors.add(LogInterceptor(responseBody: true));
 
   sl.registerSingleton<Dio>(dio);
@@ -68,19 +77,24 @@ Future<void> init() async {
   sl.registerSingleton<SharedPrefService>(sharedPrefService);
 
   // Register data sources
-  sl.registerSingleton<AuthRemoteDatasource>(AuthRemoteDatasource(sl())); 
-  sl.registerSingleton<AuthLocalDataSource>(AuthLocalDataSource());  
+  sl.registerSingleton<AuthRemoteDataSource>(AuthRemoteDataSource(sl())); 
+  sl.registerSingleton<AuthLocalDataSource>(AuthLocalDataSource(sl()));  
   sl.registerSingleton<MovieRemoteDatasource>(MovieRemoteDatasource(sl()));
   sl.registerSingleton<ReviewRemoteDatasource>(ReviewRemoteDatasource(sl()));
+  sl.registerSingleton<ShowingMovieRemoteDataSource>(ShowingMovieRemoteDataSource(sl()));
   sl.registerSingleton<SettingsLocalDataSource>(SettingsLocalDataSourceImpl(sl<SharedPrefService>()));
+  sl.registerSingleton<BookingSeatRemoteDataSource>(BookingSeatRemoteDataSource());
+  
 
   // Register repository
-  sl.registerLazySingleton<AuthRepository>(() => AuthReposImpl());
+  sl.registerLazySingleton<AuthRepository>(() => AuthReposImpl(sl<AuthLocalDataSource>(), sl<AuthRemoteDataSource>()));
   sl.registerLazySingleton<MovieRepository>(() => MovieRepositoryImpl());
   sl.registerLazySingleton<ReviewRepository>(() => ReviewRepositoryImpl());
+  sl.registerLazySingleton<ShowingMovieRepository>(() => ShowingMovieRepositoryImpl());
   sl.registerLazySingleton<SettingsRepository>(() => SettingsRepositoryImpl(sl<SettingsLocalDataSource>(), sl<AuthRepository>()));
   sl.registerLazySingleton<PaymentRepository>(() => PaymentRepositoryImpl());
-
+  sl.registerLazySingleton<BookingSeatRepository>(() => BookingSeatRepositoryImpl(seatService: sl<BookingSeatRemoteDataSource>()));
+  
   // Register use cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => SignUpUseCase(sl()));
@@ -94,6 +108,8 @@ Future<void> init() async {
   sl.registerFactory(() => SignupBloc(authRepository: sl<AuthRepository>()));
   sl.registerFactory(() => MovieBloc(movieRepository: sl<MovieRepository>()));
   sl.registerFactory(() => ReviewBloc(reviewRepository: sl<ReviewRepository>()));
+  sl.registerFactory(() => ShowingMovieBloc(repository: sl<ShowingMovieRepository>()));
+  sl.registerFactory(() => BookingSeatBloc(bookingSeatRepository: sl<BookingSeatRepositoryImpl>()));
   sl.registerFactory(() => PaymentBloc(paymentRepository: sl<PaymentRepository>()));
   sl.registerFactory(() => SettingsBloc(sl<SettingsRepository>()));
 }

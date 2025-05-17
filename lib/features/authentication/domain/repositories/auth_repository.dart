@@ -16,4 +16,6 @@ abstract class AuthRepository {
   Future<void> logOut();
   Future<bool> isSignedIn();
   Future<Result<UserModel>> getCurrentUser();
+  Future<Result<String>> sendEmailAuthRequest(String email);
+  Future<Result<RegularResponse>> verifyCode(String email, String code);
 }

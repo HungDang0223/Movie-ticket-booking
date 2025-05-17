@@ -6,7 +6,7 @@ import 'package:movie_tickets/features/booking/data/models/showing.dart';
 class Ticket {
   final int bookingId;
   final String userId;
-  final Showing showing;
+  final ShowingMovie showing;
   final DateTime bookTime;
   final int amount;
   final BookingSeat seats;
@@ -27,7 +27,7 @@ class Ticket {
     return Ticket(
       bookingId: json['bookingId'] as int,
       userId: json['userId'] as String,
-      showing: Showing.fromJson(json['showing'] as Map<String, dynamic>),
+      showing: ShowingMovie.fromJson(json['showing'] as Map<String, dynamic>),
       bookTime: DateTime.parse(json['bookTime'] as String),
       amount: json['amount'] as int,
       seats: BookingSeat.fromJson(json['seats'] as Map<String, dynamic>),

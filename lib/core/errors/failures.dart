@@ -7,6 +7,10 @@ class DioExceptionFailure extends Failure {
   DioExceptionFailure(super.message);
 }
 
+class ClientFailure extends Failure {
+  ClientFailure(super.message);
+}
+
 class ServerFailure extends Failure {
   ServerFailure(super.message);
 }

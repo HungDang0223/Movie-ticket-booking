@@ -6,3 +6,4 @@ export 'showing.dart';
 export 'snack.dart';
 export 'combo.dart';
 export 'seat.dart';
+export 'showing_seat.dart';

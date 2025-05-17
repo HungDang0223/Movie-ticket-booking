@@ -7,7 +7,7 @@ import 'package:movie_tickets/features/authentication/domain/repositories/auth_r
 import 'package:movie_tickets/features/authentication/presentation/widgets/widget_signup_form.dart';
 import 'package:movie_tickets/features/authentication/presentation/widgets/widgets.dart';
 
-import '../../bloc/signup_bloc/bloc.dart';
+import '../bloc/signup_bloc/bloc.dart';
 
 class SignupPage extends StatefulWidget {
   @override

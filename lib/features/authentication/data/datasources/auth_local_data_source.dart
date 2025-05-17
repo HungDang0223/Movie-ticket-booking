@@ -5,7 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../injection.dart';
 
 class AuthLocalDataSource {
-  final sharedPrefsService = sl<SharedPrefService>();
+  final SharedPrefService sharedPrefsService;
+  AuthLocalDataSource(this.sharedPrefsService);
   Future<void> saveUserData(UserModel user) async {
     await sharedPrefsService.saveValue('user', user.toJson());
     await sharedPrefsService.saveValue('isLoggedIn', true);

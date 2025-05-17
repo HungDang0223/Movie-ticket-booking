@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie_tickets/features/setting/presentation/bloc/setting_event.dart';
+import 'package:movie_tickets/features/setting/presentation/bloc/settings_state.dart';
+import 'package:movie_tickets/injection.dart';
 import '../bloc/settings_bloc.dart';
 
 class LanguageSelectionPage extends StatelessWidget {
@@ -13,6 +16,7 @@ class LanguageSelectionPage extends StatelessWidget {
         centerTitle: true,
       ),
       body: BlocBuilder<SettingsBloc, SettingsState>(
+        bloc: sl<SettingsBloc>()..add(LoadSettings()),
         builder: (context, state) {
           if (state is SettingsLoaded) {
             return ListView(

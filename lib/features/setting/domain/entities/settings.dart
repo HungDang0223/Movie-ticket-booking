@@ -1,19 +1,19 @@
 import 'package:equatable/equatable.dart';
 
 class UserProfile extends Equatable {
-  final String name;
-  final String email;
+  final String? name;
+  final String? email;
   final String? photoUrl;
-  final int points;
-  final int level;
+  final int? points;
+  final int? level;
   final String? phoneNumber;
 
   const UserProfile({
-    required this.name,
-    required this.email,
+    this.name,
+    this.email,
     this.photoUrl,
-    required this.points,
-    required this.level,
+    this.points,
+    this.level,
     this.phoneNumber,
   });
 
@@ -35,5 +35,5 @@ class Settings extends Equatable {
   });
 
   @override
-  List<Object?> get props => [isDarkMode, currentLanguage, notificationSettings, userProfile];
+  List<Object?> get props => [isDarkMode, currentLanguage, notificationSettings];
 } 

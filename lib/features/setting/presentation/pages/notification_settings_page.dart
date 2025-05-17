@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie_tickets/features/setting/presentation/bloc/setting_event.dart';
+import 'package:movie_tickets/features/setting/presentation/bloc/settings_state.dart';
 import '../bloc/settings_bloc.dart';
 
 class NotificationSettingsPage extends StatelessWidget {

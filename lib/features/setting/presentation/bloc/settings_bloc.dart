@@ -1,104 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:movie_tickets/features/setting/presentation/bloc/setting_event.dart';
+import 'package:movie_tickets/features/setting/presentation/bloc/settings_state.dart';
 import '../../domain/entities/settings.dart';
 import '../../domain/repositories/settings_repository.dart';
 
-// Events
-abstract class SettingsEvent extends Equatable {
-  const SettingsEvent();
 
-  @override
-  List<Object?> get props => [];
-}
-
-class LoadSettings extends SettingsEvent {}
-
-class UpdateProfile extends SettingsEvent {
-  final Map<String, dynamic> profileData;
-
-  const UpdateProfile(this.profileData);
-
-  @override
-  List<Object?> get props => [profileData];
-}
-
-class ChangePassword extends SettingsEvent {
-  final String currentPassword;
-  final String newPassword;
-
-  const ChangePassword(this.currentPassword, this.newPassword);
-
-  @override
-  List<Object?> get props => [currentPassword, newPassword];
-}
-
-class UpdateNotificationSettings extends SettingsEvent {
-  final Map<String, bool> settings;
-
-  const UpdateNotificationSettings(this.settings);
-
-  @override
-  List<Object?> get props => [settings];
-}
-
-class ChangeLanguage extends SettingsEvent {
-  final String languageCode;
-
-  const ChangeLanguage(this.languageCode);
-
-  @override
-  List<Object?> get props => [languageCode];
-}
-
-class ChangeTheme extends SettingsEvent {
-  final bool isDarkMode;
-
-  const ChangeTheme(this.isDarkMode);
-
-  @override
-  List<Object?> get props => [isDarkMode];
-}
-
-class SignOut extends SettingsEvent {}
-
-// States
-abstract class SettingsState extends Equatable {
-  const SettingsState();
-
-  @override
-  List<Object?> get props => [];
-}
-
-class SettingsInitial extends SettingsState {}
-
-class SettingsLoading extends SettingsState {}
-
-class SettingsLoaded extends SettingsState {
-  final bool isDarkMode;
-  final String currentLanguage;
-  final Map<String, bool> notificationSettings;
-  final UserProfile userProfile;
-
-  const SettingsLoaded({
-    required this.isDarkMode,
-    required this.currentLanguage,
-    required this.notificationSettings,
-    required this.userProfile,
-  });
-
-  @override
-  List<Object?> get props => [isDarkMode, currentLanguage, notificationSettings, userProfile];
-}
-
-class SettingsError extends SettingsState {
-  final String message;
-
-  const SettingsError(this.message);
-
-  @override
-  List<Object?> get props => [message];
-}
 
 // Bloc
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {

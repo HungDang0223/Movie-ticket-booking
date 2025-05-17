@@ -22,12 +22,9 @@ String refreshToken = "";
 
 class AuthReposImpl implements AuthRepository {
   
-  final _prefs = sl<SharedPrefService>();
-  final String _userKey = "user_info";
-  final String isLoggedInKey = "is_logged_in";
-  final dio = sl<Dio>();
-  final AuthRemoteDatasource _authRemoteDataSource = AuthRemoteDatasource(sl<Dio>());
-  final AuthLocalDataSource _authLocalDataSource = AuthLocalDataSource();
+  final AuthRemoteDataSource _authRemoteDataSource;
+  final AuthLocalDataSource _authLocalDataSource;
+  AuthReposImpl(this._authLocalDataSource, this._authRemoteDataSource);
 
   @override
   Future<Result<SignupResponse>> signUpWithUserInfo(String fullName, String email, String phone, String password, String address, DateTime? birthDate, String? gender) async {
@@ -99,38 +96,27 @@ class AuthReposImpl implements AuthRepository {
   
   @override
   Future<Result<LoginResponse>> logInWithEmailOrPhoneAndPassword(String emailOrPhone, String password) async {
+    final body = {"emailOrPhone": emailOrPhone, "password": password};
     try {
-      final body = {"emailOrPhone": emailOrPhone, "password": password};
-      try {
-        final httpResponse = await _authRemoteDataSource.logInWithEmailOrPhoneAndPassword(body);
-        
-        log("Response: ${httpResponse.response.statusCode}", name: "Log in UC");
+      final httpResponse = await _authRemoteDataSource.logInWithEmailOrPhoneAndPassword(body);
+      
+      log("Response: ${httpResponse.response.statusCode}", name: "Log in UC");
 
-        if (httpResponse.response.statusCode == HttpStatus.ok) {
-          final loginRes = httpResponse.data;
-          final user = loginRes.user;
-          await _authLocalDataSource.saveUserData(user);
-          return Result.success(loginRes);
-        } else {
-          return Result.fromFailure(ServerFailure(httpResponse.response.statusMessage ?? "Unknown error"));
-        }
-      } on DioException catch (e) {
-        log("DioException: ${e.response?.statusCode} - ${e.type.toPrettyDescription()} - ${e.message}", name: "Log in UC");
-        
-        return Result.fromFailure(DioExceptionFailure(e.type.toPrettyDescription()));
-      } catch (e) {
-        log("Unknown Error: $e", name: "Log in UC");
-        return Result.fromFailure(ServerFailure("Unknown Error: $e"));
+      if (httpResponse.response.statusCode == HttpStatus.ok) {
+        final loginRes = httpResponse.data;
+        final user = loginRes.user;
+        await _authLocalDataSource.saveUserData(user);
+        return Result.success(loginRes);
+      } else {
+        return Result.fromFailure(ServerFailure(httpResponse.response.statusMessage ?? "Unknown error"));
       }
-
-    } on ServerException catch (e) {
-      return Result.fromFailure(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Result.fromFailure(NetworkFailure(e.message));
     } on DioException catch (e) {
-      return Result.fromFailure(DioExceptionFailure("DioExceptionnnn: ${e.message}"));
+      log("DioException: ${e.response?.statusCode} - ${e.type.toPrettyDescription()} - ${e.message}", name: "Log in UC");
+      
+      return Result.fromFailure(DioExceptionFailure(e.type.toPrettyDescription()));
     } catch (e) {
-      return Result.fromFailure(ServerFailure("Unexpected error occurred: $e"));
+      log("Unknown Error: $e", name: "Log in UC");
+      return Result.fromFailure(ServerFailure("Unknown Error: $e"));
     }
   }
   
@@ -139,7 +125,51 @@ class AuthReposImpl implements AuthRepository {
     final GoogleSignIn googleSignIn = GoogleSignIn();
     await googleSignIn.signOut();
     await _authLocalDataSource.logout();
-    await _prefs.removeValue(_userKey);
   }
   
+  @override
+  Future<Result<String>> sendEmailAuthRequest(String email) async {
+    final body = {"to": email};
+    try {
+      final httpResponse = await _authRemoteDataSource.sendEmailAuthRequest(body);
+      if (httpResponse.response.statusCode == HttpStatus.ok) {
+        final response = httpResponse.data;
+        log(response['message'].toString(), name: 'Send verify code via email');
+        return Result.success("Gửi mã xác thực thành công.");
+      }
+      return Result.fromFailure(DioExceptionFailure(httpResponse.response.statusCode.toString()));
+    } catch (e) {
+      return Result.fromFailure(ServerFailure("Gửi mã xác thực thất bại: $e"));
+    }
+  }
+  
+  @override
+  Future<Result<RegularResponse>> verifyCode(String email, String code) async {
+    final body = {
+      "emailOrPhone": email,
+      "code": code
+    };
+    try {
+      final httpResponse = await _authRemoteDataSource.verifyCode(body);
+      
+      log("Response: ${httpResponse.response.statusCode}", name: "Verify email code");
+
+      if (httpResponse.response.statusCode == HttpStatus.ok) {
+        final verifyRes = httpResponse.data;
+        return Result.success(verifyRes);
+      } else {
+        return Result.fromFailure(ServerFailure(httpResponse.response.statusMessage ?? "Unknown error"));
+      }
+    } on DioException catch (e) {
+      if (e.response!.statusCode == 400) {
+        return Result.fromFailure(ClientFailure("Mã xác thực không đúng!"));
+      }
+      if (e.response!.statusCode == 404) {
+        return Result.fromFailure(ClientFailure("Email này chưa được đăng ký cho tài khoản nào!"));
+      }
+      return Result.fromFailure(DioExceptionFailure(e.type.toPrettyDescription()));
+    } catch (e) {
+      return Result.fromFailure(ServerFailure("Unexpected error occurred: $e"));
+    }
+  }
 }

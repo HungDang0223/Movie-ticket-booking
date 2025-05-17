@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:movie_tickets/core/constants/app_color.dart';
 import '../../data/models/payment_card.dart';
 import '../../domain/services/card_service.dart';
 import '../../domain/services/stripe_payment_service.dart';
@@ -127,14 +128,13 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
         maxHeight: MediaQuery.of(context).size.height * 0.45,
       ),
       decoration: const BoxDecoration(
-        color: Colors.black,
+        color: Colors.white,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
           _isPaymentProcessing
               ? _buildProcessingHeader()
@@ -173,7 +173,7 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
               child: Text(
                 _showAddCard ? 'Add Payment Card' : 'Select Payment Card',
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -190,10 +190,10 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
                         _showAddCard = true;
                       });
                     },
-                    icon: const Icon(Icons.add, color: Colors.green),
+                    icon: const Icon(Icons.add, color: AppColor.DEFAULT_2),
                     label: const Text(
                       'New',
-                      style: TextStyle(color: Colors.green),
+                      style: TextStyle(color: AppColor.DEFAULT_2),
                     ),
                   ),
                 if (_showAddCard && _savedCards.isNotEmpty)
@@ -203,14 +203,14 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
                         _showAddCard = false;
                       });
                     },
-                    icon: const Icon(Icons.credit_card, color: Colors.blue),
+                    icon: const Icon(Icons.credit_card, color: AppColor.DEFAULT_2),
                     label: const Text(
                       'Saved',
-                      style: TextStyle(color: Colors.blue),
+                      style: TextStyle(color: AppColor.DEFAULT_2),
                     ),
                   ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
+                  icon: const Icon(Icons.close, color: Colors.black),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -231,20 +231,20 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           TextField(
             controller: _cardHolderNameController,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.black87),
             decoration: InputDecoration(
               labelText: 'Card Holder Name',
-              labelStyle: const TextStyle(color: Colors.grey),
+              labelStyle: const TextStyle(color: AppColor.BLACK),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey.shade800),
                 borderRadius: BorderRadius.circular(8),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.blue),
+                borderSide: const BorderSide(color: AppColor.DEFAULT_2),
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
@@ -253,10 +253,13 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
           CardFormField(
             controller: _cardFormController,
             style: CardFormStyle(
-              textColor: Colors.white,
-              placeholderColor: Colors.grey,
-              backgroundColor: Colors.grey.shade900,
-              borderColor: Colors.grey.shade800,
+              textColor: Colors.black87,
+              placeholderColor: Colors.black87,
+              backgroundColor: Colors.white70,
+              borderColor: Colors.black87,
+              borderWidth: 1,
+              borderRadius: 8,
+              cursorColor: AppColor.DEFAULT_2
             ),
             enablePostalCode: false,
           ),
@@ -272,14 +275,14 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
                 },
                 fillColor: WidgetStateProperty.resolveWith(
                   (states) => states.contains(WidgetState.selected) 
-                      ? const Color(0xFF4CAF50) 
+                      ? AppColor.DEFAULT_2
                       : Colors.grey,
                 ),
               ),
               const Text(
                 'Save card for future payments',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black87,
                   fontSize: 14,
                 ),
               ),
@@ -288,18 +291,22 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
           const SizedBox(height: 24),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4CAF50),
+              backgroundColor: AppColor.DEFAULT_2,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
             onPressed: _isPaymentProcessing ? null : _handlePayment,
-            child: Text(
-              'PAY ${widget.amount.toStringAsFixed(0)} đ',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              child: Text(
+                'PAY ${widget.amount.toStringAsFixed(0)} đ',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColor.WHITE
+                ),
               ),
             ),
           ),
@@ -330,7 +337,7 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: card.isDefault ? Colors.blue : Colors.grey.shade700,
+          color: card.isDefault ? AppColor.DEFAULT_2 : Colors.grey.shade700,
           width: 1,
         ),
       ),
@@ -389,7 +396,7 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
                               fontSize: 12,
                             ),
                           ),
-                          backgroundColor: Colors.green,
+                          backgroundColor: AppColor.DEFAULT_2,
                           padding: EdgeInsets.zero,
                           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         )
@@ -399,17 +406,17 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
                             await _cardService.setDefaultCard(card.id);
                             _loadSavedCards();
                           },
-                          child: const Text(
-                            'Set Default',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 12,
-                            ),
-                          ),
                           style: TextButton.styleFrom(
                             minimumSize: const Size(0, 0),
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: const Text(
+                            'Set Default',
+                            style: TextStyle(
+                              color: AppColor.DEFAULT_2,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                       IconButton(
@@ -489,10 +496,10 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
   Widget _buildProcessingPayment() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
-      child: Column(
+      child: const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(
+          SizedBox(
             width: 48,
             height: 48,
             child: CircularProgressIndicator(
@@ -500,8 +507,8 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
               strokeWidth: 3,
             ),
           ),
-          const SizedBox(height: 24),
-          const Text(
+          SizedBox(height: 24),
+          Text(
             'Processing your payment...',
             style: TextStyle(
               color: Colors.white,
@@ -570,7 +577,7 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Payment successful!'),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColor.DEFAULT_2,
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -609,7 +616,7 @@ class _PaymentCardBottomSheetState extends State<PaymentCardBottomSheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Payment successful!'),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColor.DEFAULT_2,
               behavior: SnackBarBehavior.floating,
             ),
           );

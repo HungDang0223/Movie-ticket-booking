@@ -83,3 +83,17 @@ class AuthResponse {
     };
   }
 }
+
+class RegularResponse {
+  final String status;
+  final String message;
+
+  RegularResponse({required this.status, required this.message});
+
+  factory RegularResponse.fromJson(Map<String, dynamic> json) {
+    return RegularResponse(
+      status: json['status'],
+      message: json['message'],
+    );
+  }
+}

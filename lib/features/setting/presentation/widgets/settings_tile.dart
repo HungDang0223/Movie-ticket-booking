@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movie_tickets/core/constants/app_color.dart';
 
 class SettingsTile extends StatelessWidget {
   final IconData icon;
@@ -25,7 +26,7 @@ class SettingsTile extends StatelessWidget {
     return ListTile(
       leading: Icon(
         icon,
-        color: iconColor ?? Colors.blue,
+        color: iconColor ?? AppColor.DEFAULT,
         size: 24,
       ),
       title: Text(

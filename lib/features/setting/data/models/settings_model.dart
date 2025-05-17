@@ -2,11 +2,11 @@ import '../../domain/entities/settings.dart';
 
 class UserProfileModel extends UserProfile {
   const UserProfileModel({
-    required super.name,
-    required super.email,
+    super.name,
+    super.email,
     super.photoUrl,
-    required super.points,
-    required super.level,
+    super.points,
+    super.level,
     super.phoneNumber,
   });
 

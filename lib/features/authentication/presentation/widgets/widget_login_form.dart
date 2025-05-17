@@ -1,5 +1,6 @@
 import 'package:movie_tickets/core/utils/multi_devices.dart';
 import 'package:movie_tickets/core/utils/validators.dart';
+import 'package:movie_tickets/features/authentication/presentation/pages/input_email_page.dart';
 import 'package:movie_tickets/features/movies/presentation/pages/home_page.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/auth_bloc/bloc.dart';
 import 'package:movie_tickets/injection.dart';
@@ -11,8 +12,10 @@ import 'package:movie_tickets/features/authentication/presentation/widgets/widge
 import '../bloc/login_bloc/bloc.dart';
 
 class WidgetLoginForm extends StatefulWidget {
+  const WidgetLoginForm({super.key});
+
   @override
-  _WidgetLoginFormState createState() => _WidgetLoginFormState();
+  State<WidgetLoginForm> createState() => _WidgetLoginFormState();
 }
 
 class _WidgetLoginFormState extends State<WidgetLoginForm> {
@@ -82,7 +85,7 @@ class _WidgetLoginFormState extends State<WidgetLoginForm> {
               children: <Widget>[
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Login to your account',
+                  child: Text('Đăng nhập',
                       style: AppFont.MEDIUM_DEFAULT_16),
                 ),
                 const SizedBox(height: 20),
@@ -92,9 +95,16 @@ class _WidgetLoginFormState extends State<WidgetLoginForm> {
                 const SizedBox(height: 10),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: Text(
-                    'Forgot password ?',
-                    style: AppFont.REGULAR_GRAY4_12,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(context, 
+                        MaterialPageRoute(builder: (context) => InputEmailPage())
+                      );
+                    },
+                    child: Text(
+                      'Forgot password ?',
+                      style: AppFont.REGULAR_DEFAULT_12,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),

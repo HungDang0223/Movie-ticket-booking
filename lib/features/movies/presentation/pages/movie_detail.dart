@@ -31,7 +31,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text("Phim", style: TextStyle(color: AppColor.DEFAULT)),
+        title: Text(widget.movie.title, style: TextStyle(color: AppColor.DEFAULT), overflow: TextOverflow.ellipsis,),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -71,11 +71,11 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                 ],
               ),
             ),
-            const Positioned(
+            Positioned(
               bottom: 10,
               left: 10,
               right: 10,
-              child: BookingButton(),
+              child: BookingButton(movie: widget.movie,),
             ),
           ],
         ),

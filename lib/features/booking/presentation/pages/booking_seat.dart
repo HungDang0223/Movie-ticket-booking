@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'snack_booking.dart';
+import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
+import 'package:movie_tickets/features/movies/domain/entities/movie.dart';
+import '../../data/models/models.dart';
+import 'booking_snack.dart';
 
 class Seat {
   final String id;
@@ -14,25 +17,21 @@ class Seat {
   });
 }
 
-class SeatBookingScreen extends StatefulWidget {
-  final String movieTitle;
-  final String theaterName;
-  final String showTime;
-  final String showDate;
+class BookingSeatScreen extends StatefulWidget {
+  final MovieModel movie;
+  final ShowingMovie showingMovie;
 
-  const SeatBookingScreen({
+  const BookingSeatScreen({
     Key? key,
-    required this.movieTitle,
-    required this.theaterName,
-    required this.showTime,
-    required this.showDate,
+    required this.movie,
+    required this.showingMovie,
   }) : super(key: key);
 
   @override
-  State<SeatBookingScreen> createState() => _SeatBookingScreenState();
+  State<BookingSeatScreen> createState() => _BookingSeatScreenState();
 }
 
-class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTickerProviderStateMixin {
+class _BookingSeatScreenState extends State<BookingSeatScreen> with SingleTickerProviderStateMixin {
   // Selected seats
   List<String> selectedSeats = [];
   double totalPrice = 0;
@@ -56,7 +55,7 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
     _transformationController = TransformationController();
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
     );
     
     SystemChrome.setSystemUIOverlayStyle(
@@ -163,20 +162,20 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
     if (seat == null) return Colors.grey;
     
     if (seat.isBooked) {
-      return Color(0xFFE0E0E0);
+      return const Color(0xFFE0E0E0);
     }
     
     if (selectedSeats.contains(seatId)) {
-      return Color(0xFF4CAF50);
+      return const Color(0xFF4CAF50);
     }
     
     switch (seat.type) {
       case 'regular':
-        return Color(0xFFF5E6E8);
+        return const Color(0xFFF5E6E8);
       case 'vip':
-        return Color(0xFFE8F5E9);
+        return const Color(0xFFE8F5E9);
       case 'sweetbox':
-        return Color(0xFFFFF3E0);
+        return const Color(0xFFFFF3E0);
       default:
         return Colors.grey;
     }
@@ -197,10 +196,10 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
       context,
       MaterialPageRoute(
         builder: (context) => SnackSelectionScreen(
-          movieTitle: widget.movieTitle,
-          theaterName: widget.theaterName,
-          showTime: widget.showTime,
-          showDate: widget.showDate,
+          movieTitle: widget.movie.title,
+          theaterName: widget.showingMovie.cinemaName,
+          showTime: "${widget.showingMovie.startTime} - ${widget.showingMovie.endTime}",
+          showDate: widget.showingMovie.showingDate.toIso8601String(),
           selectedSeats: selectedSeats,
           ticketPrice: totalPrice,
         ),
@@ -212,7 +211,7 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
     return Container(
       width: 300, // Fixed width to ensure the screen is centered
       height: 40,
-      margin: EdgeInsets.only(top: 20, bottom: 40), // Add more space below the screen
+      margin: const EdgeInsets.only(top: 20, bottom: 40), // Add more space below the screen
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -228,7 +227,7 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
           width: 1,
         ),
       ),
-      child: Center(
+      child: const Center(
         child: Text(
           'MÀN HÌNH',
           style: TextStyle(
@@ -245,7 +244,7 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
   // Seat legend with wrap that prioritizes horizontal layout
   Widget _buildLegend() {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
       child: LayoutBuilder(
         builder: (context, constraints) {
           // Calculate if items can fit in a single row
@@ -259,11 +258,11 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildLegendItem(Color(0xFF4CAF50), 'Đang chọn'),
+                _buildLegendItem(const Color(0xFF4CAF50), 'Đang chọn'),
                 _buildLegendItem(Colors.grey.shade400, 'Đã đặt'),
-                _buildLegendItem(Color(0xFFF5E6E8), 'Thường'),
-                _buildLegendItem(Color(0xFFE8F5E9), 'VIP'),
-                _buildLegendItem(Color(0xFFFFF3E0), 'Sweet Box'),
+                _buildLegendItem(const Color(0xFFF5E6E8), 'Thường'),
+                _buildLegendItem(const Color(0xFFE8F5E9), 'VIP'),
+                _buildLegendItem(const Color(0xFFFFF3E0), 'Sweet Box'),
               ],
             );
           } else {
@@ -273,19 +272,19 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildLegendItem(Color(0xFF4CAF50), 'Đang chọn'),
-                    SizedBox(width: 16),
+                    _buildLegendItem(const Color(0xFF4CAF50), 'Đang chọn'),
+                    const SizedBox(width: 16),
                     _buildLegendItem(Colors.grey.shade400, 'Đã đặt'),
-                    SizedBox(width: 16),
-                    _buildLegendItem(Color(0xFFF5E6E8), 'Thường'),
+                    const SizedBox(width: 16),
+                    _buildLegendItem(const Color(0xFFF5E6E8), 'Thường'),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildLegendItem(Color(0xFFE8F5E9), 'VIP'),
-                    SizedBox(width: 16),
-                    _buildLegendItem(Color(0xFFFFF3E0), 'Sweet Box'),
+                    _buildLegendItem(const Color(0xFFE8F5E9), 'VIP'),
+                    const SizedBox(width: 16),
+                    _buildLegendItem(const Color(0xFFFFF3E0), 'Sweet Box'),
                   ],
                 ),
               ],
@@ -301,12 +300,12 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70),
+        preferredSize: const Size.fromHeight(70),
         child: AppBar(
           backgroundColor: Colors.black,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios, color: Colors.red),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.red),
             onPressed: () => Navigator.pop(context),
           ),
           title: Column(
@@ -315,7 +314,7 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
               RichText(
                 text: TextSpan(
                   children: [
-                    TextSpan(
+                    const TextSpan(
                       text: 'CGV ',
                       style: TextStyle(
                         color: Colors.red,
@@ -324,8 +323,8 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                       ),
                     ),
                     TextSpan(
-                      text: widget.theaterName,
-                      style: TextStyle(
+                      text: widget.showingMovie.cinemaName,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -335,8 +334,8 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                 ),
               ),
               Text(
-                'Cinema 5, ${widget.showDate}, ${widget.showTime}',
-                style: TextStyle(
+                'Cinema 5, ${widget.showingMovie.showingDate}, ${widget.showingMovie.startTime}-${widget.showingMovie.endTime}',
+                style: const TextStyle(
                   color: Colors.grey,
                   fontSize: 14,
                 ),
@@ -345,14 +344,14 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
           ),
           actions: [
             IconButton(
-              icon: Icon(Icons.refresh, color: Colors.red),
+              icon: const Icon(Icons.refresh, color: Colors.red),
               onPressed: resetZoom,
             ),
           ],
         ),
       ),
       body: isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4CAF50)),
               ),
@@ -367,21 +366,21 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                         transformationController: _transformationController,
                         minScale: 0.5,
                         maxScale: 2.0,
-                        boundaryMargin: EdgeInsets.all(150),
+                        boundaryMargin: const EdgeInsets.all(150),
                         constrained: false,
                         onInteractionEnd: (_) {
                           setState(() {}); // Refresh state to update minimap
                         },
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           child: Padding(
-                            padding: EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(16),
                             child: Column(
                               children: [
                                 // Screen indicator
                                 _buildScreen(),
-                                SizedBox(height: 20),
+                                const SizedBox(height: 20),
                                 // Seat layout
                                 Align(
                                   alignment: Alignment.centerLeft,
@@ -395,11 +394,11 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                                         children: seatLayout.keys.map((row) => Container(
                                           height: 44,
                                           width: 25,
-                                          margin: EdgeInsets.symmetric(vertical: 2),
+                                          margin: const EdgeInsets.symmetric(vertical: 2),
                                           alignment: Alignment.center,
                                           child: Text(
                                             row,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
@@ -408,14 +407,14 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                                           ),
                                         )).toList(),
                                       ),
-                                      SizedBox(width: 10),
+                                      const SizedBox(width: 10),
                                       // Seats grid
                                       Column(
                                         mainAxisSize: MainAxisSize.min,
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: seatLayout.entries.map((entry) {
                                           return Padding(
-                                            padding: EdgeInsets.symmetric(vertical: 2),
+                                            padding: const EdgeInsets.symmetric(vertical: 2),
                                             child: _buildSeatRow(entry.key, entry.value),
                                           );
                                         }).toList(),
@@ -440,14 +439,14 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                 
                 // Movie info and booking button
                 Container(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   color: Colors.black,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.movieTitle,
-                        style: TextStyle(
+                        widget.movie.title,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -459,7 +458,7 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 '2D Phụ Đề Anh',
                                 style: TextStyle(
                                   color: Colors.grey,
@@ -468,7 +467,7 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                               ),
                               Text(
                                 '${totalPrice.toStringAsFixed(0)} đ',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -479,15 +478,15 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                           ElevatedButton(
                             onPressed: proceedToSnacks,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF4CAF50),
+                              backgroundColor: const Color(0xFF4CAF50),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(25),
                               ),
-                              padding: EdgeInsets.symmetric(horizontal: 35, vertical: 15),
+                              padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 15),
                               elevation: 3,
-                              shadowColor: Color(0xFF4CAF50).withOpacity(0.3),
+                              shadowColor: const Color(0xFF4CAF50).withOpacity(0.3),
                             ),
-                            child: Text(
+                            child: const Text(
                               'ĐẶT VÉ',
                               style: TextStyle(
                                 color: Colors.white,
@@ -508,7 +507,7 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
 
   Widget _buildLegendItem(Color color, String label) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.3),
       ),
@@ -526,10 +525,10 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
               ),
             ),
           ),
-          SizedBox(width: 6),
+          const SizedBox(width: 6),
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 11,
               fontWeight: FontWeight.w500,
@@ -550,13 +549,13 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
           child: Container(
             width: 44,
             height: 44,
-            margin: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             decoration: BoxDecoration(
               color: getSeatColor(row, seat.id),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: selectedSeats.contains(seat.id)
-                    ? Color(0xFF4CAF50)
+                    ? const Color(0xFF4CAF50)
                     : Colors.grey.shade300,
                 width: 1.5,
               ),
@@ -564,7 +563,7 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
                   blurRadius: 4,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -610,12 +609,12 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
             BoxShadow(
               color: Colors.black.withOpacity(0.3),
               blurRadius: 8,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Padding(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -637,7 +636,7 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                     ),
                     borderRadius: BorderRadius.circular(2),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Text(
                       'MÀN HÌNH',
                       style: TextStyle(
@@ -649,12 +648,12 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                   ),
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               // Current view scale indicator
               Align(
                 alignment: Alignment.center,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.red.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(4),
@@ -662,7 +661,7 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                   ),
                   child: Text(
                     'Scale: ${scale.toStringAsFixed(1)}x',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.red,
                       fontSize: 6,
                       fontWeight: FontWeight.bold,
@@ -670,7 +669,7 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                   ),
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               // Mini seat layout
               Expanded(
                 child: SingleChildScrollView(
@@ -690,22 +689,22 @@ class _SeatBookingScreenState extends State<SeatBookingScreen> with SingleTicker
                             alignment: Alignment.center,
                             child: Text(
                               entry.key,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 5,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
-                          SizedBox(width: 2),
+                          const SizedBox(width: 2),
                           // Seats
                           ...entry.value.map((seat) => Container(
                             width: 5,
                             height: 5,
-                            margin: EdgeInsets.all(1),
+                            margin: const EdgeInsets.all(1),
                             decoration: BoxDecoration(
                               color: selectedSeats.contains(seat.id)
-                                  ? Color(0xFF4CAF50)
+                                  ? const Color(0xFF4CAF50)
                                   : getSeatColor(entry.key, seat.id),
                               borderRadius: BorderRadius.circular(1),
                             ),

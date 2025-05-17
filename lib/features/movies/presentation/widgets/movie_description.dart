@@ -24,18 +24,18 @@ class MovieDescription extends StatelessWidget {
           children: [
             const Row(),
             Positioned(
-              top: -MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.11),
+              top: -MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.13),
               left: 0,
               child: Column(
                 children: [
                   Row(
                     children: [
                       Container(
-                        width: MultiDevices.getValueByScale(SizeConfig.screenWidth! * 0.28),
+                        width: MultiDevices.getValueByScale(SizeConfig.screenWidth! * 0.30),
                         height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.22),
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: NetworkImage(movie.posterUrl ?? tempNetwordImage),
+                            image: NetworkImage(movie.posterUrl),
                             fit: BoxFit.cover,
                           ),
                           borderRadius: BorderRadius.circular(10),
@@ -49,26 +49,29 @@ class MovieDescription extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(left: 10, right: 10),
+                        margin: const EdgeInsets.only(left: 10, right: 10),
                         
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.10),
+                                height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.12),
+                                width: MediaQuery.of(context).size.width * 0.55,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       movie.title,
+                                      maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.start,
                                       style: MultiDevices.getStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: AppColor.WHITE,
                                       ),
                                     ),
-                                    const SizedBox(height: 8,)
                                   ],
                                 ),
                               ),
@@ -137,10 +140,10 @@ class MovieDescription extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.11) + 10),
+        SizedBox(height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.11)),
         Text(
           movie.synopsis,
-          style: TextStyle(fontSize: 15, color: AppColor.WHITE),
+          style: const TextStyle(fontSize: 15, color: AppColor.WHITE),
           textAlign: TextAlign.justify,
           maxLines: 4,
           overflow: TextOverflow.clip,
@@ -156,7 +159,7 @@ class MovieDescription extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: Text(entry.key, style: TextStyle(fontWeight: FontWeight.bold, color: AppColor.WHITE)),
+                    child: Text(entry.key, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColor.WHITE)),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(4.0),

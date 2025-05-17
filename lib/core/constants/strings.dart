@@ -1,7 +1,7 @@
 // run in real device
 const String baseURL = 'https://skunk-elegant-hideously.ngrok-free.app/api/v1';
-const String authAPIBaseURL = 'https://skunk-elegant-hideously.ngrok-free.app/api/v1/Auth/';
-const String movieAPIBaseURL = '';
+const String authAPIBaseURL = 'https://skunk-elegant-hideously.ngrok-free.app/api/v1/auth/';
+const String showingMovieAPIBaseURL = 'https://skunk-elegant-hideously.ngrok-free.app/api/v1/showing-movie';
 
 // run in web -> localhost and https
 // const String baseURL = 'http://localhost:5000/api/v1/';

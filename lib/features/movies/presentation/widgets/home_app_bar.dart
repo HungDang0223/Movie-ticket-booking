@@ -13,18 +13,18 @@ class HomeAppBar extends StatelessWidget {
       pinned: true,
       expandedHeight: 60,
       backgroundColor: AppColor.DEFAULT_2,
-      systemOverlayStyle: SystemUiOverlayStyle(
+      systemOverlayStyle: const SystemUiOverlayStyle(
         statusBarColor: AppColor.DEFAULT_2,
         statusBarIconBrightness: Brightness.light,
         statusBarBrightness: Brightness.dark,
       ),
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
-          padding: EdgeInsets.only(top: 5, left: 16),
+          padding: const EdgeInsets.only(top: 5, left: 16),
           child: AnimatedOpacity(
             opacity: isScrolled ? 0.0 : 1.0,
-            duration: Duration(milliseconds: 250),
-            child: Column(
+            duration: const Duration(milliseconds: 250),
+            child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -54,10 +54,10 @@ class HomeAppBar extends StatelessWidget {
       actions: [
         AnimatedOpacity(
           opacity: isScrolled ? 1.0 : 0.0,
-          duration: Duration(milliseconds: 250),
+          duration: const Duration(milliseconds: 250),
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: const Row(
               children: [
                 Icon(Icons.location_on, size: 16),
                 SizedBox(width: 4),
@@ -75,27 +75,42 @@ class HomeAppBar extends StatelessWidget {
         const Spacer(),
         Container(
           width: MediaQuery.of(context).size.width * 0.6,
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: AnimatedOpacity(
             opacity: isScrolled ? 1.0 : 0.0,
-            duration: Duration(milliseconds: 250),
+            duration: const Duration(milliseconds: 250),
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
-                color: Colors.black12,
+                color: Colors.white30,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.black26),
+                border: Border.all(color: Colors.white70, width: 1),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 4.0,
+                    offset: Offset(0, 2),
+                  ),
+                ],
               ),
-              child: Row(
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(Icons.search, size: 20, color: Colors.grey),
+                  Icon(Icons.search, size: 20, color: Colors.white70),
                   SizedBox(width: 4),
                   Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Tìm kiếm...',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(fontSize: 14),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: TextField(
+                        textAlign: TextAlign.start,
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
+                          hintText: 'Tìm kiếm...',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(fontSize: 14, color: Colors.white70),
+                        ),
+                        style: TextStyle(color: Colors.white70),
                       ),
                     ),
                   ),

@@ -11,6 +11,8 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     on<AppStarted>(_onAppStarted);
     on<LoggedIn>(_onLoggedIn);
     on<LoggedOut>(_onLoggedOut);
+    on<SendEmailAuthRequest>(_sendEmailAuthRequest);
+    on<VerifyCodeRequest>(_verifyCode);
   }
 
   Future<void> _onAppStarted(
@@ -36,7 +38,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     }
   }
 
-  Future<void> _onLoggedIn(LoggedIn event, Emitter<AuthenticationState> emit) async {
+  Future _onLoggedIn(LoggedIn event, Emitter<AuthenticationState> emit) async {
     final result = await authRepository.getCurrentUser();
     final name = result.data!.fullName;
     print(name);
@@ -46,5 +48,33 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
   void _onLoggedOut(LoggedOut event, Emitter<AuthenticationState> emit) {
     authRepository.logOut();
     emit(Unauthenticated());
+  }
+
+  Future _sendEmailAuthRequest(SendEmailAuthRequest event, Emitter<AuthenticationState> emit) async {
+    emit(EmailVerificationInitial());
+    try {
+      final result = await authRepository.sendEmailAuthRequest(event.email);
+      if (result.isSuccess) {
+        emit(EmailRequestSentSuccessfully());
+      } else {
+        emit(SendEmailRequestFailed(result.failure!.message));
+      }
+    } catch (e) {
+      emit(SendEmailRequestFailed(e.toString()));
+    }
+  }
+
+  Future _verifyCode(VerifyCodeRequest event, Emitter<AuthenticationState> emit) async {
+    emit(EmailVerificationInitial());
+    try {
+      final result = await authRepository.verifyCode(event.email, event.code);
+      if (result.isSuccess) {
+        emit(EmailVerificatedSuccessfully());
+      } else {
+        emit(EmailVerificateFailed(result.failure!.message));
+      }
+    } catch (e) {
+      emit(EmailVerificateFailed(e.toString()));
+    }
   }
 }

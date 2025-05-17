@@ -1,6 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-extension DateTimeExt on DateTime {
+extension DateExt on DateTime {
   String toFormattedString() {
     String dayStr = day.toString().padLeft(2, '0'); // Ensure two digits
     String monthStr = month.toString().padLeft(2, '0'); // Ensure two digits
@@ -19,8 +20,22 @@ extension DateTimeExt on DateTime {
   DateTime standardFormatDate() {
     return DateFormat('yyyy-MM-dd').parse(toString());
   }
+  String standardFormatString() {
+    String yearStr = year.toString();
+    String monthStr = month.toString();
+    String dayStr = day.toString();
+    return "$yearStr-$monthStr-$dayStr";
+  }
   // Same format with saved datetime in database
   DateTime standardFormatDateTime() {
     return DateFormat('yyyy-MM-dd HH:mm:ss').parse(toString());
+  }
+}
+
+extension TimeExt on String {
+  String HH_mm() {
+    final str = toString();
+    final parts = str.split(':');
+    return '${parts[0]}:${parts[1]}';
   }
 }

@@ -24,17 +24,18 @@ class DbHelper {
     );
 
     // Sample data for Showing
-    final showing1 = Showing(
+    final showing1 = ShowingMovie(
       showingId: 1,
-      movieName: "Avengers: Endgame",
       cinemaName: "CGV Aeon Mall",
       screenName: "Screen 1",
-      startTime: DateTime.now(),
-      endTime: DateTime.now().add(const Duration(hours: 3)),
+      startTime: 'DateTime.now()',
+      endTime: 'DateTime.now().add(const Duration(hours: 3))',
       language: "English",
       subtitleLanguage: "Vietnamese",
       showingFormat: "2D",
       showingDate: DateTime.now(),
+      screenId: 1,
+      seatCount: 100,
     );
 
     // Sample data for seats
@@ -43,6 +44,7 @@ class DbHelper {
       seats: [
         Seat(
           seatId: 1,
+          showingId: 1,
           seatType: "Regular",
           screenName: "Screen 1",
           rowName: "G",
@@ -50,6 +52,7 @@ class DbHelper {
         ),
         Seat(
           seatId: 2,
+          showingId: 1,
           seatType: "Regular",
           screenName: "Screen 1",
           rowName: "G",

@@ -8,8 +8,8 @@ import 'package:retrofit/retrofit.dart';
 part 'auth_remote_data_source.g.dart';
 
 @RestApi(baseUrl: authAPIBaseURL)
-abstract class AuthRemoteDatasource {
-  factory AuthRemoteDatasource(Dio dio) = _AuthRemoteDatasource;
+abstract class AuthRemoteDataSource {
+  factory AuthRemoteDataSource(Dio dio) = _AuthRemoteDataSource;
 
   @POST('/login')
   Future<HttpResponse<LoginResponse>> logInWithEmailOrPhoneAndPassword(
@@ -28,6 +28,16 @@ abstract class AuthRemoteDatasource {
     // @Field('address') String address,
     // @Field('dateOfBirth') String dateOfBirth,
     @Body() Map<String, dynamic> body,
+  );
+
+  @POST('/send-email-verify')
+  Future<HttpResponse<Map<String, String>>> sendEmailAuthRequest(
+    @Body() Map<String, dynamic> email
+  );
+
+  @POST('/verify-code')
+  Future<HttpResponse<RegularResponse>> verifyCode(
+    @Body() Map<String, dynamic> body
   );
 
   @POST('/refresh-token')

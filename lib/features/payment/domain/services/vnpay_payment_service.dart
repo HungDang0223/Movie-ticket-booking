@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:movie_tickets/injection.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -35,6 +37,7 @@ class VNPAYPaymentService {
     //[instance] Single Ton Init
   static VNPAYPaymentService get instance => _instance;
 
+  Dio dio = sl<Dio>();
 
   Map<String, dynamic> _sortParams(Map<String, dynamic> params) {
     final sortedParams = <String, dynamic>{};
@@ -46,7 +49,7 @@ class VNPAYPaymentService {
   }
 
 
-  //[generatePaymentUrl] Generate payment Url with input parameters
+  // [generatePaymentUrl] Generate payment Url with input parameters
   String generatePaymentUrl({
     String url = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
     required String version,
@@ -114,5 +117,14 @@ class VNPAYPaymentService {
         "$url?$query&vnp_SecureHashType=${vnPayHashType.toValueString()}&vnp_SecureHash=$vnpSecureHash";
     debugPrint("=====>[PAYMENT URL]: $paymentUrl");
     return paymentUrl;
+  }
+  Future<String> generatePaymentUrlApi(double amount, String description) async {
+    String queryString = "https://skunk-elegant-hideously.ngrok-free.app/api/Vnpay/CreatePaymentUrl?money=$amount&description=$description";
+    final paymentUrl = await dio.get(queryString);
+    if (paymentUrl.statusCode == 201) {
+      return paymentUrl.data;
+    } else {
+      throw Exception("Failed to generate payment URL");
+    }
   }
 }

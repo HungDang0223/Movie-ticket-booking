@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie_tickets/features/setting/presentation/bloc/setting_event.dart';
+import 'package:movie_tickets/features/setting/presentation/bloc/settings_state.dart';
 import 'package:movie_tickets/injection.dart';
-import '../../domain/repositories/settings_repository.dart';
 import '../widgets/settings_section.dart';
 import '../widgets/settings_tile.dart';
 import '../bloc/settings_bloc.dart';
 import 'notification_settings_page.dart';
 import 'language_selection_page.dart';
-import 'profile_edit_page.dart';
-import 'password_change_page.dart';
 
 class SettingPage extends StatelessWidget {
 
   const SettingPage({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -56,12 +55,7 @@ class SettingPage extends StatelessWidget {
                         title: 'Profile Information',
                         subtitle: 'Update your personal details',
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ProfileEditPage(),
-                            ),
-                          );
+                          Navigator.pushNamed(context, '/user-info');
                         },
                       ),
                       SettingsTile(
@@ -69,12 +63,7 @@ class SettingPage extends StatelessWidget {
                         title: 'Change Password',
                         subtitle: 'Update your password',
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const PasswordChangePage(),
-                            ),
-                          );
+                          Navigator.pushNamed(context, '/change-password');
                         },
                       ),
                       SettingsTile(
@@ -92,7 +81,7 @@ class SettingPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 10),
                   SettingsSection(
                     title: 'App Settings',
                     children: [
@@ -126,7 +115,7 @@ class SettingPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 10),
                   SettingsSection(
                     title: 'Support',
                     children: [
@@ -154,7 +143,7 @@ class SettingPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 10),
                   SettingsSection(
                     title: 'Account Actions',
                     children: [

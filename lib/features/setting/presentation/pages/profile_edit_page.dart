@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:movie_tickets/features/setting/presentation/bloc/setting_event.dart';
+import 'package:movie_tickets/features/setting/presentation/bloc/settings_state.dart';
 import '../../domain/entities/settings.dart';
 import '../bloc/settings_bloc.dart';
 
@@ -13,7 +15,7 @@ class ProfileEditPage extends StatefulWidget {
 
 class _ProfileEditPageState extends State<ProfileEditPage> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController;
+  late TextEditingController _nameController = TextEditingController();
   late TextEditingController _phoneController;
   String? _photoUrl;
   bool _isLoading = false;

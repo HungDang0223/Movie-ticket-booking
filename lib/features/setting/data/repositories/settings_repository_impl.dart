@@ -18,12 +18,12 @@ class SettingsRepositoryImpl implements SettingsRepository {
 
       final settings = await getSettings();
       return {
-        'name': settings.userProfile.name,
-        'email': settings.userProfile.email,
-        'photoUrl': settings.userProfile.photoUrl,
-        'points': settings.userProfile.points,
-        'level': settings.userProfile.level,
-        'phoneNumber': settings.userProfile.phoneNumber,
+        'name': null,
+        'email': null,
+        'photoUrl': null,
+        'points': null,
+        'level': null,
+        'phoneNumber': null,
       };
     } catch (e) {
       throw Exception('Failed to get profile: ${e.toString()}');
@@ -132,25 +132,25 @@ class SettingsRepositoryImpl implements SettingsRepository {
         return settings;
       }
 
-      final user = await _authRepository.getCurrentUser();
+      // final user = await _authRepository.getCurrentUser();
 
       // Create default settings for new user
-      final defaultSettings = SettingsModel(
+      const defaultSettings = SettingsModel(
         isDarkMode: false,
         currentLanguage: 'en',
-        notificationSettings: {
+        notificationSettings: const {
           'movie_reminders': true,
           'booking_confirmations': true,
           'special_offers': true,
           'news_updates': true,
         },
-        userProfile: UserProfileModel(
-          name: user.data!.fullName ?? '',
-          email: user.data!.email ?? '',
-          photoUrl: user.data!.photoPath ?? '',
+        userProfile: const UserProfileModel(
+          name: '',
+          email:  '',
+          photoUrl:  '',
           points: 0,
           level: 1,
-          phoneNumber: user.data!.phoneNumber ?? '',
+          phoneNumber:  '',
         ),
       );
 

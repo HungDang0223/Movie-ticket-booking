@@ -23,22 +23,29 @@ class PersistentHeader extends StatelessWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   color: Colors.black12,
-                  border: Border.all(color: Colors.black26),
+                  border: Border.all(color: Colors.white70, width: 1),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4.0,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    Icon(Icons.search, color: Colors.grey),
+                    Icon(Icons.search, color: Colors.white70),
                     SizedBox(width: 8),
                     Expanded(
                       child: TextField(
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'Tìm tên phim hoặc rạp',
                           border: InputBorder.none,
-                          hintStyle: TextStyle(color: Colors.grey),
+                          hintStyle: TextStyle(color: Colors.white70),
                         ),
                       ),
                     ),
