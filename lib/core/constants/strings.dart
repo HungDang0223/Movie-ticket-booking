@@ -2,6 +2,8 @@
 const String baseURL = 'https://skunk-elegant-hideously.ngrok-free.app/api/v1';
 const String authAPIBaseURL = 'https://skunk-elegant-hideously.ngrok-free.app/api/v1/auth/';
 const String showingMovieAPIBaseURL = 'https://skunk-elegant-hideously.ngrok-free.app/api/v1/showing-movie';
+const String reviewAPIBaseURL = 'https://skunk-elegant-hideously.ngrok-free.app/api/v1/review';
+const String movieAPIBaseURL = 'https://skunk-elegant-hideously.ngrok-free.app/api/v1/movie';
 
 // run in web -> localhost and https
 // const String baseURL = 'http://localhost:5000/api/v1/';

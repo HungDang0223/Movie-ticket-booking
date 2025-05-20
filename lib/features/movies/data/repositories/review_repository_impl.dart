@@ -16,9 +16,9 @@ class ReviewRepositoryImpl extends ReviewRepository {
   final ReviewRemoteDatasource _reviewRemoteDatasource = sl<ReviewRemoteDatasource>();
   
   @override
-  Future<Result<List<ReviewModel>>> getMovieReivews(int movieId) async {
+  Future<Result<List<MovieReview>>> getMovieReivews(int movieId) async {
     try {
-      final httpResponse = await _reviewRemoteDatasource.getMovieReviews(movieId);
+      final httpResponse = await _reviewRemoteDatasource.getMovieModels(movieId);
       
       if (httpResponse.response.statusCode == HttpStatus.ok) {
         final response = httpResponse.data;

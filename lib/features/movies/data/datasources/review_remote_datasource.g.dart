@@ -24,12 +24,12 @@ class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<HttpResponse<List<ReviewModel>>> getMovieReviews(int movieId) async {
+  Future<HttpResponse<List<MovieReview>>> getMovieModels(int movieId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<HttpResponse<List<ReviewModel>>>(Options(
+    final _options = _setStreamType<HttpResponse<List<MovieReview>>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -46,10 +46,10 @@ class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
           baseUrl,
         )));
     final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<ReviewModel> _value;
+    late List<MovieReview> _value;
     try {
       _value = _result.data!
-          .map((dynamic i) => ReviewModel.fromJson(i as Map<String, dynamic>))
+          .map((dynamic i) => MovieReview.fromJson(i as Map<String, dynamic>))
           .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);

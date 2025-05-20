@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Movie Tickets"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "or": "OR",
+    "loginWithGoogle": "Login with Google",
+    "dontHaveAccount": "Don't have an account?"
+  },
+  "settings": {
+    "settings": "Settings",
+    "accountSettings": "Account Settings",
+    "profileInformation": "Profile Information",
+    "changePassword": "Change Password",
+    "notifications": "Notifications",
+    "appSettings": "App Settings",
+    "language": "Language",
+    "selectLanguage": "Select Language",
+    "theme": "Theme",
+    "darkMode": "Dark Mode",
+    "support": "Support",
+    "helpCenter": "Help Center",
+    "about": "About",
+    "accountActions": "Account Actions",
+    "signOut": "Sign Out"
+  },
+  "notifications": {
+    "notificationSettings": "Notification Settings",
+    "movieReminders": "Movie Reminders",
+    "movieRemindersDesc": "Get notified about upcoming movies and showtimes",
+    "bookingConfirmations": "Booking Confirmations",
+    "bookingConfirmationsDesc": "Receive confirmation for your ticket bookings",
+    "specialOffers": "Special Offers",
+    "specialOffersDesc": "Get notified about special deals and promotions"
+  },
+  "venues": {
+    "movieVenues": "Movie Venues",
+    "theaters": "Theaters",
+    "capacity": "Capacity",
+    "location": "Location",
+    "selectSeat": "Select Seat",
+    "bookNow": "Book Now"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "update": "Update",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "next": "Next",
+    "back": "Back",
+    "done": "Done",
+    "error": "Error",
+    "success": "Success",
+    "comingSoon": "comming soon"
+  }
+}

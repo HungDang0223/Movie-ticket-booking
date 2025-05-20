@@ -1,4 +1,5 @@
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:localization/localization.dart';
 import 'package:movie_tickets/core/commons/app_nav_bar.dart';
 import 'package:movie_tickets/core/configs/routes.dart';
 import 'package:movie_tickets/core/configs/size_config.dart';
@@ -27,6 +28,7 @@ import 'package:movie_tickets/features/authentication/presentation/bloc/signup_b
 import 'package:movie_tickets/features/authentication/presentation/pages/login_page.dart';
 import 'package:movie_tickets/features/authentication/presentation/pages/signup_page.dart';
 import 'package:movie_tickets/features/sc_splash.dart';
+import 'package:movie_tickets/core/utils/app_localizations.dart';
 
 import 'features/authentication/presentation/bloc/auth_bloc/bloc.dart';
 
@@ -51,6 +53,7 @@ class MyApp extends StatelessWidget {
       child: BlocBuilder<SettingsBloc, SettingsState>(
         builder: (context, state) {
           final isDarkMode = state is SettingsLoaded ? state.isDarkMode : false;
+          LocalJsonLocalization.delegate.directories = ['assets/i18n'];
           
           return MaterialApp(
             debugShowCheckedModeBanner: false,
@@ -82,26 +85,20 @@ class MyApp extends StatelessWidget {
             ),
             themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
             supportedLocales: const [
-              Locale('vi', 'VN'), // Vietnamese
-            ],
-            localizationsDelegates: const [
+              Locale('vi', 'VN'),
+              Locale('en', 'US')
+            ],            
+            localizationsDelegates: [
+              LocalJsonLocalization.delegate,
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
-            ],
-            locale: const Locale('vi', 'VN'),
-            home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-              builder: (context, state) {
-                // if (state is Uninitialized) {
-                //   return LoginPage();
-                // } else if (state is Unauthenticated) {
-                //   return LoginPage();
-                // } else if (state is Authenticated) {
-                //   return MainScreen();
-                // }
-                return MainScreen();
-              },
-            ),
+            ],            
+            locale: state is SettingsLoaded 
+              ? Locale(state.languageCode, state.countryCode)
+              : const Locale('vi', 'VN'),
+            localeResolutionCallback: AppLocalizations.localeResolutionCallback,
+            home: MainScreen(), // Use SplashScreen as the initial screen
           );
         },
       ),

@@ -7,10 +7,10 @@ class ReviewEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class GetMovieReviews extends ReviewEvent {
+class GetMovieModels extends ReviewEvent {
   final int id;
 
-  const GetMovieReviews(this.id);
+  const GetMovieModels(this.id);
 
   @override
   List<Object?> get props => [id];

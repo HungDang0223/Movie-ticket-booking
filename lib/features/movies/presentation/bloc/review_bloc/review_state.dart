@@ -13,7 +13,7 @@ class ReviewLoading extends ReviewState {
 }
 
 class ReviewLoaded extends ReviewState {
-  final List<ReviewModel> reviews;
+  final List<MovieReview> reviews;
   const ReviewLoaded(this.reviews);
 }
 

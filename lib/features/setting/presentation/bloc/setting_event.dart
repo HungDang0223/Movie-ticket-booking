@@ -39,8 +39,9 @@ class UpdateNotificationSettings extends SettingsEvent {
 
 class ChangeLanguage extends SettingsEvent {
   final String languageCode;
+  final String countryCode;
 
-  const ChangeLanguage(this.languageCode);
+  const ChangeLanguage(this.languageCode, this.countryCode);
 
   @override
   List<Object?> get props => [languageCode];

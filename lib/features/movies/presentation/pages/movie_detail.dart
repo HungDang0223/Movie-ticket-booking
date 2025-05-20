@@ -63,7 +63,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                       children: [
                         MovieDescription(movie: widget.movie),
                         const SizedBox(height: 10),
-                        const MovieCommentView(),
+                        MovieCommentView(movieId: widget.movie.movieId),
                         const SizedBox(height: 10),
                       ],
                     ),

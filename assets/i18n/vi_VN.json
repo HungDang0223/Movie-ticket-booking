@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Đặt Vé Phim"
+  },
+  "auth": {
+    "login": "Đăng Nhập",
+    "signup": "Đăng Ký",
+    "email": "Email",
+    "password": "Mật Khẩu",
+    "confirmPassword": "Xác Nhận Mật Khẩu",
+    "forgotPassword": "Quên Mật Khẩu?",
+    "or": "HOẶC",
+    "loginWithGoogle": "Đăng nhập với Google",
+    "dontHaveAccount": "Chưa có tài khoản?"
+  },
+  "settings": {
+    "settings": "Cài Đặt",
+    "accountSettings": "Cài Đặt Tài Khoản",
+    "profileInformation": "Thông Tin Cá Nhân",
+    "changePassword": "Đổi Mật Khẩu",
+    "notifications": "Thông Báo",
+    "appSettings": "Cài Đặt Ứng Dụng",
+    "language": "Ngôn Ngữ",
+    "selectLanguage": "Chọn ngôn ngữ",
+    "theme": "Giao Diện",
+    "darkMode": "Chế Độ Tối",
+    "support": "Hỗ Trợ",
+    "helpCenter": "Trung Tâm Trợ Giúp",
+    "about": "Về Chúng Tôi",
+    "accountActions": "Thao Tác Tài Khoản",
+    "signOut": "Đăng Xuất"
+  },
+  "notifications": {
+    "notificationSettings": "Cài Đặt Thông Báo",
+    "movieReminders": "Nhắc Nhở Phim",
+    "movieRemindersDesc": "Nhận thông báo về các phim sắp chiếu và lịch chiếu",
+    "bookingConfirmations": "Xác Nhận Đặt Vé",
+    "bookingConfirmationsDesc": "Nhận xác nhận cho các đặt vé của bạn",
+    "specialOffers": "Ưu Đãi Đặc Biệt",
+    "specialOffersDesc": "Nhận thông báo về các ưu đãi và khuyến mãi đặc biệt"
+  },
+  "venues": {
+    "movieVenues": "Rạp Chiếu Phim",
+    "theaters": "Nhà Hát",
+    "capacity": "Sức Chứa",
+    "location": "Vị Trí",
+    "selectSeat": "Chọn Ghế",
+    "bookNow": "Đặt Ngay"
+  },
+  "common": {
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "update": "Cập Nhật",
+    "delete": "Xóa",
+    "confirm": "Xác Nhận",
+    "next": "Tiếp",
+    "back": "Quay Lại",
+    "done": "Xong",
+    "error": "Lỗi",
+    "success": "Thành Công",
+    "comingSoon": "Sắp ra mắt"
+  }
+}

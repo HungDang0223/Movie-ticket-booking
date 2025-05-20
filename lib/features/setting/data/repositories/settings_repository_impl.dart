@@ -14,7 +14,6 @@ class SettingsRepositoryImpl implements SettingsRepository {
   @override
   Future<Map<String, dynamic>> getProfile() async {
     try {
-      final user = _authRepository.getCurrentUser();
 
       final settings = await getSettings();
       return {
@@ -46,7 +45,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
 
       final updatedSettings = SettingsModel(
         isDarkMode: currentSettings.isDarkMode,
-        currentLanguage: currentSettings.currentLanguage,
+        languageCode: currentSettings.languageCode,
+        countryCode: currentSettings.countryCode,
         notificationSettings: currentSettings.notificationSettings,
         userProfile: updatedProfile,
       );
@@ -72,7 +72,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
       final currentSettings = await getSettings();
       final updatedSettings = SettingsModel(
         isDarkMode: currentSettings.isDarkMode,
-        currentLanguage: currentSettings.currentLanguage,
+        languageCode: currentSettings.languageCode,
+        countryCode: currentSettings.countryCode,
         notificationSettings: settings,
         userProfile: currentSettings.userProfile,
       );
@@ -81,14 +82,14 @@ class SettingsRepositoryImpl implements SettingsRepository {
       throw Exception('Failed to update notification settings: ${e.toString()}');
     }
   }
-
   @override
-  Future<void> changeLanguage(String languageCode) async {
+  Future<void> changeLanguage(String languageCode, String countryCode) async {
     try {
       final currentSettings = await getSettings();
       final updatedSettings = SettingsModel(
         isDarkMode: currentSettings.isDarkMode,
-        currentLanguage: languageCode,
+        languageCode: languageCode,
+        countryCode: countryCode,
         notificationSettings: currentSettings.notificationSettings,
         userProfile: currentSettings.userProfile,
       );
@@ -104,7 +105,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
       final currentSettings = await getSettings();
       final updatedSettings = SettingsModel(
         isDarkMode: isDarkMode,
-        currentLanguage: currentSettings.currentLanguage,
+        languageCode: currentSettings.languageCode,
+        countryCode: currentSettings.countryCode,
         notificationSettings: currentSettings.notificationSettings,
         userProfile: currentSettings.userProfile,
       );
@@ -132,20 +134,22 @@ class SettingsRepositoryImpl implements SettingsRepository {
         return settings;
       }
 
-      // final user = await _authRepository.getCurrentUser();
+      final result = await _authRepository.getCurrentUser();
+      final user = result.data;
 
       // Create default settings for new user
-      const defaultSettings = SettingsModel(
+      final defaultSettings = SettingsModel(
         isDarkMode: false,
-        currentLanguage: 'en',
+        languageCode: 'vi',
+        countryCode: 'VN',
         notificationSettings: const {
           'movie_reminders': true,
           'booking_confirmations': true,
           'special_offers': true,
           'news_updates': true,
         },
-        userProfile: const UserProfileModel(
-          name: '',
+        userProfile: UserProfileModel(
+          name: user!.fullName,
           email:  '',
           photoUrl:  '',
           points: 0,

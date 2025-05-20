@@ -1,66 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:localization/localization.dart';
 import 'package:movie_tickets/features/setting/presentation/bloc/setting_event.dart';
 import 'package:movie_tickets/features/setting/presentation/bloc/settings_state.dart';
 import 'package:movie_tickets/injection.dart';
 import '../bloc/settings_bloc.dart';
 
-class LanguageSelectionPage extends StatelessWidget {
+class LanguageSelectionPage extends StatefulWidget {
   const LanguageSelectionPage({Key? key}) : super(key: key);
 
+  @override
+  State<LanguageSelectionPage> createState() => _LanguageSelectionPageState();
+}
+
+class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select Language'),
+        title: Text('settings.selectLanguage'.i18n()),
         centerTitle: true,
       ),
       body: BlocBuilder<SettingsBloc, SettingsState>(
-        bloc: sl<SettingsBloc>()..add(LoadSettings()),
         builder: (context, state) {
           if (state is SettingsLoaded) {
             return ListView(
               padding: const EdgeInsets.all(16.0),
-              children: [
+              children: [                
+                _buildLanguageTile(
+                  context,
+                  title: 'Tiếng Việt',
+                  languageCode: 'vi',
+                  isSelected: state.languageCode == 'vi',
+                  onTap: () {
+                    context.read<SettingsBloc>().add(const ChangeLanguage('vi', 'VN'));
+                  },
+                ),
                 _buildLanguageTile(
                   context,
                   title: 'English',
-                  subtitle: 'English',
                   languageCode: 'en',
-                  isSelected: state.currentLanguage == 'en',
-                  onTap: () => context.read<SettingsBloc>().add(ChangeLanguage('en')),
-                ),
-                _buildLanguageTile(
-                  context,
-                  title: 'Español',
-                  subtitle: 'Spanish',
-                  languageCode: 'es',
-                  isSelected: state.currentLanguage == 'es',
-                  onTap: () => context.read<SettingsBloc>().add(ChangeLanguage('es')),
-                ),
-                _buildLanguageTile(
-                  context,
-                  title: 'Français',
-                  subtitle: 'French',
-                  languageCode: 'fr',
-                  isSelected: state.currentLanguage == 'fr',
-                  onTap: () => context.read<SettingsBloc>().add(ChangeLanguage('fr')),
-                ),
-                _buildLanguageTile(
-                  context,
-                  title: 'Deutsch',
-                  subtitle: 'German',
-                  languageCode: 'de',
-                  isSelected: state.currentLanguage == 'de',
-                  onTap: () => context.read<SettingsBloc>().add(ChangeLanguage('de')),
-                ),
-                _buildLanguageTile(
-                  context,
-                  title: 'Italiano',
-                  subtitle: 'Italian',
-                  languageCode: 'it',
-                  isSelected: state.currentLanguage == 'it',
-                  onTap: () => context.read<SettingsBloc>().add(ChangeLanguage('it')),
+                  isSelected: state.languageCode == 'en',
+                  onTap: () {
+                    context.read<SettingsBloc>().add(const ChangeLanguage('en', 'US'));
+                  },
                 ),
               ],
             );
@@ -77,7 +64,6 @@ class LanguageSelectionPage extends StatelessWidget {
   Widget _buildLanguageTile(
     BuildContext context, {
     required String title,
-    required String subtitle,
     required String languageCode,
     required bool isSelected,
     required VoidCallback onTap,
@@ -91,7 +77,6 @@ class LanguageSelectionPage extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-        subtitle: Text(subtitle),
         trailing: isSelected
             ? Icon(
                 Icons.check_circle,

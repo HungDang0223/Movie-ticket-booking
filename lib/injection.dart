@@ -100,7 +100,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SignUpUseCase(sl()));
   sl.registerLazySingleton(() => GetListMoviesUseCase(sl()));
   sl.registerLazySingleton(() => GetMovieDetailUseCase(sl()));
-  sl.registerLazySingleton(() => GetMovieReviewUseCase(sl()));
+  sl.registerLazySingleton(() => GetMovieModelUseCase(sl()));
 
   // Register blocs
   sl.registerFactory(() => AuthenticationBloc(authRepository: sl<AuthRepository>()));

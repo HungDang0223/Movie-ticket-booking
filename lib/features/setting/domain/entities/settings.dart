@@ -23,17 +23,19 @@ class UserProfile extends Equatable {
 
 class Settings extends Equatable {
   final bool isDarkMode;
-  final String currentLanguage;
+  final String languageCode;
+  final String countryCode;
   final Map<String, bool> notificationSettings;
   final UserProfile userProfile;
 
   const Settings({
     required this.isDarkMode,
-    required this.currentLanguage,
+    required this.languageCode,
+    required this.countryCode,
     required this.notificationSettings,
     required this.userProfile,
   });
 
   @override
-  List<Object?> get props => [isDarkMode, currentLanguage, notificationSettings];
+  List<Object?> get props => [isDarkMode, languageCode, countryCode, notificationSettings];
 } 

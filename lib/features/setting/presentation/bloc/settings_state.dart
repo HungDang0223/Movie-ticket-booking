@@ -14,19 +14,21 @@ class SettingsLoading extends SettingsState {}
 
 class SettingsLoaded extends SettingsState {
   final bool isDarkMode;
-  final String currentLanguage;
+  final String languageCode;
+  final String countryCode;
   final Map<String, bool> notificationSettings;
   final UserProfile userProfile;
 
   const SettingsLoaded({
     required this.isDarkMode,
-    required this.currentLanguage,
+    required this.languageCode,
+    required this.countryCode,
     required this.notificationSettings,
     required this.userProfile,
   });
 
   @override
-  List<Object?> get props => [isDarkMode, currentLanguage, notificationSettings, userProfile];
+  List<Object?> get props => [isDarkMode, languageCode, notificationSettings, userProfile];
 }
 
 class SettingsError extends SettingsState {

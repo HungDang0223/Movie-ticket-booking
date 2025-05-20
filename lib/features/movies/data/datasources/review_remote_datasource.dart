@@ -13,7 +13,7 @@ abstract class ReviewRemoteDatasource {
   factory ReviewRemoteDatasource(Dio dio) = _ReviewRemoteDatasource;
 
   @GET('/{movieId}')
-  Future<HttpResponse<List<ReviewModel>>> getMovieReviews(
+  Future<HttpResponse<List<MovieReview>>> getMovieModels(
     @Path("movieId") int movieId,
   );
 

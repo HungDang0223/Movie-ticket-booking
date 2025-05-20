@@ -28,7 +28,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       final settings = await _repository.getSettings();
       emit(SettingsLoaded(
         isDarkMode: settings.isDarkMode,
-        currentLanguage: settings.currentLanguage,
+        languageCode: settings.languageCode,
+        countryCode: settings.countryCode,
         notificationSettings: settings.notificationSettings,
         userProfile: settings.userProfile,
       ));
@@ -59,9 +60,24 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
   Future<void> _onUpdateNotificationSettings(UpdateNotificationSettings event, Emitter<SettingsState> emit) async {
     try {
-      emit(SettingsLoading());
-      await _repository.updateNotificationSettings(event.settings);
-      add(LoadSettings());
+      if (state is SettingsLoaded) {
+        final currentState = state as SettingsLoaded;
+        
+        await _repository.updateNotificationSettings(event.settings);
+        
+        // Just update the language without reloading everything
+        emit(SettingsLoaded(
+          isDarkMode: currentState.isDarkMode,
+          languageCode: currentState.languageCode,
+          countryCode: currentState.countryCode,
+          notificationSettings: event.settings,
+          userProfile: currentState.userProfile,
+        ));
+      } else {
+        emit(SettingsLoading());
+        await _repository.updateNotificationSettings(event.settings);
+        add(LoadSettings());
+      }
     } catch (e) {
       emit(SettingsError(e.toString()));
     }
@@ -69,9 +85,24 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
   Future<void> _onChangeLanguage(ChangeLanguage event, Emitter<SettingsState> emit) async {
     try {
-      emit(SettingsLoading());
-      await _repository.changeLanguage(event.languageCode);
-      add(LoadSettings());
+      if (state is SettingsLoaded) {
+        final currentState = state as SettingsLoaded;
+        
+        await _repository.changeLanguage(event.languageCode, event.countryCode);
+        
+        // Just update the language without reloading everything
+        emit(SettingsLoaded(
+          isDarkMode: currentState.isDarkMode,
+          languageCode: event.languageCode,
+          countryCode: event.countryCode,
+          notificationSettings: currentState.notificationSettings,
+          userProfile: currentState.userProfile,
+        ));
+      } else {
+        emit(SettingsLoading());
+        await _repository.changeLanguage(event.languageCode, event.countryCode);
+        add(LoadSettings());
+      }
     } catch (e) {
       emit(SettingsError(e.toString()));
     }
@@ -79,9 +110,24 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
   Future<void> _onChangeTheme(ChangeTheme event, Emitter<SettingsState> emit) async {
     try {
-      emit(SettingsLoading());
-      await _repository.changeTheme(event.isDarkMode);
-      add(LoadSettings());
+      if (state is SettingsLoaded) {
+        final currentState = state as SettingsLoaded;
+        
+        await _repository.changeTheme(event.isDarkMode);
+        
+        // Just update the language without reloading everything
+        emit(SettingsLoaded(
+          isDarkMode: event.isDarkMode,
+          languageCode: currentState.languageCode,
+          countryCode: currentState.countryCode,
+          notificationSettings: currentState.notificationSettings,
+          userProfile: currentState.userProfile,
+        ));
+      } else {
+        emit(SettingsLoading());
+        await _repository.changeTheme(event.isDarkMode);
+        add(LoadSettings());
+      }
     } catch (e) {
       emit(SettingsError(e.toString()));
     }

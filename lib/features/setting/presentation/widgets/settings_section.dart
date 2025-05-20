@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movie_tickets/core/constants/app_color.dart';
 
 class SettingsSection extends StatelessWidget {
   final String title;
@@ -22,7 +23,7 @@ class SettingsSection extends StatelessWidget {
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.grey,
+              color: AppColor.GRAY6,
             ),
           ),
         ),
