@@ -4,7 +4,6 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:movie_tickets/core/errors/failures.dart';
 import 'package:movie_tickets/core/usecase/use_case.dart';
 import 'package:movie_tickets/core/utils/result.dart';
-import 'package:movie_tickets/features/payment/data/models/payment_card.dart';
 import 'package:movie_tickets/features/payment/domain/repositories/payment_repository.dart';
 
 class StripePaymentUseCase implements UseCase<PaymentIntent, StripePaymentParams> {

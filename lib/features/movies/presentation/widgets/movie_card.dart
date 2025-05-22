@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:movie_tickets/core/constants/app_color.dart';
 import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
 
@@ -11,7 +10,7 @@ class MovieCard extends StatefulWidget {
   // Thêm callback để thông báo khi trang thay đổi
   final Function(int)? onPageChanged;
 
-  MovieCard({
+  const MovieCard({super.key, 
     required this.movies,
     this.onPageChanged, // Tham số tùy chọn
   });
@@ -131,7 +130,7 @@ class _MovieCardState extends State<MovieCard> {
                 children: [
                   // Movie poster container
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 5, vertical: 20),
+                    margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 20),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       image: DecorationImage(
@@ -189,7 +188,7 @@ class _MovieCardState extends State<MovieCard> {
                         color: Colors.white.withOpacity(0.85),
                         shadows: [
                           Shadow(
-                            offset: Offset(2, 2),
+                            offset: const Offset(2, 2),
                             blurRadius: 5.0,
                             color: Colors.black.withOpacity(0.7),
                           ),

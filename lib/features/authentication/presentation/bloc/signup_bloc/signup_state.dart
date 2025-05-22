@@ -1,4 +1,3 @@
-import 'package:movie_tickets/core/errors/failures.dart';
 import 'package:movie_tickets/features/authentication/data/models/auth_response.dart';
 
 abstract class SignupState {

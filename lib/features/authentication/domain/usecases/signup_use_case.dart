@@ -1,4 +1,3 @@
-import 'package:movie_tickets/core/extensions/date_time_ext.dart';
 import 'package:movie_tickets/core/usecase/use_case.dart';
 import 'package:movie_tickets/core/utils/result.dart';
 import 'package:movie_tickets/features/authentication/data/models/auth_response.dart';

@@ -1,9 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:movie_tickets/core/constants/strings.dart';
-import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
 import 'package:movie_tickets/features/movies/data/models/review_model.dart';
-import 'package:retrofit/dio.dart';
-import 'package:retrofit/http.dart';
 import 'package:retrofit/retrofit.dart';
 
 part 'review_remote_datasource.g.dart';
@@ -13,8 +10,38 @@ abstract class ReviewRemoteDatasource {
   factory ReviewRemoteDatasource(Dio dio) = _ReviewRemoteDatasource;
 
   @GET('/{movieId}')
-  Future<HttpResponse<List<MovieReview>>> getMovieModels(
+  Future<HttpResponse<ReviewResponse>> getMovieModels(
     @Path("movieId") int movieId,
+      @Query("page") int page,
+      @Query("limit") int limit,
+      @Query("sort") String? sort,
+  );
+
+  @POST('/{movieId}')
+  Future<HttpResponse<MovieReview>> postMovieReview(
+    @Path("movieId") int movieId,
+    @Body() Map<String, dynamic> reviewData,
+  );
+
+  @PATCH('/{reviewId}')
+  Future<HttpResponse<MovieReview>> updateMovieReview(
+    @Path("reviewId") int reviewId,
+    @Body() Map<String, dynamic> reviewData,
+  );
+
+  @DELETE('/{reviewId}')
+  Future<HttpResponse<bool>> deleteMovieReview(
+    @Path("reviewId") int reviewId,
+  );
+
+  @PATCH('/{reviewId}/like')
+  Future<HttpResponse<bool>> likeMovieReview(
+    @Path("reviewId") int reviewId,
+  );
+
+  @PATCH('/{reviewId}/unlike')
+  Future<HttpResponse<bool>> unlikeMovieReview(
+    @Path("reviewId") int reviewId,
   );
 
 }

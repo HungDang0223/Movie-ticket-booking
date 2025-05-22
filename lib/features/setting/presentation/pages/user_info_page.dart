@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:movie_tickets/core/services/networking/upload_services.dart';
-import 'package:movie_tickets/features/authentication/data/models/user_model.dart';
 import 'package:movie_tickets/features/authentication/presentation/pages/email_verification_page.dart';
 
 import '../../../../core/constants/my_const.dart';

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
-import 'package:movie_tickets/features/movies/domain/entities/movie.dart';
 import '../../data/models/models.dart';
 import 'booking_snack.dart';
 
@@ -22,10 +21,10 @@ class BookingSeatScreen extends StatefulWidget {
   final ShowingMovie showingMovie;
 
   const BookingSeatScreen({
-    Key? key,
+    super.key,
     required this.movie,
     required this.showingMovie,
-  }) : super(key: key);
+  });
 
   @override
   State<BookingSeatScreen> createState() => _BookingSeatScreenState();
@@ -248,7 +247,7 @@ class _BookingSeatScreenState extends State<BookingSeatScreen> with SingleTicker
       child: LayoutBuilder(
         builder: (context, constraints) {
           // Calculate if items can fit in a single row
-          final itemWidth = 90.0; // Estimated width per legend item
+          const itemWidth = 90.0; // Estimated width per legend item
           final availableWidth = constraints.maxWidth;
           final itemsPerRow = (availableWidth / itemWidth).floor();
           

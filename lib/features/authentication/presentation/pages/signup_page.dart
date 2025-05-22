@@ -10,6 +10,8 @@ import 'package:movie_tickets/features/authentication/presentation/widgets/widge
 import '../bloc/signup_bloc/bloc.dart';
 
 class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
+
   @override
   _SignupPageState createState() => _SignupPageState();
 }
@@ -36,6 +38,6 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  _buildTopWelcome() => WidgetTopWelcome();
-  _buildSignupForm() => WidgetSignupForm();
+  _buildTopWelcome() => const WidgetTopWelcome();
+  _buildSignupForm() => const WidgetSignupForm();
 }

@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movie_tickets/core/errors/failures.dart';
-import 'package:movie_tickets/core/utils/validators.dart';
+import 'package:movie_tickets/features/authentication/data/repositories/auth_repository_impl.dart';
 import 'package:movie_tickets/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:movie_tickets/features/authentication/domain/usecases/login_use_case.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/login_bloc/bloc.dart';
@@ -25,7 +24,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
       if (result.isSuccess && result.data != null) {
         print("sucessss");
-        
+        accessToken = result.data?.accessToken ?? '';
+        print("accessToken: $accessToken");
         emit(LoginSuccess(result.data?.accessToken ?? ''));
       } else {
         emit(LoginFailed(result.failure!.message));

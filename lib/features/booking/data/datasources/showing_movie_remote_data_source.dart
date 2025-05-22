@@ -1,11 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:movie_tickets/core/constants/strings.dart';
-import 'package:movie_tickets/core/extensions/date_time_ext.dart';
 import 'package:movie_tickets/features/booking/data/models/models.dart';
-import 'package:movie_tickets/injection.dart';
 import 'package:retrofit/retrofit.dart';
 
 part 'showing_movie_remote_data_source.g.dart';

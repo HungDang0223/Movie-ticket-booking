@@ -11,7 +11,6 @@ import 'package:movie_tickets/core/utils/zalopay_utils.dart';
 import 'package:movie_tickets/features/payment/data/models/payment_card.dart';
 import 'package:movie_tickets/features/payment/data/models/zalopay_order_response.dart';
 import 'package:movie_tickets/features/payment/domain/repositories/payment_repository.dart';
-import 'package:stripe_platform_interface/src/models/payment_intents.dart';
 
 class PaymentRepositoryImpl implements PaymentRepository{
   final Dio _dio = Dio(

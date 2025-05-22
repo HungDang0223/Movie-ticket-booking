@@ -7,9 +7,31 @@ class Result<T> {
 
   Result._({this.data, this.failure, this.exception});
 
+  void when({
+    required Function(T) success,
+    required Function(Failure) failure,
+  }) {
+    if (isSuccess && data != null) {
+      success(data as T);
+    } else if (isFailure && this.failure != null) {
+      failure(this.failure!);
+    }
+  }
+
+  Future<void> whenAsync({
+    required Future<void> Function(T) success,
+    required Future<void> Function(Failure) failure,
+  }) async {
+    if (isSuccess && data != null) {
+      await success(data as T);
+    } else if (isFailure && this.failure != null) {
+      await failure(this.failure!);
+    }
+  }
+
   Result<T> fold<T>(Result<T> result, Function(T) onSuccess, Function(Failure) onFailure) {
     return result.isSuccess
-        ? Result.success(onSuccess(result.data!))
+        ? Result.success(onSuccess(result.data as T))
         : Result.fromFailure(result.failure!);
   }
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class PersistentHeader extends StatelessWidget {
   final bool isScrolled; // Add this property to control the scroll state
@@ -42,7 +41,7 @@ class PersistentHeader extends StatelessWidget {
                     SizedBox(width: 8),
                     Expanded(
                       child: TextField(
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'Tìm tên phim hoặc rạp',
                           border: InputBorder.none,
                           hintStyle: TextStyle(color: Colors.white70),

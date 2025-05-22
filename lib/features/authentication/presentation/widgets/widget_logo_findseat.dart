@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class WidgetLogoFindSeat extends StatelessWidget {
+  const WidgetLogoFindSeat({super.key});
+
   @override
   Widget build(BuildContext context) {
     return SvgPicture.asset(

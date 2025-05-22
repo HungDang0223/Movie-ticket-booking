@@ -6,13 +6,15 @@ import 'package:movie_tickets/features/authentication/presentation/pages/login_p
 import 'package:movie_tickets/features/authentication/presentation/widgets/widget_logo_findseat.dart';
 
 class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
+
 
 @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         color: AppColor.DEFAULT,
-        child: Center(
+        child: const Center(
           child: SizedBox(
             width: 240,
             child: WidgetLogoFindSeat(),

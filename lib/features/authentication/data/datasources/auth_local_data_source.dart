@@ -1,8 +1,6 @@
 import 'package:movie_tickets/core/services/local/shared_prefs_services.dart';
 import 'package:movie_tickets/features/authentication/data/models/user_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../../injection.dart';
 
 class AuthLocalDataSource {
   final SharedPrefService sharedPrefsService;

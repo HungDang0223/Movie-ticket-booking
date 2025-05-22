@@ -35,14 +35,14 @@ class SnackSelectionScreen extends StatefulWidget {
   final double ticketPrice;
 
   const SnackSelectionScreen({
-    Key? key,
+    super.key,
     required this.movieTitle,
     required this.theaterName,
     required this.showTime,
     required this.showDate,
     required this.selectedSeats,
     required this.ticketPrice,
-  }) : super(key: key);
+  });
 
   @override
   State<SnackSelectionScreen> createState() => _SnackSelectionScreenState();
@@ -378,7 +378,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
 
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
     );
 
     _checkoutAnimation = Tween<double>(begin: 0, end: 1).animate(
@@ -406,12 +406,12 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70),
+        preferredSize: const Size.fromHeight(70),
         child: AppBar(
           backgroundColor: Colors.black,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios, color: Colors.red),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.red),
             onPressed: () => Navigator.pop(context),
           ),
           title: Column(
@@ -420,7 +420,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
               RichText(
                 text: TextSpan(
                   children: [
-                    TextSpan(
+                    const TextSpan(
                       text: 'CGV ',
                       style: TextStyle(
                         color: Colors.red,
@@ -430,7 +430,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                     ),
                     TextSpan(
                       text: widget.theaterName,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -441,7 +441,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
               ),
               Text(
                 'Cinema 5, ${widget.showDate}, ${widget.showTime}',
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.grey,
                   fontSize: 14,
                 ),
@@ -453,7 +453,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
               alignment: Alignment.center,
               children: [
             IconButton(
-                  icon: Icon(Icons.shopping_cart, color: Colors.red),
+                  icon: const Icon(Icons.shopping_cart, color: Colors.red),
                   onPressed: totalItems > 0 ? proceedToPayment : null,
                 ),
                 if (totalItems > 0)
@@ -461,14 +461,14 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
                         color: Colors.red,
                         shape: BoxShape.circle,
                       ),
                       child: Text(
                         totalItems.toString(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
@@ -499,8 +499,8 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
               Expanded(
                 child: ListView.builder(
                   controller: _scrollController,
-                  physics: BouncingScrollPhysics(),
-                  padding: EdgeInsets.only(bottom: 80), // Add padding for the checkout bar
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.only(bottom: 80), // Add padding for the checkout bar
                   itemCount: filteredSnacks.length,
                   itemBuilder: (context, index) {
                     return _buildSnackCard(index);
@@ -519,22 +519,22 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
               animation: _checkoutAnimation,
               builder: (context, child) {
                 return Transform.translate(
-                  offset: Offset(0, 0),
+                  offset: const Offset(0, 0),
                   child: child,
                 );
               },
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 decoration: BoxDecoration(
                   color: Colors.black,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.red.withOpacity(0.2),
                       blurRadius: 10,
-                      offset: Offset(0, -4),
+                      offset: const Offset(0, -4),
                     ),
                   ],
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
                   ),
@@ -546,7 +546,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
+                          const Text(
                             'Tổng cộng',
                             style: TextStyle(
                               color: Colors.grey,
@@ -555,15 +555,15 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                           ),
                           Text(
                             '${grandTotal.toStringAsFixed(0)} đ',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
                             ),
                           ),
                           Text(
-                            '${widget.selectedSeats.length} ghế · ${totalItems} món',
-                            style: TextStyle(
+                            '${widget.selectedSeats.length} ghế · $totalItems món',
+                            style: const TextStyle(
                               color: Colors.grey,
                               fontSize: 12,
                             ),
@@ -571,17 +571,17 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                         ],
                       ),
                     ),
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
                     ElevatedButton(
                       onPressed: proceedToPayment,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFC4302B),
+                        backgroundColor: const Color(0xFFC4302B),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                       ),
-                  child: Text(
+                  child: const Text(
                         'THANH TOÁN',
                         style: TextStyle(
                           color: Colors.white,
@@ -601,9 +601,9 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
 
   Widget _buildPromotionBanner() {
     return Container(
-      margin: EdgeInsets.all(16),
+      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [Color(0xFFC4302B), Color(0xFF7B1FA2)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -616,14 +616,14 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
             borderRadius: BorderRadius.circular(12),
             child: ShaderMask(
               shaderCallback: (rect) {
-                return LinearGradient(
+                return const LinearGradient(
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                   colors: [Colors.black, Colors.transparent],
                 ).createShader(rect);
               },
               blendMode: BlendMode.dstIn,
-              child: Container(
+              child: SizedBox(
                 height: 100,
                 width: double.infinity,
                 child: Image.asset(
@@ -635,7 +635,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
               ),
             ),
           ),
-          Padding(
+          const Padding(
             padding: EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -669,10 +669,10 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
   Widget _buildCategoryTabs() {
     return Container(
       height: 48,
-      margin: EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 8),
             child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: categories.length,
               itemBuilder: (context, index) {
           final category = categories[index];
@@ -685,8 +685,8 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
               });
             },
             child: Container(
-              margin: EdgeInsets.only(right: 12),
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
                 color: isSelected ? Colors.red : Colors.grey.shade900,
                 borderRadius: BorderRadius.circular(24),
@@ -731,7 +731,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
         // Show subcategory header if this is the first item
         if (isFirstOfSubcategory && snack.subcategory != null)
           Container(
-            margin: EdgeInsets.only(left: 16, right: 16, top: 24, bottom: 8),
+            margin: const EdgeInsets.only(left: 16, right: 16, top: 24, bottom: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -739,13 +739,13 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                   children: [
                     Text(
                       snack.subcategory!,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Container(
                         height: 1,
@@ -754,10 +754,10 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                     ),
                   ],
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   _getSubcategoryDescription(snack.subcategory!),
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.grey,
                     fontSize: 12,
                   ),
@@ -767,7 +767,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
           ),
         
         Container(
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             color: Colors.grey.shade900,
             borderRadius: BorderRadius.circular(12),
@@ -779,13 +779,13 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
             },
             borderRadius: BorderRadius.circular(12),
                   child: Padding(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
                     child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         // Snack image with promotion tag
                   _buildSnackImage(snack),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   
                   // Snack details
                   Expanded(
@@ -795,30 +795,30 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                         Row(
                           children: [
                             Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: Color(0xFF424242),
+                                color: const Color(0xFF424242),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 snack.category,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 10,
                                 ),
                               ),
                             ),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             if (snack.hasPromotion)
                               Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
                                   color: Colors.red.shade400,
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   snack.promotionText,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
@@ -827,10 +827,10 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                               ),
                           ],
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
                           snack.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -838,7 +838,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
                           '${snack.price.toStringAsFixed(0)} đ',
                           style: TextStyle(
@@ -847,7 +847,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                             fontSize: 16,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         
                         // Quantity controls
                         Row(
@@ -859,15 +859,15 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                                 onPressed: () => updateQuantity(actualIndex, -1),
                               ),
                               Container(
-                                margin: EdgeInsets.symmetric(horizontal: 8),
-                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                margin: const EdgeInsets.symmetric(horizontal: 8),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
                                   color: Colors.black,
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   '${snack.quantity}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
@@ -913,7 +913,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
               height: 80,
               errorBuilder: (context, error, stackTrace) => Container(
                 color: Colors.grey.shade800,
-                child: Center(
+                child: const Center(
                   child: Icon(
                     Icons.fastfood,
                     color: Colors.white,
@@ -936,7 +936,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
       ),
       child: IconButton(
         padding: EdgeInsets.zero,
-        constraints: BoxConstraints(
+        constraints: const BoxConstraints(
           minWidth: 24,
           minHeight: 24,
         ),
@@ -949,11 +949,11 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
   Widget _buildAddButton(VoidCallback onPressed) {
     return ElevatedButton.icon(
       onPressed: onPressed,
-      icon: Icon(Icons.add, size: 16),
-      label: Text('THÊM'),
+      icon: const Icon(Icons.add, size: 16),
+      label: const Text('THÊM'),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.red.shade400,
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -973,7 +973,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
               height: MediaQuery.of(context).size.height * 0.7,
               decoration: BoxDecoration(
                 color: Colors.grey.shade900,
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
                 ),
@@ -984,7 +984,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                   // Handle
                   Center(
                     child: Container(
-                      margin: EdgeInsets.only(top: 10),
+                      margin: const EdgeInsets.only(top: 10),
                       width: 50,
                       height: 5,
                       decoration: BoxDecoration(
@@ -995,7 +995,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                   ),
                   
                   // Snack image
-                  Container(
+                  SizedBox(
                     height: 200,
                     width: double.infinity,
                               child: Image.asset(
@@ -1003,7 +1003,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                       fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) => Container(
                                   color: Colors.grey.shade800,
-                                  child: Icon(
+                                  child: const Icon(
                                     Icons.fastfood,
                                     color: Colors.white,
                           size: 64,
@@ -1015,7 +1015,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                   // Content
                   Expanded(
                     child: SingleChildScrollView(
-                      padding: EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -1023,30 +1023,30 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                           Row(
                             children: [
                               Container(
-                                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: Color(0xFF424242),
+                                  color: const Color(0xFF424242),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   snack.category,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 10),
+                              const SizedBox(width: 10),
                             if (snack.hasPromotion)
                                 Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                   decoration: BoxDecoration(
                                     color: Colors.red.shade400,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
                                     snack.promotionText,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
@@ -1055,18 +1055,18 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                               ),
                           ],
                         ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           
                           // Name and price
                               Text(
                                 snack.name,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                               fontSize: 22,
                                 ),
                               ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                               Text(
                                 '${snack.price.toStringAsFixed(0)} đ',
                             style: TextStyle(
@@ -1075,10 +1075,10 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                               fontSize: 20,
                             ),
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           
                           // Description
-                          Text(
+                          const Text(
                             'Thông tin',
                                 style: TextStyle(
                                   color: Colors.white,
@@ -1086,19 +1086,19 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                                   fontSize: 16,
                                 ),
                               ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                               Text(
                                 snack.description,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.grey,
                               fontSize: 14,
                               height: 1.5,
                             ),
                           ),
-                          SizedBox(height: 24),
+                          const SizedBox(height: 24),
                           
                           // Quantity
-                          Text(
+                          const Text(
                             'Số lượng',
                             style: TextStyle(
                                       color: Colors.white,
@@ -1106,7 +1106,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                               fontSize: 16,
                             ),
                           ),
-                          SizedBox(height: 12),
+                          const SizedBox(height: 12),
                           Row(
                             children: [
                               _buildDetailQuantityButton(
@@ -1117,15 +1117,15 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                                 },
                               ),
                                   Container(
-                                margin: EdgeInsets.symmetric(horizontal: 16),
-                                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                                margin: const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                                     decoration: BoxDecoration(
                                   color: Colors.black,
                                   borderRadius: BorderRadius.circular(8),
                                     ),
                                       child: Text(
                                         '${snack.quantity}',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                     color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18,
@@ -1148,7 +1148,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                   
                   // Add to cart button
                   Padding(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     child: ElevatedButton(
                       onPressed: () {
                         if (snack.quantity == 0) {
@@ -1160,7 +1160,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                         backgroundColor: snack.quantity > 0 
                             ? Colors.green 
                             : Colors.red.shade400,
-                        padding: EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1169,7 +1169,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                         snack.quantity > 0 
                             ? 'ĐÃ THÊM VÀO GIỎ HÀNG' 
                             : 'THÊM VÀO GIỎ HÀNG',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1192,7 +1192,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
         onTap: onPressed,
         borderRadius: BorderRadius.circular(8),
         child: Container(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey),
             borderRadius: BorderRadius.circular(8),
@@ -1246,11 +1246,11 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
     
     return Container(
       height: 240,
-      padding: EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
+          const Padding(
             padding: EdgeInsets.only(left: 16, right: 16, bottom: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1276,7 +1276,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
           Expanded(
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               itemCount: recommendedIndices.length,
               itemBuilder: (context, index) {
                 final snack = snacks[recommendedIndices[index]];
@@ -1284,7 +1284,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                 
                 return Container(
                   width: 140,
-                  margin: EdgeInsets.symmetric(horizontal: 8),
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade900,
                     borderRadius: BorderRadius.circular(12),
@@ -1297,7 +1297,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                   children: [
                         // Image
                         ClipRRect(
-                          borderRadius: BorderRadius.only(
+                          borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(12),
                             topRight: Radius.circular(12),
                           ),
@@ -1309,7 +1309,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                             errorBuilder: (context, error, stackTrace) => Container(
                               height: 70,
                               color: Colors.grey.shade800,
-                              child: Icon(
+                              child: const Icon(
                                 Icons.fastfood,
                                 color: Colors.white,
                                 size: 36,
@@ -1320,13 +1320,13 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                         
                         // Details
                         Padding(
-                          padding: EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                                 snack.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
@@ -1334,7 +1334,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                         ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                         Text(
                                 '${snack.price.toStringAsFixed(0)} đ',
                           style: TextStyle(
@@ -1343,10 +1343,10 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                                   fontSize: 12,
                                 ),
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               snack.quantity > 0
                                   ? Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                       decoration: BoxDecoration(
                                         color: Colors.green.withOpacity(0.2),
                                         borderRadius: BorderRadius.circular(4),
@@ -1354,7 +1354,7 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                                       ),
                                       child: Text(
                                         'Đã thêm ${snack.quantity}',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.green,
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
@@ -1365,12 +1365,12 @@ class _SnackSelectionScreenState extends State<SnackSelectionScreen> with Single
                                       onTap: () => updateQuantity(actualIndex, 1),
                                       borderRadius: BorderRadius.circular(4),
                                       child: Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                         decoration: BoxDecoration(
                                           color: Colors.red.shade400,
                                           borderRadius: BorderRadius.circular(4),
                                         ),
-                                        child: Row(
+                                        child: const Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(

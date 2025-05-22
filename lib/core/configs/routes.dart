@@ -38,13 +38,13 @@ class AppRoutes {
   static Route onGenerateRoutes(RouteSettings settings) {
     switch (settings.name) {
       case '/home':
-        return _materialRoute(HomePage());
+        return _materialRoute(const HomePage());
 
       case '/login':
         return _materialRoute(const LoginPage());
 
       case '/signup':
-        return _materialRoute(SignupPage());
+        return _materialRoute(const SignupPage());
 
       case '/movie_detail':
         final movie = settings.arguments as MovieModel;
@@ -97,7 +97,7 @@ class AppRoutes {
       
       case Routes.userInfo:
         // final user = settings.arguments as UserModel;
-        return _materialRoute(UserInfoPage());
+        return _materialRoute(const UserInfoPage());
 
       case Routes.changePassword:
         return _materialRoute(const ChangePasswordPage());
@@ -107,7 +107,7 @@ class AppRoutes {
         return _materialRoute(EmailVerificationPage(email: email));
         
       default:
-        return _materialRoute(HomePage());
+        return _materialRoute(const HomePage());
     }
   }
 

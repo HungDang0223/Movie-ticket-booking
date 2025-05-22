@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:movie_tickets/features/booking/data/datasources/booking_seat_remote_data_source.dart';
-import 'package:movie_tickets/features/booking/data/models/showing_seat.dart';
 import 'package:movie_tickets/features/booking/domain/repositories/booking_seat_repository.dart';
 
 import '../models/models.dart';

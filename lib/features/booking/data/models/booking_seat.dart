@@ -1,5 +1,3 @@
-import 'package:json_annotation/json_annotation.dart';
-import 'package:equatable/equatable.dart';
 import 'package:movie_tickets/features/booking/data/models/seat.dart';
 
 class BookingSeat {

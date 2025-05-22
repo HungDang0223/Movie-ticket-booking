@@ -1,7 +1,6 @@
 import 'package:movie_tickets/core/utils/multi_devices.dart';
 import 'package:movie_tickets/core/utils/validators.dart';
 import 'package:movie_tickets/features/authentication/presentation/pages/input_email_page.dart';
-import 'package:movie_tickets/features/movies/presentation/pages/home_page.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/auth_bloc/bloc.dart';
 import 'package:movie_tickets/injection.dart';
 import 'package:movie_tickets/core/constants/my_const.dart';
@@ -98,7 +97,7 @@ class _WidgetLoginFormState extends State<WidgetLoginForm> {
                   child: InkWell(
                     onTap: () {
                       Navigator.push(context, 
-                        MaterialPageRoute(builder: (context) => InputEmailPage())
+                        MaterialPageRoute(builder: (context) => const InputEmailPage())
                       );
                     },
                     child: Text(

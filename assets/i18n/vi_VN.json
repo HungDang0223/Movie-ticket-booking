@@ -13,6 +13,45 @@
     "loginWithGoogle": "Đăng nhập với Google",
     "dontHaveAccount": "Chưa có tài khoản?"
   },
+  "movie": {
+    "censor": "Kiểm duyệt",
+    "casts": "Diễn viên",
+    "directors": "Đạo diễn",
+    "genres": "Thể loại",
+    "hour": "tiếng",
+    "minute": "phút",
+    "sortByOptions": {
+      "popular": "Phổ biến",
+      "latest": "Mới nhất",
+      "upcoming": "Sắp chiếu",
+      "topRated": "Đánh giá cao nhất"
+    }
+  },
+  "review": {
+    "Review": "Đánh giá",
+    "review": "đánh giá",
+    "Comment": "Bình luận",
+    "rating": "Xếp hạng",
+    "commentHint": "Bạn cảm thấy bộ phim như thế nào?\nHãy để lại đánh giá của bạn...",
+    "writeReview": "Viết Đánh Giá",
+    "addComment": "Thêm Bình Luận",
+    "loadMore": "Tải Thêm",
+    "loadAll": "Tải Tất Cả",
+    "noReviews": "Chưa có đánh giá nào",
+    "bethefirst": "Hãy là người đầu tiên đánh giá",
+    "editReview": "Chỉnh Sửa Đánh Giá",
+    "deleteReview": "Xóa Đánh Giá",
+    "deleteReviewConfirmation": "Bạn có chắc chắn muốn xóa đánh giá này không?",
+    "editComment": "Chỉnh Sửa Bình Luận",
+    "deleteComment": "Xóa Bình Luận",
+    "deleteCommentConfirmation": "Bạn có chắc chắn muốn xóa bình luận này không?",
+    "sortByOptions": {
+      "latest": "Mới nhất",
+      "oldest": "Cũ nhất",
+      "topRated": "Đánh giá cao nhất",
+      "lowestRated": "Đánh giá thấp nhất"
+    }
+  },
   "settings": {
     "settings": "Cài Đặt",
     "accountSettings": "Cài Đặt Tài Khoản",
@@ -58,6 +97,20 @@
     "done": "Xong",
     "error": "Lỗi",
     "success": "Thành Công",
-    "comingSoon": "Sắp ra mắt"
+    "fail": "Thất bại",
+    "comingSoon": "Sắp ra mắt",
+    "submit": "Gửi",
+    "yes": "Có",
+    "no": "Không",
+    "ok": "Đồng ý",
+    "loading": "Đang tải...",
+    "noData": "Không có dữ liệu",
+    "noInternet": "Không có kết nối Internet",
+    "noResults": "Không tìm thấy kết quả",
+    "somethingWentWrong": "Đã có lỗi xảy ra",
+    "retry": "Thử lại",
+    "search": "Tìm kiếm",
+    "searchHint": "Tìm kiếm phim, rạp chiếu, diễn viên...",
+    "sortBy": "Sắp xếp theo"
   }
 }

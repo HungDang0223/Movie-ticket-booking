@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:movie_tickets/core/configs/size_config.dart';
-import 'package:movie_tickets/core/constants/strings.dart';
 import 'package:movie_tickets/core/utils/multi_devices.dart';
 import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
 
@@ -9,7 +8,7 @@ import '../widgets/widgets.dart';
 
 class MovieDetailScreen extends StatefulWidget {
   final MovieModel movie;
-  MovieDetailScreen({super.key, required this.movie});
+  const MovieDetailScreen({super.key, required this.movie});
 
   @override
   State<MovieDetailScreen> createState() => _MovieDetailScreenState();
@@ -29,10 +28,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
   Widget build(BuildContext context) {
     size.init;
     return Scaffold(
-      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: Text(widget.movie.title, style: TextStyle(color: AppColor.DEFAULT), overflow: TextOverflow.ellipsis,),
-        backgroundColor: Colors.white,
+        title: Text(widget.movie.title, style: const TextStyle(color: AppColor.DEFAULT), overflow: TextOverflow.ellipsis,),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColor.DEFAULT),
@@ -46,29 +43,30 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         ],
       ),
       body: Container(
-        decoration: BoxDecoration(
-          color: AppColor.BLACK2
-        ),
         child: Stack(
           children: [
             SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  MovieTrailer(posterUrl: widget.movie.posterUrl ,trailerUrl: widget.movie.trailerUrl),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        MovieDescription(movie: widget.movie),
-                        const SizedBox(height: 10),
-                        MovieCommentView(movieId: widget.movie.movieId),
-                        const SizedBox(height: 10),
-                      ],
+              child: Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    MovieTrailer(posterUrl: widget.movie.posterUrl ,trailerUrl: widget.movie.trailerUrl),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          MovieDescription(movie: widget.movie),
+                          const SizedBox(height: 10),
+                          EnhancedMovieCommentView(
+                            movie: widget.movie// Optional
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             Positioned(
@@ -95,9 +93,9 @@ class MovieTrailer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Image.network(
-      posterUrl ?? tempNetwordImage,
+      posterUrl,
       width: double.infinity,
-      height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.3),
+      height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.25),
       fit: BoxFit.cover,
     );
   }

@@ -9,14 +9,14 @@ class PaymentSuccessPage extends StatelessWidget {
   final String transactionId;
 
   const PaymentSuccessPage({
-    Key? key,
+    super.key,
     required this.movieTitle,
     required this.theaterName,
     required this.showDate,
     required this.showTime,
     required this.selectedSeats,
     required this.transactionId,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class PaymentSuccessPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        title: Text(
+        title: const Text(
           'Vé đã thanh toán',
           style: TextStyle(
             color: Colors.white,
@@ -36,18 +36,18 @@ class PaymentSuccessPage extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Success icon and message
-              Icon(
+              const Icon(
                 Icons.check_circle,
                 color: Colors.green,
                 size: 70,
               ),
-              SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 16),
+              const Text(
                 'Thanh toán thành công!',
                 style: TextStyle(
                   color: Colors.white,
@@ -55,14 +55,14 @@ class PaymentSuccessPage extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
+              const Text(
                 'Cảm ơn bạn đã mua vé',
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 16,
                 ),
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
               // Ticket card with QR
               Container(
@@ -74,7 +74,7 @@ class PaymentSuccessPage extends StatelessWidget {
                     BoxShadow(
                       color: Colors.green.withOpacity(0.1),
                       blurRadius: 10,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -82,13 +82,13 @@ class PaymentSuccessPage extends StatelessWidget {
                   children: [
                     // Ticket info section
                     Padding(
-                      padding: EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             movieTitle,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -96,7 +96,7 @@ class PaymentSuccessPage extends StatelessWidget {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           _buildTicketInfoRow(Icons.location_on, theaterName),
                           _buildTicketInfoRow(Icons.calendar_today, showDate),
                           _buildTicketInfoRow(Icons.access_time, showTime),
@@ -106,7 +106,7 @@ class PaymentSuccessPage extends StatelessWidget {
                           ),
                           _buildTicketInfoRow(
                             Icons.confirmation_number,
-                            'Mã đặt vé: ${transactionId}',
+                            'Mã đặt vé: $transactionId',
                           ),
                         ],
                       ),
@@ -126,7 +126,7 @@ class PaymentSuccessPage extends StatelessWidget {
                     
                     // QR code section
                     Padding(
-                      padding: EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         children: [
                           Container(
@@ -141,7 +141,7 @@ class PaymentSuccessPage extends StatelessWidget {
                                 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${Uri.encodeComponent(transactionId)}',
                                 width: 180,
                                 height: 180,
-                                errorBuilder: (context, error, stackTrace) => Icon(
+                                errorBuilder: (context, error, stackTrace) => const Icon(
                                   Icons.qr_code,
                                   size: 150,
                                   color: Colors.black,
@@ -149,8 +149,8 @@ class PaymentSuccessPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          SizedBox(height: 16),
-                          Text(
+                          const SizedBox(height: 16),
+                          const Text(
                             'Quét mã QR này tại rạp để lấy vé',
                             style: TextStyle(
                               color: Colors.grey,
@@ -164,7 +164,7 @@ class PaymentSuccessPage extends StatelessWidget {
                 ),
               ),
               
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               
               // Action buttons
               Row(
@@ -174,38 +174,38 @@ class PaymentSuccessPage extends StatelessWidget {
                       onPressed: () {
                         // TODO: Implement download ticket
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Tính năng đang phát triển')),
+                          const SnackBar(content: Text('Tính năng đang phát triển')),
                         );
                       },
-                      icon: Icon(Icons.download),
-                      label: Text('Lưu vé'),
+                      icon: const Icon(Icons.download),
+                      label: const Text('Lưu vé'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey.shade800,
-                        padding: EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
                         // TODO: Implement share ticket
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Tính năng đang phát triển')),
+                          const SnackBar(content: Text('Tính năng đang phát triển')),
                         );
                       },
-                      icon: Icon(Icons.share),
-                      label: Text('Chia sẻ'),
+                      icon: const Icon(Icons.share),
+                      label: const Text('Chia sẻ'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey.shade800,
-                        padding: EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
                 ],
               ),
               
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               
               // Back to home button
               SizedBox(
@@ -215,10 +215,10 @@ class PaymentSuccessPage extends StatelessWidget {
                     Navigator.of(context).pushNamed('/home');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF4CAF50),
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: const Color(0xFF4CAF50),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: Text(
+                  child: const Text(
                     'QUAY VỀ TRANG CHỦ',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -235,7 +235,7 @@ class PaymentSuccessPage extends StatelessWidget {
 
   Widget _buildTicketInfoRow(IconData icon, String text) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
           Icon(
@@ -243,11 +243,11 @@ class PaymentSuccessPage extends StatelessWidget {
             color: Colors.grey,
             size: 16,
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 14,
               ),

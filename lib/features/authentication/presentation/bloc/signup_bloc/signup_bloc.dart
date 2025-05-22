@@ -1,9 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movie_tickets/core/errors/failures.dart';
-import 'package:movie_tickets/core/utils/validators.dart';
 import 'package:movie_tickets/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:movie_tickets/features/authentication/domain/usecases/signup_use_case.dart';
-import 'package:rxdart/rxdart.dart';
 
 import 'bloc.dart';
 
@@ -18,7 +15,7 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
     SignupSubmitForm event,
     Emitter<SignupState> emit,
   ) async {
-    emit(SignupLoading());
+    emit(const SignupLoading());
 
     try {
       final signupUseCase = SignUpUseCase(authRepository);
@@ -37,7 +34,7 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
         if (result.data != null) {
           emit(SignupSuccess(result.data!));
         } else {
-          emit(SignupFailed("Signup response data is null"));
+          emit(const SignupFailed("Signup response data is null"));
         }
       } else {
         emit(SignupFailed(result.data!.message));

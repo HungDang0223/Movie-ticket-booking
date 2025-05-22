@@ -1,4 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:movie_tickets/core/usecase/use_case.dart';
 import 'package:movie_tickets/core/utils/result.dart';
 import 'package:movie_tickets/features/movies/data/models/movie_model.dart';

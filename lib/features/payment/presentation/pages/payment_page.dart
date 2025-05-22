@@ -28,7 +28,7 @@ class PaymentPage extends StatefulWidget {
   final double snacksPrice;
 
   const PaymentPage({
-    Key? key,
+    super.key,
     required this.movieTitle,
     required this.theaterName,
     required this.showDate,
@@ -37,7 +37,7 @@ class PaymentPage extends StatefulWidget {
     required this.ticketPrice,
     required this.selectedSnacks,
     required this.snacksPrice,
-  }) : super(key: key);
+  });
 
   @override
   State<PaymentPage> createState() => _PaymentPageState();
@@ -69,25 +69,25 @@ class _PaymentPageState extends State<PaymentPage> {
       'id': 'card',
       'name': 'Thẻ tín dụng/ghi nợ',
       'icon': 'icons/credit_card.png',
-      'color': Color(0xFF1976D2),
+      'color': const Color(0xFF1976D2),
     },
     {
       'id': 'momo',
       'name': 'Ví MoMo',
       'icon': 'icons/momo.png',
-      'color': Color(0xFFAE2070),
+      'color': const Color(0xFFAE2070),
     },
     {
       'id': 'zalopay',
       'name': 'ZaloPay',
       'icon': 'icons/zalopay.png',
-      'color': Color(0xFF0068FF),
+      'color': const Color(0xFF0068FF),
     },
     {
       'id': 'vnpay',
       'name': 'VNPay',
       'icon': 'icons/vnpay.png',
-      'color': Color(0xFF004A9F),
+      'color': const Color(0xFF004A9F),
     },
   ];
 
@@ -156,14 +156,14 @@ class _PaymentPageState extends State<PaymentPage> {
       });
       
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Đã áp dụng mã giảm giá thành công!'),
           backgroundColor: Colors.green,
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Mã giảm giá không hợp lệ hoặc đã hết hạn'),
           backgroundColor: Colors.red,
         ),
@@ -182,7 +182,7 @@ class _PaymentPageState extends State<PaymentPage> {
   void processPayment(BuildContext context) async {
     if (selectedPaymentMethod == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Vui lòng chọn phương thức thanh toán'),
           backgroundColor: Colors.red,
         ),
@@ -230,7 +230,7 @@ class _PaymentPageState extends State<PaymentPage> {
           // Step 1: Create the order
           final order = await ZalopayPaymentService.instance.createOrder(totalAmount.round());
 
-          if (order != null && order.zptranstoken != null) {
+          if (order != null) {
             final zpTransToken = order.zptranstoken;
 
             // Step 2: Start payment via native Android (invoke MethodChannel)
@@ -381,9 +381,9 @@ class _PaymentPageState extends State<PaymentPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        title: Text('Thanh toán', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text('Thanh toán', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.red),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.red),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -426,7 +426,7 @@ class _PaymentPageState extends State<PaymentPage> {
               isProcessing = false; // Hide loading indicator
             });
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              const SnackBar(
                 content: Text('Payment canceled'),
                 backgroundColor: Colors.orange,
               ),
@@ -434,35 +434,35 @@ class _PaymentPageState extends State<PaymentPage> {
           }
         },
         child: isProcessing
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Build the ticket information card
                     _buildTicketInfoCard(),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     // Build voucher section
                     _buildVoucherSection(),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     // Build payment methods list
-                    Text('Phương thức thanh toán', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 10),
+                    const Text('Phương thức thanh toán', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
                     _buildPaymentMethodsList(),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     // Checkout button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () => processPayment(context),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF4CAF50),
-                          padding: EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: const Color(0xFF4CAF50),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        child: Text('THANH TOÁN ${totalAmount.toStringAsFixed(0)} đ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        child: Text('THANH TOÁN ${totalAmount.toStringAsFixed(0)} đ', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],
@@ -479,13 +479,13 @@ class _PaymentPageState extends State<PaymentPage> {
         color: Colors.grey.shade900,
         borderRadius: BorderRadius.circular(16),
       ),
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             widget.movieTitle,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -493,7 +493,7 @@ class _PaymentPageState extends State<PaymentPage> {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           
           _infoRow('Rạp', widget.theaterName),
           _infoRow('Ngày chiếu', widget.showDate),
@@ -519,20 +519,20 @@ class _PaymentPageState extends State<PaymentPage> {
 
   Widget _infoRow(String label, String value) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.grey,
               fontSize: 14,
             ),
           ),
           Text(
             value,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -545,7 +545,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
   Widget _priceRow(String label, double amount, {bool isBold = false, Color? textColor}) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -574,7 +574,7 @@ class _PaymentPageState extends State<PaymentPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Mã giảm giá',
           style: TextStyle(
             color: Colors.white,
@@ -582,12 +582,12 @@ class _PaymentPageState extends State<PaymentPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         
         if (appliedVoucher != null)
           // Show applied voucher
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: Colors.green.withOpacity(0.2),
               borderRadius: BorderRadius.circular(8),
@@ -595,22 +595,22 @@ class _PaymentPageState extends State<PaymentPage> {
             ),
             child: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.green, size: 20),
-                SizedBox(width: 10),
+                const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         appliedVoucher!,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         'Giảm ${discountAmount.toStringAsFixed(0)} đ',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.green,
                           fontSize: 12,
                         ),
@@ -619,7 +619,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.delete, color: Colors.red, size: 20),
+                  icon: const Icon(Icons.delete, color: Colors.red, size: 20),
                   onPressed: removeVoucher,
                 ),
               ],
@@ -632,28 +632,28 @@ class _PaymentPageState extends State<PaymentPage> {
               Expanded(
                 child: TextField(
                   controller: _voucherController,
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     hintText: 'Nhập mã giảm giá',
-                    hintStyle: TextStyle(color: Colors.grey),
+                    hintStyle: const TextStyle(color: Colors.grey),
                     filled: true,
                     fillColor: Colors.grey.shade900,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                 ),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               ElevatedButton(
                 onPressed: applyVoucher,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColor.DEFAULT_2,
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 ),
-                child: Text('ÁP DỤNG'),
+                child: const Text('ÁP DỤNG'),
               ),
             ],
           ),
@@ -667,7 +667,7 @@ class _PaymentPageState extends State<PaymentPage> {
         final bool isSelected = selectedPaymentMethod == method['id'];
         
         return Container(
-          margin: EdgeInsets.only(bottom: 8),
+          margin: const EdgeInsets.only(bottom: 8),
           decoration: BoxDecoration(
             color: isSelected ? method['color'].withOpacity(0.2) : Colors.grey.shade900,
             borderRadius: BorderRadius.circular(8),
@@ -691,13 +691,13 @@ class _PaymentPageState extends State<PaymentPage> {
             },
             borderRadius: BorderRadius.circular(8),
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
                   Container(
                     width: 40,
                     height: 40,
-                    padding: EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: method['color'].withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
@@ -708,7 +708,7 @@ class _PaymentPageState extends State<PaymentPage> {
                           Icon(Icons.credit_card, color: method['color']),
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   
                   Expanded(
                     child: Column(
@@ -724,7 +724,7 @@ class _PaymentPageState extends State<PaymentPage> {
                         if (method['id'] == 'card' && selectedCard != null)
                           Text(
                             selectedCard!.maskedCardNumber,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.grey,
                               fontSize: 12,
                             ),

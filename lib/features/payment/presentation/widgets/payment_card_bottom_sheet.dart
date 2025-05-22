@@ -5,7 +5,6 @@ import 'package:movie_tickets/core/constants/app_color.dart';
 import '../../data/models/payment_card.dart';
 import '../../domain/services/card_service.dart';
 import '../../domain/services/stripe_payment_service.dart';
-import '../../../../core/configs/payment_config.dart';
 import 'package:flutter/cupertino.dart';
 
 class PaymentCardBottomSheet extends StatefulWidget {
@@ -13,7 +12,7 @@ class PaymentCardBottomSheet extends StatefulWidget {
   final double amount;
   
 
-  PaymentCardBottomSheet({
+  const PaymentCardBottomSheet({
     super.key,
     required this.onCardSelected,
     required this.amount,

@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:movie_tickets/features/authentication/presentation/widgets/widget_logo_findseat.dart';
 
 class WidgetTopWelcome extends StatelessWidget {
+  const WidgetTopWelcome({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        SizedBox(
+        const SizedBox(
           width: 172,
           child: WidgetLogoFindSeat(),
         ),

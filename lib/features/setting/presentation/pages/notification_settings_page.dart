@@ -5,7 +5,7 @@ import 'package:movie_tickets/features/setting/presentation/bloc/settings_state.
 import '../bloc/settings_bloc.dart';
 
 class NotificationSettingsPage extends StatelessWidget {
-  const NotificationSettingsPage({Key? key}) : super(key: key);
+  const NotificationSettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {

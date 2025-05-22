@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_tickets/features/payment/domain/repositories/payment_repository.dart';
-import 'package:movie_tickets/features/payment/domain/services/stripe_payment_service.dart';
 import 'package:movie_tickets/features/payment/domain/usecases/stripe_payment_use_case.dart';
 import 'package:movie_tickets/features/payment/presentation/bloc/payment_event.dart';
 import 'package:movie_tickets/features/payment/presentation/bloc/payment_state.dart';

@@ -53,9 +53,9 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  _buildTopWelcome() => WidgetTopWelcome();
+  _buildTopWelcome() => const WidgetTopWelcome();
 
-  _buildLoginForm() => WidgetLoginForm();
+  _buildLoginForm() => const WidgetLoginForm();
 
-  _buildBottomSignUp() => WidgetBottomSignUp();
+  _buildBottomSignUp() => const WidgetBottomSignUp();
 }

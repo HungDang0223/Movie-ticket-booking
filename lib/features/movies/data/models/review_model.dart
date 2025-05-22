@@ -20,7 +20,7 @@ class MovieReview extends Review with EquatableMixin {
       reviewId: json['reviewId'],
       userId: json['userId'],
       fullName: json['fullName'],
-      photoPath: json['photoPath'],
+      photoPath: json['photoPath'] ?? '',
       movieId: json['movieId'],
       rating: (json['rating'] as num).toInt(),
       reviewContent: json['reviewContent'],
@@ -57,4 +57,31 @@ class MovieReview extends Review with EquatableMixin {
         likes,
         unlikes,
       ];
+}
+
+class ReviewResponse {
+  final String status;
+  final String message;
+  final List<MovieReview>? reviews;
+  const ReviewResponse({
+    required this.status,
+    required this.message,
+    this.reviews,
+  });
+  factory ReviewResponse.fromJson(Map<String, dynamic> json) {
+    return ReviewResponse(
+      status: json['status'],
+      message: json['message'],
+      reviews: (json['data'] as List<dynamic>?)
+          ?.map((e) => MovieReview.fromJson(e))
+          .toList(),
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status,
+      'message': message,
+      'reviews': reviews?.map((e) => e.toJson()).toList(),
+    };
+  }
 }

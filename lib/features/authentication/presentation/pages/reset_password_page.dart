@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movie_tickets/features/authentication/presentation/bloc/auth_bloc/authentication_bloc.dart';
 
 import '../../../../core/constants/my_const.dart';
 
@@ -19,7 +17,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Đặt lại mật khẩu mới"),
+        title: const Text("Đặt lại mật khẩu mới"),
       ),
       body: Container(
         child: Column(

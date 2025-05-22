@@ -72,6 +72,7 @@ class ImagePickerService {
       }
       return null;
     }
+    return null;
   }
 
 static void _processImageInIsolate(UploadData data) async {

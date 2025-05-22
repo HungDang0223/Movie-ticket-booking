@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -6,11 +5,8 @@ import 'package:dio/dio.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:movie_tickets/core/errors/exceptions.dart';
 import 'package:movie_tickets/core/errors/failures.dart';
-import 'package:movie_tickets/core/extensions/date_time_ext.dart';
 import 'package:movie_tickets/core/extensions/dio_exception_ext.dart';
-import 'package:movie_tickets/core/services/local/shared_prefs_services.dart';
 import 'package:movie_tickets/core/utils/result.dart';
-import 'package:movie_tickets/injection.dart';
 import 'package:movie_tickets/features/authentication/data/datasources/auth_local_data_source.dart';
 import 'package:movie_tickets/features/authentication/data/datasources/auth_remote_data_source.dart';
 import 'package:movie_tickets/features/authentication/data/models/auth_response.dart';
@@ -80,7 +76,7 @@ class AuthReposImpl implements AuthRepository {
   @override
   Future<bool> isSignedIn() async {
     bool isSignedIn = await _authLocalDataSource.isLoggedIn();
-    print("fsmdfosdmf"+isSignedIn.toString());
+    print("fsmdfosdmf$isSignedIn");
     if (isSignedIn) {
       final isExpired = await _authLocalDataSource.isLoginSessionExpired();
       if (isExpired) {

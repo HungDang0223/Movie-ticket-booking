@@ -1,12 +1,9 @@
 import 'dart:developer';
 
-import 'package:dio/dio.dart';
 import 'package:movie_tickets/core/errors/failures.dart';
 import 'package:movie_tickets/core/usecase/use_case.dart';
 import 'package:movie_tickets/core/utils/result.dart';
-import 'package:movie_tickets/injection.dart';
 import 'package:movie_tickets/features/authentication/data/models/auth_response.dart';
-import 'package:movie_tickets/features/authentication/data/models/user_model.dart';
 import 'package:movie_tickets/features/authentication/domain/repositories/auth_repository.dart';
 
 class LoginUseCase implements UseCase<LoginResponse, SignInParams> {

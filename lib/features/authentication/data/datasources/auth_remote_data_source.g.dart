@@ -14,7 +14,7 @@ class _AuthRemoteDataSource implements AuthRemoteDataSource {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= 'https://skunk-elegant-hideously.ngrok-free.app/api/v1/auth/';
+    baseUrl ??= 'http://192.168.1.2:5000/api/v1//auth/';
   }
 
   final Dio _dio;

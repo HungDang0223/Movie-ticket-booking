@@ -29,7 +29,7 @@ class SettingsTile extends StatelessWidget {
       ),
       title: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.black87,
           fontWeight: FontWeight.w500,
         ),

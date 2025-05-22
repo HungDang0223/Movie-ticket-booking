@@ -115,7 +115,7 @@ class _DateSelectorState extends State<DateSelector> {
             ),
           ),
           const SizedBox(height: 10),
-          Container(
+          SizedBox(
             height: 40,
             child: PageView.builder(
               controller: page,

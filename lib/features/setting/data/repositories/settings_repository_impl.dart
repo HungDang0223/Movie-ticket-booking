@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:movie_tickets/features/authentication/domain/repositories/auth_repository.dart';
 import '../../domain/entities/settings.dart';
 import '../../domain/repositories/settings_repository.dart';
@@ -149,7 +148,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
           'news_updates': true,
         },
         userProfile: UserProfileModel(
-          name: user!.fullName,
+          name: user != null ? user.fullName : 'Name',
           email:  '',
           photoUrl:  '',
           points: 0,

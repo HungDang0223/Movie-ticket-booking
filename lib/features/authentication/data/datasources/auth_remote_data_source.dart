@@ -1,8 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:movie_tickets/core/constants/strings.dart';
 import 'package:movie_tickets/features/authentication/data/models/auth_response.dart';
-import 'package:movie_tickets/features/authentication/data/models/user_model.dart';
 import 'package:retrofit/retrofit.dart';
 
 part 'auth_remote_data_source.g.dart';

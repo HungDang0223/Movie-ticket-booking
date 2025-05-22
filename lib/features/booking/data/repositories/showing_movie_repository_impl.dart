@@ -8,7 +8,6 @@ import 'package:movie_tickets/features/booking/data/datasources/showing_movie_re
 import 'package:movie_tickets/features/booking/domain/repositories/showing_movie_repository.dart';
 import 'package:movie_tickets/injection.dart';
 
-import '../models/models.dart';
 
 class ShowingMovieRepositoryImpl extends ShowingMovieRepository {
 

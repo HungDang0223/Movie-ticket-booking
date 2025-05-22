@@ -7,7 +7,6 @@ import 'package:movie_tickets/core/utils/multi_devices.dart';
 import 'package:movie_tickets/core/constants/my_const.dart';
 import 'package:movie_tickets/injection.dart';
 
-import '../bloc/auth_bloc/bloc.dart';
 import '../bloc/signup_bloc/bloc.dart';
 
 class WidgetSignupForm extends StatefulWidget {

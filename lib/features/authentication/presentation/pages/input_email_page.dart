@@ -4,10 +4,7 @@ import 'package:movie_tickets/core/constants/app_color.dart';
 import 'package:movie_tickets/core/constants/app_font.dart';
 import 'package:movie_tickets/core/utils/multi_devices.dart';
 import 'package:movie_tickets/core/utils/validators.dart';
-import 'package:movie_tickets/features/authentication/presentation/bloc/auth_bloc/authentication_bloc.dart';
-import 'package:movie_tickets/features/authentication/presentation/bloc/auth_bloc/authentication_state.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/auth_bloc/bloc.dart';
-import 'package:movie_tickets/features/authentication/presentation/pages/email_verification_page.dart';
 import 'package:movie_tickets/injection.dart';
 
 class InputEmailPage extends StatefulWidget {

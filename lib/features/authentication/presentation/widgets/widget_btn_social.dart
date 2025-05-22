@@ -27,7 +27,7 @@ class WidgetBtnSocial extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               child: SvgPicture.asset(
                 socialIcon,
                 width: 24,

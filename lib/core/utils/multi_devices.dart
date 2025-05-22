@@ -24,7 +24,6 @@ class MultiDevices {
 
     return TextStyle(
         fontSize: fontSize,
-        color: color ?? AppColor.WHITE,
         overflow: overflow,
         shadows: shadows,
         fontWeight: fontWeight,

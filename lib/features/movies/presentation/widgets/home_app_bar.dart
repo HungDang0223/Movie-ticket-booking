@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:movie_tickets/core/constants/app_color.dart';
 
 class HomeAppBar extends StatelessWidget {

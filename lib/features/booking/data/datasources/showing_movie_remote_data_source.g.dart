@@ -14,8 +14,7 @@ class _ShowingMovieRemoteDataSource implements ShowingMovieRemoteDataSource {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??=
-        'https://skunk-elegant-hideously.ngrok-free.app/api/v1/showing-movie';
+    baseUrl ??= 'http://192.168.1.2:5000/api/v1//showing-movie';
   }
 
   final Dio _dio;

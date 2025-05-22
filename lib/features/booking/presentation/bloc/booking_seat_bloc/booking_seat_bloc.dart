@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_tickets/features/booking/data/repositories/booking_seat_repository_impl.dart';
-import 'package:movie_tickets/features/booking/domain/repositories/booking_seat_repository.dart';
 
 import '../../../data/models/models.dart';
 import '../bloc.dart';

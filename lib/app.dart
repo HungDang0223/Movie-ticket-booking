@@ -10,6 +10,7 @@ import 'package:movie_tickets/core/constants/my_const.dart';
 import 'package:movie_tickets/core/constants/app_color.dart';
 import 'package:movie_tickets/features/booking/presentation/bloc/showing_movie_bloc/showing_movie_bloc.dart';
 import 'package:movie_tickets/features/booking/presentation/pages/booking_showing_movie.dart';
+import 'package:movie_tickets/features/movies/presentation/bloc/bloc.dart';
 import 'package:movie_tickets/features/movies/presentation/bloc/movie_bloc/movie_bloc.dart';
 import 'package:movie_tickets/features/movies/presentation/bloc/movie_bloc/movie_event.dart';
 import 'package:movie_tickets/features/movies/presentation/pages/home_page.dart';
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<PaymentBloc>()),
         BlocProvider(create: (context) => sl<SettingsBloc>()..add(LoadSettings())),
         BlocProvider(create: (context) => sl<MovieBloc>()),
+        BlocProvider(create: (context) => sl<ReviewBloc>()),
         BlocProvider(create: (context) => sl<ShowingMovieBloc>()),
       ],
       child: BlocBuilder<SettingsBloc, SettingsState>(
@@ -98,7 +100,7 @@ class MyApp extends StatelessWidget {
               ? Locale(state.languageCode, state.countryCode)
               : const Locale('vi', 'VN'),
             localeResolutionCallback: AppLocalizations.localeResolutionCallback,
-            home: MainScreen(), // Use SplashScreen as the initial screen
+            home: const MainScreen(), // Use SplashScreen as the initial screen
           );
         },
       ),
@@ -126,8 +128,8 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   
   final List<Widget> _screens = [
-    HomePage(),
-    VenuesPage(),
+    const HomePage(),
+    const VenuesPage(),
     const PaymentPage(
       movieTitle: "movieTitle",
       theaterName: "theaterName",
@@ -137,8 +139,8 @@ class _MainScreenState extends State<MainScreen> {
       ticketPrice: 10000,
       selectedSnacks: {"Snack1": 10000, "Snack2": 10000},
       snacksPrice: 10000),
-    HomePage(), // Replace with GroupPage when available
-    SettingPage(),
+    const HomePage(), // Replace with GroupPage when available
+    const SettingPage(),
   ];
 
   @override

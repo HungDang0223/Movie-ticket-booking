@@ -24,15 +24,15 @@ class MovieDescription extends StatelessWidget {
           children: [
             const Row(),
             Positioned(
-              top: -MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.13),
+              top: -MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.1),
               left: 0,
               child: Column(
                 children: [
                   Row(
                     children: [
                       Container(
-                        width: MultiDevices.getValueByScale(SizeConfig.screenWidth! * 0.30),
-                        height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.22),
+                        width: MultiDevices.getValueByScale(SizeConfig.screenWidth! * 0.25),
+                        height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.18),
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image: NetworkImage(movie.posterUrl),
@@ -50,13 +50,13 @@ class MovieDescription extends StatelessWidget {
                       ),
                       Container(
                         margin: const EdgeInsets.only(left: 10, right: 10),
-                        
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.12),
-                                width: MediaQuery.of(context).size.width * 0.55,
+                                height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.1),
+                                width: MediaQuery.of(context).size.width * 0.65,
+                                padding: EdgeInsets.only(bottom: 10),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,60 +75,63 @@ class MovieDescription extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 5),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(2),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(5),
-                                          border: Border.all(width: 1, color: AppColor.WHITE),
+                              Container(
+                                padding: EdgeInsets.only(top: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(2),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(5),
+                                            border: Border.all(width: 1, color: AppColor.GRAY1),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              const Icon(Icons.calendar_month_outlined, color: AppColor.GRAY1, size: 14),
+                                              const SizedBox(width: 5),
+                                              Text(movie.releaseDate.toFormattedString(), style: MultiDevices.getStyle(fontSize: 12)),
+                                            ],
+                                          ),
                                         ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            const Icon(Icons.calendar_month_outlined, color: AppColor.WHITE, size: 14),
-                                            const SizedBox(width: 5),
-                                            Text(movie.releaseDate.toFormattedString(), style: MultiDevices.getStyle(fontSize: 12)),
-                                          ],
+                                        const SizedBox(width: 5),
+                                        Container(
+                                          padding: EdgeInsets.all(2),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(4),
+                                            border: Border.all(width: 1, color: AppColor.GRAY1),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.access_time, color: AppColor.GRAY1, size: 14),
+                                              const SizedBox(width: 5),
+                                              Text(movie.duration.formatDuration(), style: MultiDevices.getStyle(fontSize: 12)),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 5),
-                                      Container(
-                                        padding: const EdgeInsets.all(2),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(5),
-                                          border: Border.all(width: 1, color: AppColor.WHITE),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.favorite_border_outlined, color: AppColor.DEFAULT, size: MultiDevices.getValueByScale(20)),
+                                        const SizedBox(width: 5),
+                                        Text("5139", style: MultiDevices.getStyle(color: AppColor.WHITE, fontSize: 14)),
+                                        const SizedBox(width: 10),
+                                        InkWell(
+                                          onTap: () {},
+                                          child: Icon(Icons.share_outlined, color: AppColor.DEFAULT, size: MultiDevices.getValueByScale(20)),
                                         ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            const Icon(Icons.access_time, color: AppColor.WHITE, size: 14),
-                                            const SizedBox(width: 5),
-                                            Text(movie.duration.formatDuration(), style: MultiDevices.getStyle(fontSize: 12)),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(Icons.favorite_border_outlined, color: AppColor.DEFAULT, size: 17),
-                                      const SizedBox(width: 5),
-                                      const Text("5139", style: TextStyle(color: AppColor.WHITE)),
-                                      const SizedBox(width: 10),
-                                      InkWell(
-                                        onTap: () {},
-                                        child: Icon(Icons.share_outlined, color: AppColor.DEFAULT, size: MultiDevices.getValueByScale(17)),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -140,10 +143,10 @@ class MovieDescription extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.11)),
+        SizedBox(height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.1)),
         Text(
           movie.synopsis,
-          style: const TextStyle(fontSize: 15, color: AppColor.WHITE),
+          style: MultiDevices.getStyle(fontSize: 15),
           textAlign: TextAlign.justify,
           maxLines: 4,
           overflow: TextOverflow.clip,
@@ -159,11 +162,11 @@ class MovieDescription extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: Text(entry.key, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColor.WHITE)),
+                    child: Text(entry.key, style: MultiDevices.getStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: Text(entry.value.toString(), style: MultiDevices.getStyle(),),
+                    child: Text(entry.value.toString(), style: MultiDevices.getStyle(fontSize: 14),),
                   ),
                 ],
               );

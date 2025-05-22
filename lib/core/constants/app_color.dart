@@ -45,5 +45,5 @@ class AppColor {
   static const Color SEAT_SLOT_BG = Color(0xFFFFFFFF);
   static const Color SEAT_SLOT_BORDER = Color(0xFF707070);
 
-  static const MaterialColor STATUS_BAR = const MaterialColor(0xFF2E3147, {});
+  static const MaterialColor STATUS_BAR = MaterialColor(0xFF2E3147, {});
 }

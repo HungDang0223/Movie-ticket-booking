@@ -10,21 +10,21 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
 
   MovieBloc({
     required this.movieRepository
-  }) : super(MovieInitial()) {
+  }) : super(const MovieInitial()) {
     on<GetListShowingMoviesEvent>(_getListMovies);
     on<GetMovieDetailEvent>(_getMovieDetail);
   }
 
   Future<void> _getListMovies(
       GetListShowingMoviesEvent event, Emitter<MovieState> emit) async {
-    emit(MovieLoading());
+    emit(const MovieLoading());
     final getListMoviesUseCase = GetListMoviesUseCase(movieRepository);
     final result = await getListMoviesUseCase.call(0);
   
     if (result.isSuccess) {
       final movies = result.data;
       if (movies == null) {
-        emit(MovieLoadedFailed("Get list movies got null error"));
+        emit(const MovieLoadedFailed("Get list movies got null error"));
       }
       else {
         emit(MovieLoaded(movies));
@@ -35,14 +35,14 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
   }
 
   Future<void> _getMovieDetail(GetMovieDetailEvent event, Emitter<MovieState> emit) async {
-    emit(MovieLoading());
+    emit(const MovieLoading());
     final getListMoviesUseCase = GetListMoviesUseCase(movieRepository);
     final result = await getListMoviesUseCase.call(event.id);
   
     if (result.isSuccess) {
       final movie = result.data;
       if (movie == null) {
-        emit(MovieLoadedFailed("Get movies details got null error"));
+        emit(const MovieLoadedFailed("Get movies details got null error"));
       }
       else {
         emit(MovieLoaded(movie));

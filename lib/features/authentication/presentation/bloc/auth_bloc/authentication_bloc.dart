@@ -24,7 +24,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
       await DbHelper.init();
 
       // Show splash screen delay
-      await Future.delayed(Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 2));
 
       if (isSignedIn) {
         final result = await authRepository.getCurrentUser();

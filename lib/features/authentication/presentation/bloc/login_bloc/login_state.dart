@@ -1,4 +1,3 @@
-import 'package:movie_tickets/core/errors/failures.dart';
 import 'package:flutter/material.dart';
 
 @immutable

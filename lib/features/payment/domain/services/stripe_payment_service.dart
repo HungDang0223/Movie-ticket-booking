@@ -1,8 +1,5 @@
-import 'dart:convert';
-import 'dart:io' show Platform;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_stripe/flutter_stripe.dart';
 import '../../data/models/payment_card.dart';
 import '../../../../core/configs/payment_config.dart';
@@ -115,7 +112,7 @@ Future<String?> createPaymentIntent(double amount, String currency) async {
             ],
             mode: IntentMode.paymentMode(currencyCode: currency, amount: amount.round(), setupFutureUsage: IntentFutureUsage.OffSession),
           ),
-          appearance: PaymentSheetAppearance(
+          appearance: const PaymentSheetAppearance(
             colors: PaymentSheetAppearanceColors(
               primary: Colors.black,
               background: Colors.white,
@@ -127,7 +124,7 @@ Future<String?> createPaymentIntent(double amount, String currency) async {
       
       // Step 3: Present the payment sheet to the user
       await Stripe.instance.presentPaymentSheet(
-        options: PaymentSheetPresentOptions(
+        options: const PaymentSheetPresentOptions(
           // timeout: 30000,
 
         )

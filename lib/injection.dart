@@ -1,6 +1,5 @@
 
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get_it/get_it.dart';
@@ -22,12 +21,10 @@ import 'package:movie_tickets/features/booking/data/repositories/showing_movie_r
 import 'package:movie_tickets/features/booking/domain/repositories/booking_seat_repository.dart';
 import 'package:movie_tickets/features/booking/domain/repositories/showing_movie_repository.dart';
 import 'package:movie_tickets/features/booking/presentation/bloc/bloc.dart';
-import 'package:movie_tickets/features/booking/presentation/bloc/booking_seat_bloc/booking_seat_bloc.dart';
 import 'package:movie_tickets/features/movies/data/datasources/movie_remote_datasource.dart';
 import 'package:movie_tickets/features/movies/data/datasources/review_remote_datasource.dart';
 import 'package:movie_tickets/features/movies/data/repositories/movie_repository_impl.dart';
 import 'package:movie_tickets/features/movies/data/repositories/review_repository_impl.dart';
-import 'package:movie_tickets/features/movies/domain/entities/movie.dart';
 import 'package:movie_tickets/features/movies/domain/repositories/movie_repository.dart';
 import 'package:movie_tickets/features/movies/domain/repositories/review_repository.dart';
 import 'package:movie_tickets/features/movies/domain/usecases/get_list_movie_uc.dart';
@@ -62,6 +59,7 @@ Future<void> init() async {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'Authorization': 'Bearer $accessToken',
       'ngrok-skip-browser-warning':'true',
     },
     connectTimeout: const Duration(seconds: 30),
@@ -80,7 +78,7 @@ Future<void> init() async {
   sl.registerSingleton<AuthRemoteDataSource>(AuthRemoteDataSource(sl())); 
   sl.registerSingleton<AuthLocalDataSource>(AuthLocalDataSource(sl()));  
   sl.registerSingleton<MovieRemoteDatasource>(MovieRemoteDatasource(sl()));
-  sl.registerSingleton<ReviewRemoteDatasource>(ReviewRemoteDatasource(sl()));
+  sl.registerSingleton<ReviewRemoteDatasource>(ReviewRemoteDatasource(sl<Dio>()));
   sl.registerSingleton<ShowingMovieRemoteDataSource>(ShowingMovieRemoteDataSource(sl()));
   sl.registerSingleton<SettingsLocalDataSource>(SettingsLocalDataSourceImpl(sl<SharedPrefService>()));
   sl.registerSingleton<BookingSeatRemoteDataSource>(BookingSeatRemoteDataSource());
@@ -100,7 +98,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SignUpUseCase(sl()));
   sl.registerLazySingleton(() => GetListMoviesUseCase(sl()));
   sl.registerLazySingleton(() => GetMovieDetailUseCase(sl()));
-  sl.registerLazySingleton(() => GetMovieModelUseCase(sl()));
+  sl.registerLazySingleton(() => GetMovieReviewsUseCase(sl()));
 
   // Register blocs
   sl.registerFactory(() => AuthenticationBloc(authRepository: sl<AuthRepository>()));

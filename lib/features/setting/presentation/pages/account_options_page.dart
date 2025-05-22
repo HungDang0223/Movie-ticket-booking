@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:movie_tickets/core/constants/app_color.dart';
 import 'package:movie_tickets/features/setting/presentation/pages/change_password_page.dart';
-import 'package:movie_tickets/features/setting/presentation/pages/user_info_page.dart';
 
 class AccountOptionsPage extends StatelessWidget {
-  const AccountOptionsPage({Key? key}) : super(key: key);
+  const AccountOptionsPage({super.key});
 
   @override
   Widget build(BuildContext context) {

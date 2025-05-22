@@ -1,6 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:movie_tickets/features/movies/data/models/review_model.dart';
-import 'review.dart';
 
 abstract class Movie {
   final int movieId;

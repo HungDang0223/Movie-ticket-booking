@@ -22,7 +22,7 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  late final SettingsBloc bloc;
+  final SettingsBloc bloc = sl<SettingsBloc>();
   @override
   void initState() {
     bloc.add(LoadSettings());
@@ -132,7 +132,7 @@ class _SettingPageState extends State<SettingPage> {
                       title: 'settings.helpCenter'.i18n(),
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('settings.comingSoon'.i18n(),), duration: Duration(milliseconds: 300)),
+                          SnackBar(content: Text('settings.comingSoon'.i18n(),), duration: const Duration(milliseconds: 300)),
                         );
                       },
                     ),
@@ -141,7 +141,7 @@ class _SettingPageState extends State<SettingPage> {
                       title: 'settings.about'.i18n(),
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('settings.comingSoon'.i18n()), duration: Duration(milliseconds: 300),),
+                          SnackBar(content: Text('settings.comingSoon'.i18n()), duration: const Duration(milliseconds: 300),),
                         );
                       },
                     ),

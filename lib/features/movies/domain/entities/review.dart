@@ -1,6 +1,6 @@
 abstract class Review {
   final int reviewId;
-  final int userId;
+  final String userId;
   final String fullName;
   final String photoPath;
   final int movieId;
