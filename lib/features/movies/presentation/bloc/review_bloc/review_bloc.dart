@@ -128,8 +128,9 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
       
       result.when(
         success: (success) {
-          emit(ReviewActionSuccess());
+          
           if (success && state is ReviewLoaded) {
+            emit(ReviewActionSuccess());
             final currentState = state as ReviewLoaded;
             final updatedReviews = currentState.reviews.map((review) {
               if (review.reviewId == event.reviewId) {

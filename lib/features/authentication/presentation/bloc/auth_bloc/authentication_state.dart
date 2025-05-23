@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:movie_tickets/features/authentication/data/models/user_model.dart';
 
 abstract class AuthenticationState extends Equatable {
   const AuthenticationState();
@@ -10,16 +11,16 @@ abstract class AuthenticationState extends Equatable {
 class Uninitialized extends AuthenticationState {}
 
 class Authenticated extends AuthenticationState {
-  final String displayName;
+  final UserModel user;
 
-  const Authenticated(this.displayName);
+  const Authenticated(this.user);
 
   @override
-  List<Object> get props => [displayName]; // Ensure proper equality comparison
+  List<Object> get props => [user]; // Ensure proper equality comparison
 
   @override
   String toString() {
-    return 'Authenticated{displayName: $displayName}';
+    return 'Authenticated{user: $user}';
   }
 }
 

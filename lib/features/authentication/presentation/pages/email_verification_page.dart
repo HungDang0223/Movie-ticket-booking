@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:localization/localization.dart';
 import 'package:movie_tickets/core/constants/app_color.dart';
+import 'package:movie_tickets/core/utils/snackbar_utilies.dart';
 import 'package:movie_tickets/injection.dart';
 import 'package:pinput/pinput.dart';
 import '../bloc/auth_bloc/bloc.dart';
@@ -105,52 +106,17 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
         });
         
         _startResendTimer();
-        _showSuccessSnackBar('auth.emailVerification.codeSentSuccess'.i18n());
+        _pinController.clear();
+        SnackbarUtils.showSuccessSnackbar(context, 'auth.emailVerification.codeSentSuccess'.i18n());
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _isResending = false;
         });
-        _showErrorSnackBar('auth.emailVerification.resendFailed'.i18n());
+        SnackbarUtils.showErrorSnackbar(context, 'auth.emailVerification.resendFailed'.i18n());
       }
     }
-  }
-
-  void _showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 12),
-            Text(message),
-          ],
-        ),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
-  }
-
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.error_outline, color: Colors.white),
-            const SizedBox(width: 12),
-            Expanded(child: Text(message)),
-          ],
-        ),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
   }
 
   @override
@@ -172,17 +138,24 @@ class _EmailVerificationPageState extends State<EmailVerificationPage>
       body: BlocListener<AuthenticationBloc, AuthenticationState>(
         listener: (context, state) {
           if (state is EmailVerificateFailed) {
-            _showErrorSnackBar('auth.emailVerification.invalidCode'.i18n());
+            if (state.message == 'auth.emailVerification.invalidCode') {
+              SnackbarUtils.showErrorSnackbar(context, 'auth.emailVerification.invalidCode'.i18n());
+            } else {
+              SnackbarUtils.showErrorSnackbar(context, state.message);
+            }
             _pinController.clear();
           }
-          
+          if (state is SendEmailRequestFailed) {
+            SnackbarUtils.showErrorSnackbar(context, state.message);
+          }
           if (state is EmailVerificatedSuccessfully) {
-            _showSuccessSnackBar('auth.emailVerification.verifiedSuccess'.i18n());
-            Future.delayed(const Duration(milliseconds: 500), () {
+            SnackbarUtils.showSuccessSnackbar(context, 'auth.emailVerification.verifiedSuccess'.i18n());
+            WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
-                Navigator.pushReplacementNamed(context, '/change-password');
+                Navigator.pushNamed(context, '/change-password');
               }
             });
+            
           }
         },
         child: FadeTransition(

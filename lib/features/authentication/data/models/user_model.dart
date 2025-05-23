@@ -58,6 +58,14 @@ class UserModel extends User with EquatableMixin {
       'photoPath': photoPath,
       'refreshToken': refreshToken,
       'refreshTokenExpiry': refreshTokenExpiry?.toIso8601String(),
+      'role': role,
+      'isDeleted': isDeleted,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'rankId': rankId,
+      'totalPoints': totalPoints,
+      'totalPaid': totalPaid,
+      
     };
   }
 

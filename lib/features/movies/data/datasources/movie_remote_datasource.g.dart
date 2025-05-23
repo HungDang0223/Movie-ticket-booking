@@ -14,7 +14,7 @@ class _MovieRemoteDatasource implements MovieRemoteDatasource {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= 'http://192.168.1.2:5000/api/v1//movie';
+    baseUrl ??= 'http://192.168.1.2:5000/api/v1/movie';
   }
 
   final Dio _dio;

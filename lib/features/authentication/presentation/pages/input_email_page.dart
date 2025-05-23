@@ -17,10 +17,11 @@ class InputEmailPage extends StatefulWidget {
 class _InputEmailPageState extends State<InputEmailPage> {
   final TextEditingController _inputController = TextEditingController();
   late bool isSending;
-  final bloc = sl<AuthenticationBloc>();
+  late AuthenticationBloc bloc;
   @override
   void initState() {
     isSending = false;
+    bloc = sl<AuthenticationBloc>();
     super.initState();
   }
   @override

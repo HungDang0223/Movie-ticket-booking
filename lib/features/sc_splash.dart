@@ -1,8 +1,5 @@
-import 'package:go_router/go_router.dart';
-import 'package:movie_tickets/app.dart';
 import 'package:movie_tickets/core/constants/my_const.dart';
 import 'package:flutter/material.dart';
-import 'package:movie_tickets/features/authentication/presentation/pages/login_page.dart';
 import 'package:movie_tickets/features/authentication/presentation/widgets/widget_logo_findseat.dart';
 
 class SplashScreen extends StatelessWidget {

@@ -223,7 +223,7 @@ class _EnhancedAddReviewDialogState extends State<EnhancedAddReviewDialog>
       children: [
         Text(
           'review.addComment'.i18n(),
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -271,7 +271,7 @@ class _EnhancedAddReviewDialogState extends State<EnhancedAddReviewDialog>
             ),
             child: Text(
               'common.cancel'.i18n(),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -302,7 +302,7 @@ class _EnhancedAddReviewDialogState extends State<EnhancedAddReviewDialog>
                   )
                 : Text(
                   '${'common.submit'.i18n()} ${'review.review'.i18n()}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),

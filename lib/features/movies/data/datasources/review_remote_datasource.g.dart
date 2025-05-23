@@ -14,7 +14,7 @@ class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= 'http://192.168.1.2:5000/api/v1//review';
+    baseUrl ??= 'http://192.168.1.2:5000/api/v1/review';
   }
 
   final Dio _dio;
@@ -144,12 +144,12 @@ class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
   }
 
   @override
-  Future<HttpResponse<bool>> deleteMovieReview(int reviewId) async {
+  Future<HttpResponse<RegularResponse>> deleteMovieReview(int reviewId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<HttpResponse<bool>>(Options(
+    final _options = _setStreamType<HttpResponse<RegularResponse>>(Options(
       method: 'DELETE',
       headers: _headers,
       extra: _extra,
@@ -165,8 +165,8 @@ class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
           _dio.options.baseUrl,
           baseUrl,
         )));
-    final _result = await _dio.fetch<bool>(_options);
-    late bool _value;
+    final _result = await _dio.fetch<RegularResponse>(_options);
+    late RegularResponse _value;
     try {
       _value = _result.data!;
     } on Object catch (e, s) {
@@ -178,12 +178,12 @@ class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
   }
 
   @override
-  Future<HttpResponse<bool>> likeMovieReview(int reviewId) async {
+  Future<HttpResponse<RegularResponse>> likeMovieReview(int reviewId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<HttpResponse<bool>>(Options(
+    final _options = _setStreamType<HttpResponse<RegularResponse>>(Options(
       method: 'PATCH',
       headers: _headers,
       extra: _extra,
@@ -199,8 +199,8 @@ class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
           _dio.options.baseUrl,
           baseUrl,
         )));
-    final _result = await _dio.fetch<bool>(_options);
-    late bool _value;
+    final _result = await _dio.fetch<RegularResponse>(_options);
+    late RegularResponse _value;
     try {
       _value = _result.data!;
     } on Object catch (e, s) {
@@ -212,7 +212,7 @@ class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
   }
 
   @override
-  Future<HttpResponse<bool>> unlikeMovieReview(int reviewId) async {
+  Future<HttpResponse<RegularResponse>> unlikeMovieReview(int reviewId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
@@ -233,8 +233,8 @@ class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
           _dio.options.baseUrl,
           baseUrl,
         )));
-    final _result = await _dio.fetch<bool>(_options);
-    late bool _value;
+    final _result = await _dio.fetch<RegularResponse>(_options);
+    late RegularResponse _value;
     try {
       _value = _result.data!;
     } on Object catch (e, s) {

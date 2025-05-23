@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:movie_tickets/core/configs/size_config.dart';
 
-import '../constants/my_const.dart';
 
 class MultiDevices {
   static const double defaultScale = 797.7;

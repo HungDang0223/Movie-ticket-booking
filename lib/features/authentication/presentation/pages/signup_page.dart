@@ -1,5 +1,4 @@
 import 'package:movie_tickets/core/constants/my_const.dart';
-import 'package:movie_tickets/features/authentication/presentation/bloc/auth_bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_tickets/injection.dart';

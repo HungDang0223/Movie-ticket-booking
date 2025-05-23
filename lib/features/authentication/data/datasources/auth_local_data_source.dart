@@ -16,8 +16,11 @@ class AuthLocalDataSource {
   Future<UserModel?> getUserData() async {
     final userJson = sharedPrefsService.getValue('user', type: Map<String, dynamic>);
     if (userJson != null) {
+      print("User data retrieved from local storage: $userJson");
       return UserModel.fromJson(userJson);
     }
+    print("No user data found from local storage");
+    print("isLoggedIn: ${sharedPrefsService.getValue('isLoggedIn', type: bool)}");
     return null;
   }
   Future<bool> isLoggedIn() async {

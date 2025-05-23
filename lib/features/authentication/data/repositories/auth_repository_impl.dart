@@ -17,10 +17,16 @@ String accessToken = "";
 String refreshToken = "";
 
 class AuthReposImpl implements AuthRepository {
-  
   final AuthRemoteDataSource _authRemoteDataSource;
   final AuthLocalDataSource _authLocalDataSource;
-  AuthReposImpl(this._authLocalDataSource, this._authRemoteDataSource);
+  final Dio _dio;
+
+  AuthReposImpl(this._authLocalDataSource, this._authRemoteDataSource, this._dio);
+
+  void _updateDioHeaders(String newAccessToken) {
+    _dio.options.headers['Authorization'] = 'Bearer $newAccessToken';
+    accessToken = newAccessToken;
+  }
 
   @override
   Future<Result<SignupResponse>> signUpWithUserInfo(String fullName, String email, String phone, String password, String address, DateTime? birthDate, String? gender) async {
@@ -76,7 +82,6 @@ class AuthReposImpl implements AuthRepository {
   @override
   Future<bool> isSignedIn() async {
     bool isSignedIn = await _authLocalDataSource.isLoggedIn();
-    print("fsmdfosdmf$isSignedIn");
     if (isSignedIn) {
       final isExpired = await _authLocalDataSource.isLoginSessionExpired();
       if (isExpired) {
@@ -102,6 +107,7 @@ class AuthReposImpl implements AuthRepository {
         final loginRes = httpResponse.data;
         final user = loginRes.user;
         await _authLocalDataSource.saveUserData(user);
+        _updateDioHeaders(loginRes.accessToken); // Update Dio headers with new token
         return Result.success(loginRes);
       } else {
         return Result.fromFailure(ServerFailure(httpResponse.response.statusMessage ?? "Unknown error"));
@@ -149,12 +155,13 @@ class AuthReposImpl implements AuthRepository {
       final httpResponse = await _authRemoteDataSource.verifyCode(body);
       
       log("Response: ${httpResponse.response.statusCode}", name: "Verify email code");
-
+      log("Response: ${httpResponse.data}", name: "Verify email code");
+      final verifyRes = httpResponse.data;
       if (httpResponse.response.statusCode == HttpStatus.ok) {
-        final verifyRes = httpResponse.data;
+        
         return Result.success(verifyRes);
       } else {
-        return Result.fromFailure(ServerFailure(httpResponse.response.statusMessage ?? "Unknown error"));
+        return Result.fromFailure(ServerFailure(verifyRes.message));
       }
     } on DioException catch (e) {
       if (e.response!.statusCode == 400) {

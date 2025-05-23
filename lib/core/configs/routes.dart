@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:movie_tickets/features/authentication/data/models/user_model.dart';
 import 'package:movie_tickets/features/authentication/presentation/pages/email_verification_page.dart';
 import 'package:movie_tickets/features/booking/presentation/pages/booking_seat.dart';
 import 'package:movie_tickets/features/booking/presentation/pages/booking_showing_movie.dart';
@@ -10,7 +9,6 @@ import 'package:movie_tickets/features/authentication/presentation/pages/login_p
 import 'package:movie_tickets/features/authentication/presentation/pages/signup_page.dart';
 import 'package:movie_tickets/features/movies/presentation/pages/movie_detail.dart';
 import 'package:movie_tickets/features/payment/presentation/pages/payment_page.dart';
-import 'package:movie_tickets/features/setting/presentation/bloc/settings_bloc.dart';
 import 'package:movie_tickets/features/setting/presentation/pages/account_options_page.dart';
 import 'package:movie_tickets/features/setting/presentation/pages/change_password_page.dart';
 import 'package:movie_tickets/features/setting/presentation/pages/password_verification_page.dart';

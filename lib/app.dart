@@ -9,15 +9,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_tickets/core/constants/my_const.dart';
 import 'package:movie_tickets/core/constants/app_color.dart';
 import 'package:movie_tickets/features/booking/presentation/bloc/showing_movie_bloc/showing_movie_bloc.dart';
-import 'package:movie_tickets/features/booking/presentation/pages/booking_showing_movie.dart';
 import 'package:movie_tickets/features/movies/presentation/bloc/bloc.dart';
-import 'package:movie_tickets/features/movies/presentation/bloc/movie_bloc/movie_bloc.dart';
-import 'package:movie_tickets/features/movies/presentation/bloc/movie_bloc/movie_event.dart';
 import 'package:movie_tickets/features/movies/presentation/pages/home_page.dart';
-import 'package:movie_tickets/features/movies/presentation/pages/movie_detail.dart';
 import 'package:movie_tickets/features/payment/presentation/bloc/payment_bloc.dart';
 import 'package:movie_tickets/features/payment/presentation/pages/payment_page.dart';
-import 'package:movie_tickets/features/setting/domain/repositories/settings_repository.dart';
 import 'package:movie_tickets/features/setting/presentation/bloc/settings_bloc.dart';
 import 'package:movie_tickets/features/setting/presentation/bloc/setting_event.dart';
 import 'package:movie_tickets/features/setting/presentation/bloc/settings_state.dart';
@@ -26,9 +21,6 @@ import 'package:movie_tickets/features/venues/presentation/pages/venues_page.dar
 import 'package:movie_tickets/injection.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/login_bloc/bloc.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/signup_bloc/bloc.dart';
-import 'package:movie_tickets/features/authentication/presentation/pages/login_page.dart';
-import 'package:movie_tickets/features/authentication/presentation/pages/signup_page.dart';
-import 'package:movie_tickets/features/sc_splash.dart';
 import 'package:movie_tickets/core/utils/app_localizations.dart';
 
 import 'features/authentication/presentation/bloc/auth_bloc/bloc.dart';

@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -59,7 +58,6 @@ Future<void> init() async {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization': 'Bearer $accessToken',
       'ngrok-skip-browser-warning':'true',
     },
     connectTimeout: const Duration(seconds: 30),
@@ -78,14 +76,18 @@ Future<void> init() async {
   sl.registerSingleton<AuthRemoteDataSource>(AuthRemoteDataSource(sl())); 
   sl.registerSingleton<AuthLocalDataSource>(AuthLocalDataSource(sl()));  
   sl.registerSingleton<MovieRemoteDatasource>(MovieRemoteDatasource(sl()));
-  sl.registerSingleton<ReviewRemoteDatasource>(ReviewRemoteDatasource(sl<Dio>()));
+  sl.registerSingleton<ReviewRemoteDatasource>(ReviewRemoteDatasource(sl()));
   sl.registerSingleton<ShowingMovieRemoteDataSource>(ShowingMovieRemoteDataSource(sl()));
   sl.registerSingleton<SettingsLocalDataSource>(SettingsLocalDataSourceImpl(sl<SharedPrefService>()));
   sl.registerSingleton<BookingSeatRemoteDataSource>(BookingSeatRemoteDataSource());
   
 
   // Register repository
-  sl.registerLazySingleton<AuthRepository>(() => AuthReposImpl(sl<AuthLocalDataSource>(), sl<AuthRemoteDataSource>()));
+  sl.registerLazySingleton<AuthRepository>(() => AuthReposImpl(
+    sl<AuthLocalDataSource>(), 
+    sl<AuthRemoteDataSource>(),
+    sl<Dio>(),
+  ));
   sl.registerLazySingleton<MovieRepository>(() => MovieRepositoryImpl());
   sl.registerLazySingleton<ReviewRepository>(() => ReviewRepositoryImpl());
   sl.registerLazySingleton<ShowingMovieRepository>(() => ShowingMovieRepositoryImpl());
@@ -102,7 +104,7 @@ Future<void> init() async {
 
   // Register blocs
   sl.registerFactory(() => AuthenticationBloc(authRepository: sl<AuthRepository>()));
-  sl.registerFactory(() => LoginBloc(authRepository: sl<AuthRepository>()));
+  sl.registerFactory(() => LoginBloc(authRepository: sl<AuthRepository>(), authenticationBloc: sl<AuthenticationBloc>()));
   sl.registerFactory(() => SignupBloc(authRepository: sl<AuthRepository>()));
   sl.registerFactory(() => MovieBloc(movieRepository: sl<MovieRepository>()));
   sl.registerFactory(() => ReviewBloc(reviewRepository: sl<ReviewRepository>()));

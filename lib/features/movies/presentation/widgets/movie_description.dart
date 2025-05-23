@@ -56,7 +56,7 @@ class MovieDescription extends StatelessWidget {
                               Container(
                                 height: MultiDevices.getValueByScale(SizeConfig.screenHeight! * 0.1),
                                 width: MediaQuery.of(context).size.width * 0.65,
-                                padding: EdgeInsets.only(bottom: 10),
+                                padding: const EdgeInsets.only(bottom: 10),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,7 +76,7 @@ class MovieDescription extends StatelessWidget {
                                 ),
                               ),
                               Container(
-                                padding: EdgeInsets.only(top: 10),
+                                padding: const EdgeInsets.only(top: 10),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -100,7 +100,7 @@ class MovieDescription extends StatelessWidget {
                                         ),
                                         const SizedBox(width: 5),
                                         Container(
-                                          padding: EdgeInsets.all(2),
+                                          padding: const EdgeInsets.all(2),
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(4),
                                             border: Border.all(width: 1, color: AppColor.GRAY1),
@@ -108,7 +108,7 @@ class MovieDescription extends StatelessWidget {
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              Icon(Icons.access_time, color: AppColor.GRAY1, size: 14),
+                                              const Icon(Icons.access_time, color: AppColor.GRAY1, size: 14),
                                               const SizedBox(width: 5),
                                               Text(movie.duration.formatDuration(), style: MultiDevices.getStyle(fontSize: 12)),
                                             ],

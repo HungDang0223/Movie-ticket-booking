@@ -26,13 +26,13 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
       // Show splash screen delay
       await Future.delayed(const Duration(seconds: 2));
 
-      if (isSignedIn) {
-        final result = await authRepository.getCurrentUser();
-        final name = result.data!.fullName;
-        emit(Authenticated(name));
-      } else {
+      // if (isSignedIn) {
+      //   final result = await authRepository.getCurrentUser();
+      //   final name = result.data!.fullName;
+      //   emit(Authenticated(name));
+      // } else {
         emit(Unauthenticated());
-      }
+      // }
     } catch (_) {
       emit(Unauthenticated());
     }
@@ -40,9 +40,15 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
 
   Future _onLoggedIn(LoggedIn event, Emitter<AuthenticationState> emit) async {
     final result = await authRepository.getCurrentUser();
-    final name = result.data!.fullName;
-    print(name);
-    emit(Authenticated(name));
+    if (result.isSuccess) {
+      final user = result.data!;
+      print(user);
+      if (user == null) {
+        emit(Unauthenticated());
+      } else {
+        emit(Authenticated(user));
+      }
+    }
   }
 
   void _onLoggedOut(LoggedOut event, Emitter<AuthenticationState> emit) {

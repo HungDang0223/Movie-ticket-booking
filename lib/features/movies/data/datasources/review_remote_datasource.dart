@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:movie_tickets/core/constants/strings.dart';
+import 'package:movie_tickets/features/authentication/data/models/auth_response.dart';
 import 'package:movie_tickets/features/movies/data/models/review_model.dart';
 import 'package:retrofit/retrofit.dart';
 
@@ -30,17 +31,17 @@ abstract class ReviewRemoteDatasource {
   );
 
   @DELETE('/{reviewId}')
-  Future<HttpResponse<bool>> deleteMovieReview(
+  Future<HttpResponse<RegularResponse>> deleteMovieReview(
     @Path("reviewId") int reviewId,
   );
 
   @PATCH('/{reviewId}/like')
-  Future<HttpResponse<bool>> likeMovieReview(
+  Future<HttpResponse<RegularResponse>> likeMovieReview(
     @Path("reviewId") int reviewId,
   );
 
   @PATCH('/{reviewId}/unlike')
-  Future<HttpResponse<bool>> unlikeMovieReview(
+  Future<HttpResponse<RegularResponse>> unlikeMovieReview(
     @Path("reviewId") int reviewId,
   );
 
