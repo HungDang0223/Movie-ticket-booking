@@ -32,7 +32,7 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
               children: [                
                 _buildLanguageTile(
                   context,
-                  title: 'Tiếng Việt',
+                  title: 'languages.vietnamese'.i18n(),
                   languageCode: 'vi',
                   isSelected: state.languageCode == 'vi',
                   onTap: () {
@@ -41,7 +41,7 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
                 ),
                 _buildLanguageTile(
                   context,
-                  title: 'English',
+                  title: 'languages.english'.i18n(),
                   languageCode: 'en',
                   isSelected: state.languageCode == 'en',
                   onTap: () {
@@ -86,4 +86,4 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
       ),
     );
   }
-} 
+}

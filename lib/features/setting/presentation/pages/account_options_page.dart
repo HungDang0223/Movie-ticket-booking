@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movie_tickets/core/constants/app_color.dart';
 import 'package:movie_tickets/features/setting/presentation/pages/change_password_page.dart';
+import 'package:movie_tickets/core/extensions/string_ext.dart';
 
 class AccountOptionsPage extends StatelessWidget {
   const AccountOptionsPage({super.key});
@@ -9,26 +10,26 @@ class AccountOptionsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tài khoản', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('settings.account'.i18n(), style: const TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Quản lý tài khoản',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            Text(
+              'settings.manageAccount'.i18n(),
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Cập nhật thông tin tài khoản của bạn',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              'settings.updateAccountInfo'.i18n(),
+              style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 30),
             _buildAccountOption(
               context,
-              'Thay đổi thông tin người dùng',
+              'settings.userInfo'.i18n(),
               Icons.person,
               () {
                 Navigator.pushNamed(context, '/user-info');

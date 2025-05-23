@@ -1,8 +1,7 @@
 {
   "app": {
     "title": "Đặt Vé Phim"
-  },
-  "auth": {
+  },  "auth": {
     "login": "Đăng Nhập",
     "signup": "Đăng Ký",
     "email": "Email",
@@ -11,7 +10,20 @@
     "forgotPassword": "Quên Mật Khẩu?",
     "or": "HOẶC",
     "loginWithGoogle": "Đăng nhập với Google",
-    "dontHaveAccount": "Chưa có tài khoản?"
+    "dontHaveAccount": "Chưa có tài khoản?",
+    "emailVerification": {
+      "title": "Xác Thực Email",
+      "checkEmail": "Kiểm Tra Email Của Bạn",
+      "codeSentTo": "Chúng tôi đã gửi mã xác thực đến",
+      "resendCode": "Gửi Lại Mã",
+      "resendIn": "Gửi lại sau",
+      "sending": "Đang gửi...",
+      "didntReceive": "Không nhận được mã? Kiểm tra thư mục spam hoặc thử gửi lại.",
+      "invalidCode": "Mã xác thực không hợp lệ. Vui lòng thử lại.",
+      "verifiedSuccess": "Xác thực email thành công!",
+      "codeSentSuccess": "Đã gửi mã xác thực thành công",
+      "resendFailed": "Không thể gửi lại mã. Vui lòng thử lại."
+    }
   },
   "movie": {
     "censor": "Kiểm duyệt",
@@ -51,8 +63,7 @@
       "topRated": "Đánh giá cao nhất",
       "lowestRated": "Đánh giá thấp nhất"
     }
-  },
-  "settings": {
+  },  "settings": {
     "settings": "Cài Đặt",
     "accountSettings": "Cài Đặt Tài Khoản",
     "profileInformation": "Thông Tin Cá Nhân",
@@ -67,7 +78,31 @@
     "helpCenter": "Trung Tâm Trợ Giúp",
     "about": "Về Chúng Tôi",
     "accountActions": "Thao Tác Tài Khoản",
-    "signOut": "Đăng Xuất"
+    "signOut": "Đăng Xuất",
+    "account": "Tài khoản",
+    "manageAccount": "Quản lý tài khoản",
+    "updateAccountInfo": "Cập nhật thông tin tài khoản của bạn",
+    "userInfo": "Thông tin người dùng",
+    "security": "Bảo mật",
+    "securityVerification": "Xác thực bảo mật",
+    "enterPassword": "Vui lòng nhập mật khẩu của bạn để tiếp tục",
+    "forgotPassword": "Quên mật khẩu?",
+    "verify": "Xác nhận",
+    "level": "Cấp độ",
+    "points": "Điểm",
+    "name": "Họ tên",
+    "phone": "Số điện thoại",
+    "pleaseEnterName": "Vui lòng nhập họ tên",
+    "saveChanges": "Lưu thay đổi",
+    "gender": "Giới tính",
+    "male": "Nam",
+    "female": "Nữ",
+    "other": "Khác",
+    "birthDate": "Ngày sinh",
+    "selectDate": "Chọn ngày",
+    "email": "Email",
+    "verifyEmail": "Xác thực Email",
+    "notVerified": "Chưa xác thực"
   },
   "notifications": {
     "notificationSettings": "Cài Đặt Thông Báo",
@@ -103,6 +138,21 @@
     "yes": "Có",
     "no": "Không",
     "ok": "Đồng ý",
+    "close": "Đóng",
+    "in": "trong",
+    "at": "tại",
+    "on": "vào",
+    "from": "từ",
+    "to": "đến",
+    "viewAll": "Xem Tất Cả",
+    "viewMore": "Xem Thêm",
+    "viewLess": "Xem Ít Hơn",
+    "viewDetails": "Xem Chi Tiết",
+    "results": "Kết quả",
+    "resultsFound": "Kết quả tìm thấy",
+    "resultsNotFound": "Không tìm thấy kết quả nào",
+    "resend": "Gửi lại",
+    "resendCode": "Gửi lại mã",
     "loading": "Đang tải...",
     "noData": "Không có dữ liệu",
     "noInternet": "Không có kết nối Internet",

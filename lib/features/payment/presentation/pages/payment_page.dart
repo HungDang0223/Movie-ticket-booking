@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:localization/localization.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -502,16 +503,15 @@ class _PaymentPageState extends State<PaymentPage> {
           
           Divider(color: Colors.grey.shade700, height: 30),
           
-          // Pricing details
-          _priceRow('Giá vé', widget.ticketPrice),
+          // Pricing details          _priceRow('payment.ticket_price'.i18n(), widget.ticketPrice),
           if (widget.snacksPrice > 0)
-            _priceRow('Bắp nước', widget.snacksPrice),
+            _priceRow('payment.snacks'.i18n(), widget.snacksPrice),
           if (discountAmount > 0)
-            _priceRow('Giảm giá', -discountAmount, textColor: Colors.greenAccent),
+            _priceRow('payment.discount'.i18n(), -discountAmount, textColor: Colors.greenAccent),
           
           Divider(color: Colors.grey.shade700, height: 30),
           
-          _priceRow('Tổng cộng', totalAmount, isBold: true),
+          _priceRow('payment.total'.i18n(), totalAmount, isBold: true),
         ],
       ),
     );

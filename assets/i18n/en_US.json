@@ -1,8 +1,7 @@
 {
   "app": {
     "title": "Movie Tickets"
-  },
-  "auth": {
+  },  "auth": {
     "login": "Login",
     "signup": "Sign Up",
     "email": "Email",
@@ -11,7 +10,20 @@
     "forgotPassword": "Forgot Password?",
     "or": "OR",
     "loginWithGoogle": "Login with Google",
-    "dontHaveAccount": "Don't have an account?"
+    "dontHaveAccount": "Don't have an account?",
+    "emailVerification": {
+      "title": "Email Verification",
+      "checkEmail": "Check Your Email",
+      "codeSentTo": "We sent a verification code to",
+      "resendCode": "Resend Code",
+      "resendIn": "Resend in",
+      "sending": "Sending...",
+      "didntReceive": "Didn't receive the code? Check your spam folder or try resending.",
+      "invalidCode": "Invalid verification code. Please try again.",
+      "verifiedSuccess": "Email verified successfully!",
+      "codeSentSuccess": "Verification code sent successfully",
+      "resendFailed": "Failed to resend code. Please try again."
+    }
   },
   "movie": {
     "censor": "Censor",
@@ -53,8 +65,7 @@
       "topRated": "Top Rated",
       "lowestRated": "Lowest Rated"
     }
-  },
-  "settings": {
+  },  "settings": {
     "settings": "Settings",
     "accountSettings": "Account Settings",
     "profileInformation": "Profile Information",
@@ -69,7 +80,31 @@
     "helpCenter": "Help Center",
     "about": "About",
     "accountActions": "Account Actions",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "account": "Account",
+    "manageAccount": "Manage Account",
+    "updateAccountInfo": "Update your account information",
+    "userInfo": "User Information",
+    "security": "Security",
+    "securityVerification": "Security Verification",
+    "enterPassword": "Please enter your password to continue",
+    "forgotPassword": "Forgot Password?",
+    "verify": "Verify",
+    "level": "Level",
+    "points": "Points",
+    "name": "Name",
+    "phone": "Phone Number",
+    "pleaseEnterName": "Please enter your name",
+    "saveChanges": "Save Changes",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+    "birthDate": "Birth Date",
+    "selectDate": "Select Date",
+    "email": "Email",
+    "verifyEmail": "Verify Email",
+    "notVerified": "Not Verified"
   },
   "notifications": {
     "notificationSettings": "Notification Settings",
@@ -105,6 +140,17 @@
     "yes": "Yes",
     "no": "No",
     "ok": "OK",
+    "close": "Close",
+    "in": "in",
+    "out": "out",
+    "at": "at",
+    "on": "on",
+    "from": "from",
+    "to": "to",
+    "viewAll": "View All",
+    "viewMore": "View More",
+    "viewLess": "View Less",
+    "viewDetails": "View Details",
     "loading": "Loading...",
     "noData": "No data",
     "noInternet": "No internet connection",
