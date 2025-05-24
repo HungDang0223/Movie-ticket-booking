@@ -1,153 +1,230 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movie_tickets/features/booking/data/repositories/booking_seat_repository_impl.dart';
+import 'package:movie_tickets/features/booking/domain/repositories/booking_seat_repository.dart';
 
-import '../../../data/models/models.dart';
-import '../bloc.dart';
+import '../../../data/models/seat.dart';
+import 'booking_seat_event.dart';
+import 'booking_seat_state.dart';
 
 class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
-  final BookingSeatRepositoryImpl bookingSeatRepository;
-  final List<StreamSubscription> _subscriptions = [];
+  final BookingSeatRepository _repository;
+  StreamSubscription<SeatStatusUpdate>? _seatUpdatesSubscription;
+  StreamSubscription<String>? _connectionStatusSubscription;
 
-  BookingSeatBloc({required this.bookingSeatRepository}) : super(BookingSeatInitial()) {
-    on<BookingLoadSeats>(_onLoadSeats);
-    on<BookingSeatUpdated>(_onSeatUpdated);
-    on<BulkSeatsUpdated>(_onBulkSeatsUpdated);
-    on<ReserveSeat>(_onReserveSeat);
-    on<ConfirmSeatReservation>(_onConfirmSeatReservation);
-    on<CancelSeatReservation>(_onCancelSeatReservation);
-    on<ConnectionStateChanged>(_onConnectionStateChanged);
+  BookingSeatBloc({required BookingSeatRepository repository})
+      : _repository = repository,
+        super(const BookingSeatInitial()) {
+    on<LoadSeatsEvent>(_onLoadSeats);
+    on<ConnectToRealtimeEvent>(_onConnectToRealtime);
+    on<JoinShowingEvent>(_onJoinShowing);
+    on<LeaveShowingEvent>(_onLeaveShowing);
+    on<ReserveSeatEvent>(_onReserveSeat);
+    on<ConfirmReservationEvent>(_onConfirmReservation);
+    on<CancelReservationEvent>(_onCancelReservation);
+    on<SelectSeatEvent>(_onSelectSeat);
+    on<DeselectSeatEvent>(_onDeselectSeat);
+    on<ClearSelectedSeatsEvent>(_onClearSelectedSeats);
+    on<SeatStatusUpdatedEvent>(_onSeatStatusUpdated);
+    on<ConnectionStatusChangedEvent>(_onConnectionStatusChanged);
+    on<DisconnectEvent>(_onDisconnect);
   }
 
-  Future<void> _onLoadSeats(BookingLoadSeats event, Emitter<BookingSeatState> emit) async {
-    emit(BookingSeatLoading());
+  Future<void> _onLoadSeats(LoadSeatsEvent event, Emitter<BookingSeatState> emit) async {
+    emit(state.copyWith(status: BookingSeatStatus.loading));
+    
     try {
-      await bookingSeatRepository.connect();
-      
-      _subscriptions.add(
-        bookingSeatRepository.onConnectionStateChange.listen((state) {
-          add(ConnectionStateChanged(state));
-        })
-      );
-      
-      _subscriptions.add(
-        bookingSeatRepository.onSeatUpdate.listen((seat) {
-          if (seat.showingId == event.showingId) {
-            add(BookingSeatUpdated(seat));
-          }
-        })
-      );
-      
-      _subscriptions.add(
-        bookingSeatRepository.onBulkSeatUpdate.listen((seats) {
-          if (seats.isNotEmpty && seats.first.showingId == event.showingId) {
-            add(BulkSeatsUpdated(seats));
-          }
-        })
-      );
-      
-      await bookingSeatRepository.joinShowing(event.showingId);
-      final seats = await bookingSeatRepository.loadInitialSeats(event.showingId);
-      
-      emit(BookingSeatLoaded(seats: seats));
+      final rowSeats = await _repository.getSeatsByScreen(event.screenId);
+      emit(state.copyWith(
+        status: BookingSeatStatus.loaded,
+        rowSeats: rowSeats,
+        errorMessage: null,
+      ));
     } catch (e) {
-      emit(BookingSeatOperationFailure('Không thể tải thông tin ghế: $e'));
+      emit(state.copyWith(
+        status: BookingSeatStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
-  void _onSeatUpdated(BookingSeatUpdated event, Emitter<BookingSeatState> emit) {
-    if (state is BookingSeatLoaded) {
-      final currentState = state as BookingSeatLoaded;
-      final updatedSeats = List<Seat>.from(currentState.seats);
-
-      final index = updatedSeats.indexWhere((s) => s.seatId == event.seat.seatId);
-      if (index != -1) {
-        updatedSeats[index] = event.seat;
-      } else {
-        updatedSeats.add(event.seat);
-      }
+  Future<void> _onConnectToRealtime(ConnectToRealtimeEvent event, Emitter<BookingSeatState> emit) async {
+    try {
+      await _repository.connectToRealtimeUpdates(event.websocketUrl);
       
-      emit(currentState.copyWith(seats: updatedSeats));
+      // Listen to seat updates
+      _seatUpdatesSubscription?.cancel();
+      _seatUpdatesSubscription = _repository.seatUpdates.listen(
+        (update) => add(SeatStatusUpdatedEvent(update)),
+      );
+
+      // Listen to connection status
+      _connectionStatusSubscription?.cancel();
+      _connectionStatusSubscription = _repository.connectionStatus.listen(
+        (status) => add(ConnectionStatusChangedEvent(status)),
+      );
+
+      emit(state.copyWith(
+        connectionStatus: 'connecting',
+        errorMessage: null,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        connectionStatus: 'error',
+        errorMessage: 'Failed to connect to realtime updates: $e',
+      ));
     }
   }
 
-  void _onBulkSeatsUpdated(BulkSeatsUpdated event, Emitter<BookingSeatState> emit) {
-    if (state is BookingSeatLoaded) {
-      final currentState = state as BookingSeatLoaded;
-      emit(currentState.copyWith(seats: event.seats));
+  Future<void> _onJoinShowing(JoinShowingEvent event, Emitter<BookingSeatState> emit) async {
+    try {
+      await _repository.joinShowing(event.showingId, userId: event.userId);
+      emit(state.copyWith(
+        currentShowingId: event.showingId,
+        errorMessage: null,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        errorMessage: 'Failed to join showing: $e',
+      ));
     }
   }
 
-  Future<void> _onReserveSeat(ReserveSeat event, Emitter<BookingSeatState> emit) async {
-    final currentState = state;
-    if (currentState is BookingSeatLoaded) {
-      emit(BookingSeatOperationInProgress());
-      try {
-        final result = await bookingSeatRepository.reserveSeat(
-          event.showingId,
-          event.seatId,
-          event.userId,
-        );
-        emit(BookingSeatOperationFailure('Đặt ghế thành công: $result'));
-        emit(currentState); // Quay lại trạng thái trước đó, cập nhật ghế sẽ qua stream
-      } catch (e) {
-        emit(BookingSeatOperationFailure('Đặt ghế thất bại: $e'));
-        emit(currentState);
+  Future<void> _onLeaveShowing(LeaveShowingEvent event, Emitter<BookingSeatState> emit) async {
+    try {
+      await _repository.leaveShowing();
+      emit(state.copyWith(
+        currentShowingId: null,
+        selectedSeats: [],
+        errorMessage: null,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        errorMessage: 'Failed to leave showing: $e',
+      ));
+    }
+  }
+
+  Future<void> _onReserveSeat(ReserveSeatEvent event, Emitter<BookingSeatState> emit) async {
+    emit(state.copyWith(status: BookingSeatStatus.reserving));
+    
+    try {
+      final response = await _repository.reserveSeat(event.request);
+      if (response.status == 'success') {
+        emit(state.copyWith(
+          status: BookingSeatStatus.reserved,
+          errorMessage: null,
+        ));
+      } else {
+        emit(state.copyWith(
+          status: BookingSeatStatus.error,
+          errorMessage: response.message ?? 'Failed to reserve seat',
+        ));
       }
+    } catch (e) {
+      emit(state.copyWith(
+        status: BookingSeatStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
-  Future<void> _onConfirmSeatReservation(ConfirmSeatReservation event, Emitter<BookingSeatState> emit) async {
-    final currentState = state;
-    if (currentState is BookingSeatLoaded) {
-      emit(BookingSeatOperationInProgress());
-      try {
-        final result = await bookingSeatRepository.confirmSeatReservation(
-          event.showingId,
-          event.seatId,
-          event.userId,
-        );
-        emit(BookingSeatOperationSuccess('Xác nhận đặt ghế thành công: $result'));
-        emit(currentState); // Quay lại trạng thái trước đó, cập nhật ghế sẽ qua stream
-      } catch (e) {
-        emit(BookingSeatOperationFailure('Xác nhận đặt ghế thất bại: $e'));
-        emit(currentState);
+  Future<void> _onConfirmReservation(ConfirmReservationEvent event, Emitter<BookingSeatState> emit) async {
+    emit(state.copyWith(status: BookingSeatStatus.confirming));
+    
+    try {
+      final response = await _repository.confirmReservation(event.request);
+      if (response.status == 'success') {
+        emit(state.copyWith(
+          status: BookingSeatStatus.confirmed,
+          selectedSeats: [], // Clear selected seats after confirmation
+          errorMessage: null,
+        ));
+      } else {
+        emit(state.copyWith(
+          status: BookingSeatStatus.error,
+          errorMessage: response.message ?? 'Failed to confirm reservation',
+        ));
       }
+    } catch (e) {
+      emit(state.copyWith(
+        status: BookingSeatStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
-  Future<void> _onCancelSeatReservation(CancelSeatReservation event, Emitter<BookingSeatState> emit) async {
-    final currentState = state;
-    if (currentState is BookingSeatLoaded) {
-      emit(BookingSeatOperationInProgress());
-      try {
-        final result = await bookingSeatRepository.cancelSeatReservation(
-          event.showingId,
-          event.seatId,
-          event.userId,
-        );
-        emit(BookingSeatOperationSuccess('Hủy đặt ghế thành công: $result'));
-        emit(currentState); // Quay lại trạng thái trước đó, cập nhật ghế sẽ qua stream
-      } catch (e) {
-        emit(BookingSeatOperationFailure('Hủy đặt ghế thất bại: $e'));
-        emit(currentState);
+  Future<void> _onCancelReservation(CancelReservationEvent event, Emitter<BookingSeatState> emit) async {
+    emit(state.copyWith(status: BookingSeatStatus.canceling));
+    
+    try {
+      final response = await _repository.cancelReservation(event.request);
+      if (response.status == 'success') {
+        emit(state.copyWith(
+          status: BookingSeatStatus.loaded,
+          errorMessage: null,
+        ));
+      } else {
+        emit(state.copyWith(
+          status: BookingSeatStatus.error,
+          errorMessage: response.message ?? 'Failed to cancel reservation',
+        ));
       }
+    } catch (e) {
+      emit(state.copyWith(
+        status: BookingSeatStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
-  void _onConnectionStateChanged(ConnectionStateChanged event, Emitter<BookingSeatState> emit) {
-    if (state is BookingSeatLoaded) {
-      final currentState = state as BookingSeatLoaded;
-      emit(currentState.copyWith(connectionState: event.connectionState));
+  void _onSelectSeat(SelectSeatEvent event, Emitter<BookingSeatState> emit) {
+    final currentSelected = List<int>.from(state.selectedSeats);
+    if (!currentSelected.contains(event.seatId)) {
+      currentSelected.add(event.seatId);
+      emit(state.copyWith(selectedSeats: currentSelected));
     }
+  }
+
+  void _onDeselectSeat(DeselectSeatEvent event, Emitter<BookingSeatState> emit) {
+    final currentSelected = List<int>.from(state.selectedSeats);
+    currentSelected.remove(event.seatId);
+    emit(state.copyWith(selectedSeats: currentSelected));
+  }
+
+  void _onClearSelectedSeats(ClearSelectedSeatsEvent event, Emitter<BookingSeatState> emit) {
+    emit(state.copyWith(selectedSeats: []));
+  }
+
+  void _onSeatStatusUpdated(SeatStatusUpdatedEvent event, Emitter<BookingSeatState> emit) {
+    final updatedSeatUpdates = Map<int, SeatStatusUpdate>.from(state.seatStatusUpdates);
+    updatedSeatUpdates[event.update.seatId] = event.update;
+    
+    emit(state.copyWith(seatStatusUpdates: updatedSeatUpdates));
+  }
+
+  void _onConnectionStatusChanged(ConnectionStatusChangedEvent event, Emitter<BookingSeatState> emit) {
+    emit(state.copyWith(connectionStatus: event.status));
+  }
+
+  void _onDisconnect(DisconnectEvent event, Emitter<BookingSeatState> emit) {
+    _repository.disconnect();
+    _seatUpdatesSubscription?.cancel();
+    _connectionStatusSubscription?.cancel();
+    
+    emit(state.copyWith(
+      connectionStatus: 'disconnected',
+      currentShowingId: null,
+      selectedSeats: [],
+      seatStatusUpdates: {},
+    ));
   }
 
   @override
   Future<void> close() {
-    for (var subscription in _subscriptions) {
-      subscription.cancel();
-    }
+    _seatUpdatesSubscription?.cancel();
+    _connectionStatusSubscription?.cancel();
+    _repository.disconnect();
     return super.close();
   }
 }

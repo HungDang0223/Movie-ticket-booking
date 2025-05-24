@@ -11,83 +11,105 @@ abstract class BookingSeatEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class BookingLoadSeats extends BookingSeatEvent {
+class LoadSeatsEvent extends BookingSeatEvent {
+  final int screenId;
+
+  const LoadSeatsEvent(this.screenId);
+
+  @override
+  List<Object?> get props => [screenId];
+}
+
+class ConnectToRealtimeEvent extends BookingSeatEvent {
+  final String websocketUrl;
+
+  const ConnectToRealtimeEvent(this.websocketUrl);
+
+  @override
+  List<Object?> get props => [websocketUrl];
+}
+
+class JoinShowingEvent extends BookingSeatEvent {
   final int showingId;
+  final String? userId;
 
-  const BookingLoadSeats(this.showingId);
-
-  @override
-  List<Object?> get props => [showingId];
-}
-
-class BookingSeatUpdated extends BookingSeatEvent {
-  final Seat seat;
-
-  const BookingSeatUpdated(this.seat);
+  const JoinShowingEvent(this.showingId, {this.userId});
 
   @override
-  List<Object?> get props => [seat];
+  List<Object?> get props => [showingId, userId];
 }
 
-class BulkSeatsUpdated extends BookingSeatEvent {
-  final List<Seat> seats;
+class LeaveShowingEvent extends BookingSeatEvent {
+  const LeaveShowingEvent();
+}
 
-  const BulkSeatsUpdated(this.seats);
+class ReserveSeatEvent extends BookingSeatEvent {
+  final ReserveSeatRequest request;
+
+  const ReserveSeatEvent(this.request);
 
   @override
-  List<Object?> get props => [seats];
+  List<Object?> get props => [request];
 }
 
-class ReserveSeat extends BookingSeatEvent {
-  final int showingId;
+class ConfirmReservationEvent extends BookingSeatEvent {
+  final ReserveSeatRequest request;
+
+  const ConfirmReservationEvent(this.request);
+
+  @override
+  List<Object?> get props => [request];
+}
+
+class CancelReservationEvent extends BookingSeatEvent {
+  final ReserveSeatRequest request;
+
+  const CancelReservationEvent(this.request);
+
+  @override
+  List<Object?> get props => [request];
+}
+
+class SelectSeatEvent extends BookingSeatEvent {
   final int seatId;
-  final int userId;
 
-  const ReserveSeat({
-    required this.showingId,
-    required this.seatId,
-    required this.userId,
-  });
+  const SelectSeatEvent(this.seatId);
 
   @override
-  List<Object?> get props => [showingId, seatId, userId];
+  List<Object?> get props => [seatId];
 }
 
-class ConfirmSeatReservation extends BookingSeatEvent {
-  final int showingId;
+class DeselectSeatEvent extends BookingSeatEvent {
   final int seatId;
-  final int userId;
 
-  const ConfirmSeatReservation({
-    required this.showingId,
-    required this.seatId,
-    required this.userId,
-  });
+  const DeselectSeatEvent(this.seatId);
 
   @override
-  List<Object?> get props => [showingId, seatId, userId];
+  List<Object?> get props => [seatId];
 }
 
-class CancelSeatReservation extends BookingSeatEvent {
-  final int showingId;
-  final int seatId;
-  final int userId;
-
-  const CancelSeatReservation({
-    required this.showingId,
-    required this.seatId,
-    required this.userId,
-  });
-
-  @override
-  List<Object?> get props => [showingId, seatId, userId];
+class ClearSelectedSeatsEvent extends BookingSeatEvent {
+  const ClearSelectedSeatsEvent();
 }
 
-class ConnectionStateChanged extends BookingSeatEvent {
-  final ConnectionState connectionState;
+class SeatStatusUpdatedEvent extends BookingSeatEvent {
+  final SeatStatusUpdate update;
 
-  const ConnectionStateChanged(this.connectionState);
+  const SeatStatusUpdatedEvent(this.update);
 
   @override
-  List<Object?> get props => [connectionState];
+  List<Object?> get props => [update];
+}
+
+class ConnectionStatusChangedEvent extends BookingSeatEvent {
+  final String status;
+
+  const ConnectionStatusChangedEvent(this.status);
+
+  @override
+  List<Object?> get props => [status];
+}
+
+class DisconnectEvent extends BookingSeatEvent {
+  const DisconnectEvent();
 }

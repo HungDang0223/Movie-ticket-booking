@@ -1,58 +1,69 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
+import 'package:movie_tickets/features/booking/data/models/seat.dart';
 
-import '../../../data/models/models.dart';
-
-abstract class BookingSeatState extends Equatable {
-  const BookingSeatState();
-
-  @override
-  List<Object?> get props => [];
+enum BookingSeatStatus {
+  initial,
+  loading,
+  loaded,
+  reserving,
+  reserved,
+  confirming,
+  confirmed,
+  canceling,
+  error
 }
 
-class BookingSeatInitial extends BookingSeatState {}
+class BookingSeatState extends Equatable {
+  final BookingSeatStatus status;
+  final List<RowSeatsDto> rowSeats;
+  final List<int> selectedSeats;
+  final Map<int, SeatStatusUpdate> seatStatusUpdates;
+  final String? connectionStatus;
+  final int? currentShowingId;
+  final String? errorMessage;
 
-class BookingSeatLoading extends BookingSeatState {}
-
-class BookingSeatLoaded extends BookingSeatState {
-  final List<Seat> seats;
-  final ConnectionState connectionState;
-
-  const BookingSeatLoaded({
-    required this.seats,
-    this.connectionState = ConnectionState.done,
+  const BookingSeatState({
+    this.status = BookingSeatStatus.initial,
+    this.rowSeats = const [],
+    this.selectedSeats = const [],
+    this.seatStatusUpdates = const {},
+    this.connectionStatus,
+    this.currentShowingId,
+    this.errorMessage,
   });
 
-  BookingSeatLoaded copyWith({
-    List<Seat>? seats,
-    ConnectionState? connectionState,
+  BookingSeatState copyWith({
+    BookingSeatStatus? status,
+    List<RowSeatsDto>? rowSeats,
+    List<int>? selectedSeats,
+    Map<int, SeatStatusUpdate>? seatStatusUpdates,
+    String? connectionStatus,
+    int? currentShowingId,
+    String? errorMessage,
   }) {
-    return BookingSeatLoaded(
-      seats: seats ?? this.seats,
-      connectionState: connectionState ?? this.connectionState,
+    return BookingSeatState(
+      status: status ?? this.status,
+      rowSeats: rowSeats ?? this.rowSeats,
+      selectedSeats: selectedSeats ?? this.selectedSeats,
+      seatStatusUpdates: seatStatusUpdates ?? this.seatStatusUpdates,
+      connectionStatus: connectionStatus ?? this.connectionStatus,
+      currentShowingId: currentShowingId ?? this.currentShowingId,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
   @override
-  List<Object?> get props => [seats, connectionState];
+  List<Object?> get props => [
+        status,
+        rowSeats,
+        selectedSeats,
+        seatStatusUpdates,
+        connectionStatus,
+        currentShowingId,
+        errorMessage,
+      ];
 }
 
-class BookingSeatOperationInProgress extends BookingSeatState {}
-
-class BookingSeatOperationSuccess extends BookingSeatState {
-  final String message;
-
-  const BookingSeatOperationSuccess(this.message);
-
-  @override
-  List<Object?> get props => [message];
-}
-
-class BookingSeatOperationFailure extends BookingSeatState {
-  final String error;
-
-  const BookingSeatOperationFailure(this.error);
-
-  @override
-  List<Object?> get props => [error];
+class BookingSeatInitial extends BookingSeatState {
+  const BookingSeatInitial() : super();
 }

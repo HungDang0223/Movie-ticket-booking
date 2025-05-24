@@ -57,3 +57,83 @@ class Seat {
     };
   }
 }
+
+class SetDto {
+  final int seatId;
+  final int seatNumber;
+  const SetDto({
+    required this.seatId,
+    required this.seatNumber,
+  });
+  factory SetDto.fromJson(Map<String, dynamic> json) {
+    return SetDto(
+      seatId: json['seatId'] as int,
+      seatNumber: json['seatNumber'] as int,
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'seatId': seatId,
+      'seatNumber': seatNumber,
+    };
+  }
+}
+
+class RowSeatsDto {
+  final String rowName;
+  final String seatType;
+  final List<SetDto> seats;
+  const RowSeatsDto({
+    required this.rowName,
+    required this.seatType,
+    required this.seats,
+  });
+  factory RowSeatsDto.fromJson(Map<String, dynamic> json) {
+    return RowSeatsDto(
+      rowName: json['rowName'] as String,
+      seatType: json['seatType'] as String,
+      seats: (json['seats'] as List<dynamic>)
+          .map((e) => SetDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'rowName': rowName,
+      'seatType': seatType,
+      'seats': seats.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+class SeatStatusUpdate {
+  final int seatId;
+  final SeatStatus status; // ENUM('Available', 'TemporarilyReserved', 'Reserved', 'Sold')
+  final String? reservedBy; // userId
+  final DateTime? reservationExpiresAt;
+
+  const SeatStatusUpdate({
+    required this.seatId,
+    required this.status,
+    this.reservedBy,
+    this.reservationExpiresAt,
+  });
+
+  factory SeatStatusUpdate.fromJson(Map<String, dynamic> json) {
+    return SeatStatusUpdate(
+      seatId: json['seatId'] as int,
+      status: SeatStatus.values.firstWhere((e) => e.toString() == 'SeatStatus.${json['status']}'),
+      reservedBy: json['reservedBy'] as String?,
+      reservationExpiresAt: json['reservationExpiresAt'] != null ? DateTime.parse(json['reservationExpiresAt'] as String) : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'seatId': seatId,
+      'status': status.toString().split('.').last,
+      'reservedBy': reservedBy,
+      'reservationExpiresAt': reservationExpiresAt?.toIso8601String(),
+    };
+  }
+}

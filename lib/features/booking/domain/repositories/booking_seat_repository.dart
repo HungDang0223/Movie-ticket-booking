@@ -1,15 +1,18 @@
-import 'package:flutter/material.dart';
-
-import '../../data/models/models.dart';
+import 'package:movie_tickets/features/authentication/data/models/auth_response.dart';
+import 'package:movie_tickets/features/booking/data/models/seat.dart';
+import 'package:movie_tickets/features/booking/data/models/showing_seat.dart';
 
 abstract class BookingSeatRepository {
-  Future<void> connect();
-  Future<void> disconnect();
-  Future<void> joinShowing(int showingId);
-  Future<void> leaveShowing(int showingId);
-  Future<List<Seat>> loadInitialSeats(int showingId);
-  Future<String> reserveSeat(int showingId, int seatId, int userId);
-  Future<String> confirmSeatReservation(int showingId, int seatId, int userId);
-  Future<String> cancelSeatReservation(int showingId, int seatId, int userId);
-  Stream<ConnectionState> get connectionStateStream;
+  Future<List<RowSeatsDto>> getSeatsByScreen(int screenId);
+  Future<RegularResponse> reserveSeat(ReserveSeatRequest request);
+  Future<RegularResponse> confirmReservation(ReserveSeatRequest request);
+  Future<RegularResponse> cancelReservation(ReserveSeatRequest request);
+  
+  // WebSocket methods
+  Future<void> connectToRealtimeUpdates(String websocketUrl);
+  Future<void> joinShowing(int showingId, {String? userId});
+  Future<void> leaveShowing();
+  Stream<SeatStatusUpdate> get seatUpdates;
+  Stream<String> get connectionStatus;
+  void disconnect();
 }

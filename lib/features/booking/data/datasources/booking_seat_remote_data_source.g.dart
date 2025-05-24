@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'review_remote_datasource.dart';
+part of 'booking_seat_remote_data_source.dart';
 
 // **************************************************************************
 // RetrofitGenerator
@@ -8,13 +8,13 @@ part of 'review_remote_datasource.dart';
 
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations
 
-class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
-  _ReviewRemoteDatasource(
+class _BookingSeatRemoteDataSource implements BookingSeatRemoteDataSource {
+  _BookingSeatRemoteDataSource(
     this._dio, {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= 'http://192.168.1.2:5000/api/v1/review';
+    baseUrl ??= 'http://192.168.1.2:5000/api/v1';
   }
 
   final Dio _dio;
@@ -24,29 +24,19 @@ class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<HttpResponse<ReviewResponse>> getMovieModels(
-    int movieId,
-    int page,
-    int limit,
-    String? sort,
-  ) async {
+  Future<List<RowSeatsDto>> getSeatsByScreen(int screenId) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'page': page,
-      r'limit': limit,
-      r'sort': sort,
-    };
-    queryParameters.removeWhere((k, v) => v == null);
+    final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<HttpResponse<ReviewResponse>>(Options(
+    final _options = _setStreamType<List<RowSeatsDto>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
         .compose(
           _dio.options,
-          '/${movieId}',
+          '/api/Screen/${screenId}/seats',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -55,36 +45,34 @@ class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
           _dio.options.baseUrl,
           baseUrl,
         )));
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late ReviewResponse _value;
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<RowSeatsDto> _value;
     try {
-      _value = ReviewResponse.fromJson(_result.data!);
+      _value = _result.data!
+          .map((dynamic i) => RowSeatsDto.fromJson(i as Map<String, dynamic>))
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
     }
-    final httpResponse = HttpResponse(_value, _result);
-    return httpResponse;
+    return _value;
   }
 
   @override
-  Future<HttpResponse<MovieReview>> postMovieReview(
-    int movieId,
-    Map<String, dynamic> reviewData,
-  ) async {
+  Future<RegularResponse> reserveSeat(ReserveSeatRequest request) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
-    _data.addAll(reviewData);
-    final _options = _setStreamType<HttpResponse<MovieReview>>(Options(
+    _data.addAll(request.toJson());
+    final _options = _setStreamType<RegularResponse>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
     )
         .compose(
           _dio.options,
-          '/${movieId}',
+          '/api/seat-reserve/reserve',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -94,69 +82,31 @@ class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
           baseUrl,
         )));
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late MovieReview _value;
+    late RegularResponse _value;
     try {
-      _value = MovieReview.fromJson(_result.data!);
+      _value = RegularResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
     }
-    final httpResponse = HttpResponse(_value, _result);
-    return httpResponse;
+    return _value;
   }
 
   @override
-  Future<HttpResponse<MovieReview>> updateMovieReview(
-    int reviewId,
-    Map<String, dynamic> reviewData,
-  ) async {
+  Future<RegularResponse> confirmReservation(ReserveSeatRequest request) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
-    _data.addAll(reviewData);
-    final _options = _setStreamType<HttpResponse<MovieReview>>(Options(
-      method: 'PATCH',
+    _data.addAll(request.toJson());
+    final _options = _setStreamType<RegularResponse>(Options(
+      method: 'POST',
       headers: _headers,
       extra: _extra,
     )
         .compose(
           _dio.options,
-          '/${reviewId}',
-          queryParameters: queryParameters,
-          data: _data,
-        )
-        .copyWith(
-            baseUrl: _combineBaseUrls(
-          _dio.options.baseUrl,
-          baseUrl,
-        )));
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late MovieReview _value;
-    try {
-      _value = MovieReview.fromJson(_result.data!);
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
-      rethrow;
-    }
-    final httpResponse = HttpResponse(_value, _result);
-    return httpResponse;
-  }
-
-  @override
-  Future<HttpResponse<RegularResponse>> deleteMovieReview(int reviewId) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<HttpResponse<RegularResponse>>(Options(
-      method: 'DELETE',
-      headers: _headers,
-      extra: _extra,
-    )
-        .compose(
-          _dio.options,
-          '/${reviewId}',
+          '/api/seat-reserve/confirm',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -173,24 +123,24 @@ class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
       errorLogger?.logError(e, s, _options);
       rethrow;
     }
-    final httpResponse = HttpResponse(_value, _result);
-    return httpResponse;
+    return _value;
   }
 
   @override
-  Future<HttpResponse<RegularResponse>> likeMovieReview(int reviewId) async {
+  Future<RegularResponse> cancelReservation(ReserveSeatRequest request) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<HttpResponse<RegularResponse>>(Options(
-      method: 'PATCH',
+    final _data = <String, dynamic>{};
+    _data.addAll(request.toJson());
+    final _options = _setStreamType<RegularResponse>(Options(
+      method: 'POST',
       headers: _headers,
       extra: _extra,
     )
         .compose(
           _dio.options,
-          '/${reviewId}/like',
+          '/api/seat-reserve/cancel',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -207,42 +157,7 @@ class _ReviewRemoteDatasource implements ReviewRemoteDatasource {
       errorLogger?.logError(e, s, _options);
       rethrow;
     }
-    final httpResponse = HttpResponse(_value, _result);
-    return httpResponse;
-  }
-
-  @override
-  Future<HttpResponse<RegularResponse>> unlikeMovieReview(int reviewId) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<HttpResponse<RegularResponse>>(Options(
-      method: 'PATCH',
-      headers: _headers,
-      extra: _extra,
-    )
-        .compose(
-          _dio.options,
-          '/${reviewId}/unlike',
-          queryParameters: queryParameters,
-          data: _data,
-        )
-        .copyWith(
-            baseUrl: _combineBaseUrls(
-          _dio.options.baseUrl,
-          baseUrl,
-        )));
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late RegularResponse _value;
-    try {
-      _value = RegularResponse.fromJson(_result.data!);
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
-      rethrow;
-    }
-    final httpResponse = HttpResponse(_value, _result);
-    return httpResponse;
+    return _value;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

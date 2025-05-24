@@ -212,7 +212,12 @@ class _TheaterListState extends State<TheaterList> {
                             alignment: Alignment.center,
                             child: ElevatedButton(
                               onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => BookingSeatScreen(movie: widget.movie, showingMovie: showing,)));
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => BookingSeatPage(
+                                  movie: widget.movie,
+                                  showingMovie: showing,
+                                  websocketUrl: 'ws://192.168.1.2:5000/ws/seat-reservation',
+                                  userId: '43810148fb5b11efa5ff4c22c67a10e0',
+                                )));
                               },
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,

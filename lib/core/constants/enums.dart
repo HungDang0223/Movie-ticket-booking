@@ -9,7 +9,8 @@ enum ConnectionState {
 enum SeatStatus {
   Available,
   Reserved,
-  Unavailable,
+  TemporarilyReserved,
+  Sold,
 }
 enum SeatType {
   Regular,

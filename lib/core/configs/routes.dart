@@ -55,9 +55,11 @@ class AppRoutes {
       case '/seat_booking':
         // movie + movie showing
         final args = settings.arguments as Map<String, dynamic>;
-        return _materialRoute(BookingSeatScreen(
+        return _materialRoute(BookingSeatPage(
           movie: args['movie'],
           showingMovie: args['showingMovie'],
+          websocketUrl: args['websocketUrl'],
+          userId: args['userId'],
         ));
 
       case '/snack_booking':

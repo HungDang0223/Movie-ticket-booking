@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:movie_tickets/core/configs/firebase_options.dart';
+import 'package:movie_tickets/core/services/networking/websocket_service.dart';
 import 'package:movie_tickets/features/authentication/domain/usecases/login_use_case.dart';
 import 'package:movie_tickets/features/authentication/domain/usecases/signup_use_case.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/auth_bloc/authentication_bloc.dart';
@@ -73,13 +74,14 @@ Future<void> init() async {
   sl.registerSingleton<SharedPrefService>(sharedPrefService);
 
   // Register data sources
+  sl.registerSingleton<WebSocketService>(WebSocketService());
   sl.registerSingleton<AuthRemoteDataSource>(AuthRemoteDataSource(sl())); 
   sl.registerSingleton<AuthLocalDataSource>(AuthLocalDataSource(sl()));  
   sl.registerSingleton<MovieRemoteDatasource>(MovieRemoteDatasource(sl()));
   sl.registerSingleton<ReviewRemoteDatasource>(ReviewRemoteDatasource(sl()));
   sl.registerSingleton<ShowingMovieRemoteDataSource>(ShowingMovieRemoteDataSource(sl()));
   sl.registerSingleton<SettingsLocalDataSource>(SettingsLocalDataSourceImpl(sl<SharedPrefService>()));
-  sl.registerSingleton<BookingSeatRemoteDataSource>(BookingSeatRemoteDataSource());
+  sl.registerSingleton<BookingSeatRemoteDataSource>(BookingSeatRemoteDataSource(sl()));
   
 
   // Register repository
@@ -93,7 +95,10 @@ Future<void> init() async {
   sl.registerLazySingleton<ShowingMovieRepository>(() => ShowingMovieRepositoryImpl());
   sl.registerLazySingleton<SettingsRepository>(() => SettingsRepositoryImpl(sl<SettingsLocalDataSource>(), sl<AuthRepository>()));
   sl.registerLazySingleton<PaymentRepository>(() => PaymentRepositoryImpl());
-  sl.registerLazySingleton<BookingSeatRepository>(() => BookingSeatRepositoryImpl(seatService: sl<BookingSeatRemoteDataSource>()));
+  sl.registerLazySingleton<BookingSeatRepository>(() => BookingSeatRepositoryImpl(
+    apiService: sl<BookingSeatRemoteDataSource>(),
+    webSocketService: sl<WebSocketService>(),
+  ));
   
   // Register use cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
@@ -109,7 +114,9 @@ Future<void> init() async {
   sl.registerFactory(() => MovieBloc(movieRepository: sl<MovieRepository>()));
   sl.registerFactory(() => ReviewBloc(reviewRepository: sl<ReviewRepository>()));
   sl.registerFactory(() => ShowingMovieBloc(repository: sl<ShowingMovieRepository>()));
-  sl.registerFactory(() => BookingSeatBloc(bookingSeatRepository: sl<BookingSeatRepositoryImpl>()));
+  sl.registerFactory(() => BookingSeatBloc(
+    repository: sl<BookingSeatRepository>(),
+  ));
   sl.registerFactory(() => PaymentBloc(paymentRepository: sl<PaymentRepository>()));
   sl.registerFactory(() => SettingsBloc(sl<SettingsRepository>()));
 }
