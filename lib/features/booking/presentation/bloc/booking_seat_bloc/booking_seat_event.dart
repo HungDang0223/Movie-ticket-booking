@@ -18,6 +18,16 @@ class LoadSeatsEvent extends BookingSeatEvent {
   List<Object?> get props => [screenId];
 }
 
+// New event to load seat statuses for a specific showing
+class LoadSeatStatusesEvent extends BookingSeatEvent {
+  final int showingId;
+
+  const LoadSeatStatusesEvent(this.showingId);
+
+  @override
+  List<Object?> get props => [showingId];
+}
+
 class ConnectToRealtimeEvent extends BookingSeatEvent {
   final String websocketUrl;
 
@@ -112,7 +122,33 @@ class DisconnectEvent extends BookingSeatEvent {
   const DisconnectEvent();
 }
 
-// Add this new event to clear errors
 class ClearErrorEvent extends BookingSeatEvent {
   const ClearErrorEvent();
+}
+
+class CleanupUserReservedSeatsEvent extends BookingSeatEvent {
+  final int seatId;
+  final int showingId;
+
+  const CleanupUserReservedSeatsEvent({
+    required this.seatId,
+    required this.showingId,
+  });
+
+  @override
+  List<Object?> get props => [seatId, showingId];
+}
+
+class ReleaseUserSeatsEvent extends BookingSeatEvent {
+  final String userId;
+  
+  final int showingId;
+
+  const ReleaseUserSeatsEvent({
+    required this.userId,
+    required this.showingId,
+  });
+
+  @override
+  List<Object?> get props => [userId, showingId];
 }

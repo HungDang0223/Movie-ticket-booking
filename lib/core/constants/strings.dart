@@ -2,7 +2,7 @@
 // const String baseURL = 'https://skunk-elegant-hideously.ngrok-free.app/api/v1';
 const String baseURL = 'http://192.168.1.2:5000/api/v1';
 const String authAPIBaseURL = '$baseURL/auth/';
-const String showingMovieAPIBaseURL = '$baseURL/showing-movie';
+const String showingMovieAPIBaseURL = '$baseURL/showing';
 const String reviewAPIBaseURL = '$baseURL/review';
 const String movieAPIBaseURL = '$baseURL/movie';
 

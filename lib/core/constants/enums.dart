@@ -8,8 +8,8 @@ enum ConnectionState {
 }
 enum SeatStatus {
   Available,
+  TempReserved,
   Reserved,
-  TemporarilyReserved,
   Sold,
 }
 enum SeatType {

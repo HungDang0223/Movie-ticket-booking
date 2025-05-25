@@ -14,6 +14,9 @@ abstract class BookingSeatRemoteDataSource {
   @GET('/screen/{screenId}/seats')
   Future<HttpResponse<List<RowSeatsDto>>> getSeatsByScreen(@Path('screenId') int screenId);
 
+  @GET('/showing/{showingId}/seat-statuses')
+  Future<HttpResponse<List<SeatStatusUpdate>>> getSeatStatusesByShowing(@Path('showingId') int showingId);
+
   // Reserve seat
   @POST('/seat-reserve/reserve')
   Future<HttpResponse<RegularResponse>> reserveSeat(@Body() ReserveSeatRequest request);
@@ -23,6 +26,10 @@ abstract class BookingSeatRemoteDataSource {
   Future<HttpResponse<RegularResponse>> confirmReservation(@Body() ReserveSeatRequest request);
 
   // Cancel reservation
-  @POST('/seat-reserve/cancel')
+  @POST('/seat-reserve/cancel-specific')
   Future<HttpResponse<RegularResponse>> cancelReservation(@Body() ReserveSeatRequest request);
+
+  // Cancel all reservations from a user
+  @POST('/seat-reserve/cancel-user-reservations')
+  Future<HttpResponse<RegularResponse>> cancelAllReservations(@Body() CancelUserReservationRequest request);
 }

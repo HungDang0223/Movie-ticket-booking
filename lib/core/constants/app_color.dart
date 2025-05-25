@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppColor {
   static const Color DEFAULT = Color(0xFFE81667);
   static const Color DEFAULT_2 = Color.fromARGB(255, 245, 59, 133);
-  static const Color DEFAULT_5 = Color(0xffe81667);
+  static const Color DEFAULT_5 = Color.fromARGB(255, 212, 81, 151);
   static const Color RED = Color(0xFFF93F3E);
   static const Color RED2 = Color(0xFFD05045);
   static const Color GREEN = Color(0xFF2EC492);
@@ -44,6 +44,12 @@ class AppColor {
   static const Color SEAT_SLOT_BG_BOOKED = Color(0xFFEBEBEB);
   static const Color SEAT_SLOT_BG = Color(0xFFFFFFFF);
   static const Color SEAT_SLOT_BORDER = Color(0xFF707070);
-
+  static const Color SEAT_REGULAR = Color.fromARGB(255, 178, 145, 123);
+  static const Color SEAT_VIP = Color.fromARGB(255, 135, 23, 51);
+  static const Color SEAT_COUPLE = Color.fromARGB(255, 245, 59, 133);
+  static const Color SEAT_SELECTED = Color(0xFF4CAF50);
+  static const Color SEAT_RESERVED = Color(0xFFFFB74D);
+  static const Color SEAT_SOLD = Color(0xFFE0E0E0);
+  static const Color SEAT_TEMP_RESERVED = Color(0xFFFF8A65);
   static const MaterialColor STATUS_BAR = MaterialColor(0xFF2E3147, {});
 }

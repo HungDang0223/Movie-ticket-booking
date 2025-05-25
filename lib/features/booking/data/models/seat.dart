@@ -108,7 +108,7 @@ class RowSeatsDto {
 
 class SeatStatusUpdate {
   final int seatId;
-  final SeatStatus status; // ENUM('Available', 'TemporarilyReserved', 'Reserved', 'Sold')
+  final SeatStatus status; // ENUM('Available', 'TempReserved', 'Reserved', 'Sold')
   final String? reservedBy; // userId
   final DateTime? reservationExpiresAt;
 
@@ -122,7 +122,9 @@ class SeatStatusUpdate {
   factory SeatStatusUpdate.fromJson(Map<String, dynamic> json) {
     return SeatStatusUpdate(
       seatId: json['seatId'] as int,
-      status: SeatStatus.values.firstWhere((e) => e.toString() == 'SeatStatus.${json['status']}'),
+      // ENUM('Available', 'TempReserved', 'Reserved', 'Sold')
+      // trả về tương ứng vị trí 0 -> 3
+      status: SeatStatusExtension.fromIndex(json['status'] as int),
       reservedBy: json['reservedBy'] as String?,
       reservationExpiresAt: json['reservationExpiresAt'] != null ? DateTime.parse(json['reservationExpiresAt'] as String) : null,
     );
@@ -135,5 +137,35 @@ class SeatStatusUpdate {
       'reservedBy': reservedBy,
       'reservationExpiresAt': reservationExpiresAt?.toIso8601String(),
     };
+  }
+}
+
+extension SeatStatusExtension on SeatStatus {
+  int get index {
+    switch (this) {
+      case SeatStatus.Available:
+        return 0;
+      case SeatStatus.TempReserved:
+        return 1;
+      case SeatStatus.Reserved:
+        return 2;
+      case SeatStatus.Sold:
+        return 3;
+    }
+  }
+
+  static SeatStatus fromIndex(int index) {
+    switch (index) {
+      case 0:
+        return SeatStatus.Available;
+      case 1:
+        return SeatStatus.TempReserved;
+      case 2:
+        return SeatStatus.Reserved;
+      case 3:
+        return SeatStatus.Sold;
+      default:
+        throw ArgumentError('Invalid index for SeatStatus: $index');
+    }
   }
 }

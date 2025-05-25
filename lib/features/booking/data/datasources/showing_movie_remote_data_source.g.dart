@@ -14,7 +14,7 @@ class _ShowingMovieRemoteDataSource implements ShowingMovieRemoteDataSource {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= 'http://192.168.1.2:5000/api/v1/showing-movie';
+    baseUrl ??= 'http://192.168.1.2:5000/api/v1/showing';
   }
 
   final Dio _dio;

@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie_tickets/core/constants/enums.dart';
+import 'package:movie_tickets/features/booking/data/models/showing_seat.dart';
 import 'package:movie_tickets/features/booking/domain/repositories/booking_seat_repository.dart';
 
 import '../../../data/models/seat.dart';
@@ -16,6 +18,7 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
       : _repository = repository,
         super(const BookingSeatInitial()) {
     on<LoadSeatsEvent>(_onLoadSeats);
+    on<LoadSeatStatusesEvent>(_onLoadSeatStatuses);
     on<ConnectToRealtimeEvent>(_onConnectToRealtime);
     on<JoinShowingEvent>(_onJoinShowing);
     on<LeaveShowingEvent>(_onLeaveShowing);
@@ -27,8 +30,10 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
     on<ClearSelectedSeatsEvent>(_onClearSelectedSeats);
     on<SeatStatusUpdatedEvent>(_onSeatStatusUpdated);
     on<ConnectionStatusChangedEvent>(_onConnectionStatusChanged);
+    on<CleanupUserReservedSeatsEvent>(_onCleanupUserReservedSeats);
+    on<ReleaseUserSeatsEvent>(_onReleaseUserSeats);
     on<DisconnectEvent>(_onDisconnect);
-    on<ClearErrorEvent>(_onClearError); // Add handler for clearing errors
+    on<ClearErrorEvent>(_onClearError);
   }
 
   Future<void> _onLoadSeats(LoadSeatsEvent event, Emitter<BookingSeatState> emit) async {
@@ -52,6 +57,30 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
       emit(state.copyWith(
         status: BookingSeatStatus.error,
         errorMessage: 'Failed to load seats: $e',
+        hasNewError: true,
+      ));
+    }
+  }
+
+  Future<void> _onLoadSeatStatuses(LoadSeatStatusesEvent event, Emitter<BookingSeatState> emit) async {
+    emit(state.copyWith(
+      seatStatusLoadingState: SeatStatusLoadingState.loading,
+      clearError: true
+    ));
+    
+    try {
+      // You need to implement this method in your repository
+      final seatStatuses = await _repository.getSeatStatusesByShowing(event.showingId);
+      print('Loaded seat statuses: ${seatStatuses.length}');
+      emit(state.copyWith(
+        seatStatusLoadingState: SeatStatusLoadingState.loaded,
+        currentSeatStatuses: seatStatuses,
+        clearError: true,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        seatStatusLoadingState: SeatStatusLoadingState.error,
+        errorMessage: 'Failed to load seat statuses: $e',
         hasNewError: true,
       ));
     }
@@ -215,10 +244,116 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
   }
 
   void _onSeatStatusUpdated(SeatStatusUpdatedEvent event, Emitter<BookingSeatState> emit) {
-    final updatedSeatUpdates = Map<int, SeatStatusUpdate>.from(state.seatStatusUpdates);
-    updatedSeatUpdates[event.update.seatId] = event.update;
+  print('Received seat status update: seatId=${event.update.seatId}, status=${event.update.status}');
+  
+  // Update the current seat statuses list (this is the source of truth)
+  final updatedCurrentSeatStatuses = List<SeatStatusUpdate>.from(state.currentSeatStatuses);
+  final currentIndex = updatedCurrentSeatStatuses.indexWhere((status) => status.seatId == event.update.seatId);
+  
+  if (currentIndex != -1) {
+    updatedCurrentSeatStatuses[currentIndex] = event.update;
+  } else {
+    updatedCurrentSeatStatuses.add(event.update);
+  }
+
+  // Also update the real-time updates list for immediate UI response
+  final updatedSeatUpdates = List<SeatStatusUpdate>.from(state.seatStatusUpdates);
+  final updateIndex = updatedSeatUpdates.indexWhere((update) => update.seatId == event.update.seatId);
+  
+  if (updateIndex != -1) {
+    updatedSeatUpdates[updateIndex] = event.update;
+  } else {
+    updatedSeatUpdates.add(event.update);
+  }
+
+  // If a seat that was selected by the user gets reserved/sold by someone else,
+  // remove it from selected seats
+  if (event.update.status != SeatStatus.Available && 
+      state.selectedSeats.contains(event.update.seatId)) {
+    final updatedSelectedSeats = List<int>.from(state.selectedSeats);
+    updatedSelectedSeats.remove(event.update.seatId);
     
-    emit(state.copyWith(seatStatusUpdates: updatedSeatUpdates));
+    emit(state.copyWith(
+      currentSeatStatuses: updatedCurrentSeatStatuses,
+      seatStatusUpdates: updatedSeatUpdates,
+      selectedSeats: updatedSelectedSeats,
+    ));
+  } else {
+    emit(state.copyWith(
+      currentSeatStatuses: updatedCurrentSeatStatuses,
+      seatStatusUpdates: updatedSeatUpdates,
+    ));
+  }
+}
+
+Future<void> _onCleanupUserReservedSeats(
+    CleanupUserReservedSeatsEvent event, 
+    Emitter<BookingSeatState> emit
+  ) async {
+    try {
+      print('Cleaning up reserved seats for user: ${event.seatId} in showing ${event.showingId}');
+      
+      final response = await _repository.cancelReservation(
+        ReserveSeatRequest(
+          showingId: event.showingId,
+          seatId: event.seatId,
+        ),
+      );
+      
+      if (response.status == 'success') {
+        print('Successfully released user reserved seats');
+        
+        // Clear selected seats from local state
+        emit(state.copyWith(
+          selectedSeats: [],
+          clearError: true,
+        ));
+      } else {
+        print('Failed to release seats: ${response.message}');
+        emit(state.copyWith(
+          errorMessage: 'Failed to release reserved seats: ${response.message}',
+          hasNewError: true,
+        ));
+      }
+    } catch (e) {
+      print('Error releasing user reserved seats: $e');
+      emit(state.copyWith(
+        errorMessage: 'Error releasing reserved seats: $e',
+        hasNewError: true,
+      ));
+    }
+  }
+
+  Future<void> _onReleaseUserSeats(
+    ReleaseUserSeatsEvent event, 
+    Emitter<BookingSeatState> emit
+  ) async {
+    try {
+      print('Releasing specific seats: ${event.userId}');
+      
+      final response = await _repository.cancelAllReservations(
+        CancelUserReservationRequest(
+          showingId: event.showingId,
+          userId: event.userId,
+        ),
+      );
+
+      if (response.status == 'success') {
+        print('Successfully released specific seats');
+        
+        // Remove released seats from selected seats
+        state.selectedSeats.clear();
+        
+        emit(state.copyWith(
+          selectedSeats: [],
+          clearError: true,
+        ));
+      } else {
+        print('Failed to release specific seats: ${response.message}');
+      }
+    } catch (e) {
+      print('Error releasing specific seats: $e');
+    }
   }
 
   void _onConnectionStatusChanged(ConnectionStatusChangedEvent event, Emitter<BookingSeatState> emit) {
@@ -238,7 +373,7 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
       connectionStatus: 'disconnected',
       currentShowingId: null,
       selectedSeats: [],
-      seatStatusUpdates: {},
+      seatStatusUpdates: [],
       clearError: true,
     ));
   }

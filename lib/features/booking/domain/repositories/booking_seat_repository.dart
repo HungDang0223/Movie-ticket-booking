@@ -4,9 +4,11 @@ import 'package:movie_tickets/features/booking/data/models/showing_seat.dart';
 
 abstract class BookingSeatRepository {
   Future<List<RowSeatsDto>> getSeatsByScreen(int screenId);
+  Future<List<SeatStatusUpdate>> getSeatStatusesByShowing(int showingId);
   Future<RegularResponse> reserveSeat(ReserveSeatRequest request);
   Future<RegularResponse> confirmReservation(ReserveSeatRequest request);
   Future<RegularResponse> cancelReservation(ReserveSeatRequest request);
+  Future<RegularResponse> cancelAllReservations(CancelUserReservationRequest request);
   
   // WebSocket methods
   Future<void> connectToRealtimeUpdates(String websocketUrl);

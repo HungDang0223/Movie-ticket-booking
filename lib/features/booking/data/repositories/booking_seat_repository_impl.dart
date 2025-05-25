@@ -30,10 +30,23 @@ class BookingSeatRepositoryImpl implements BookingSeatRepository {
   }
 
   @override
-  Future<RegularResponse> reserveSeat(ReserveSeatRequest request) async {
-
-      final response = await _bookingSeatRemoteDataSource.reserveSeat(request);
+  Future<List<SeatStatusUpdate>> getSeatStatusesByShowing(int showingId) async {
+    final response = await _bookingSeatRemoteDataSource.getSeatStatusesByShowing(showingId);
+    if (response.response.statusCode == HttpStatus.ok) {
       return response.data;
+    } else {
+      throw Exception('Failed to load seat statuses: ${response.response.statusMessage}');
+    }
+  }
+
+  @override
+  Future<RegularResponse> reserveSeat(ReserveSeatRequest request) async {
+    final response = await _bookingSeatRemoteDataSource.reserveSeat(request);
+    if (response.response.statusCode == HttpStatus.ok) {
+      return response.data;
+    } else {
+      throw Exception('Failed to reserve seat: ${response.response.statusMessage}');
+    }
   }
 
   @override
@@ -53,6 +66,16 @@ class BookingSeatRepositoryImpl implements BookingSeatRepository {
       return response.data;
     } catch (e) {
       throw Exception('Failed to cancel reservation: $e');
+    }
+  }
+
+  @override
+  Future<RegularResponse> cancelAllReservations(CancelUserReservationRequest request) async {
+    try {
+      final response = await _bookingSeatRemoteDataSource.cancelAllReservations(request);
+      return response.data;
+    } catch (e) {
+      throw Exception('Failed to cancel all reservations: $e');
     }
   }
 

@@ -1,41 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_tickets/core/constants/app_color.dart';
 import 'package:movie_tickets/core/constants/enums.dart';
 import 'package:movie_tickets/core/extensions/date_time_ext.dart';
 import 'package:movie_tickets/features/booking/presentation/bloc/booking_seat_bloc/booking_seat_bloc.dart';
 import 'package:movie_tickets/features/booking/presentation/bloc/booking_seat_bloc/booking_seat_event.dart';
 import 'package:movie_tickets/features/booking/presentation/bloc/booking_seat_bloc/booking_seat_state.dart';
+import 'package:movie_tickets/features/booking/presentation/widgets/connection_state_widget.dart';
+import 'package:movie_tickets/features/booking/presentation/widgets/legend_widget.dart';
+import 'package:movie_tickets/features/booking/presentation/widgets/screen_widget.dart';
+import 'package:movie_tickets/features/booking/presentation/widgets/seat_row_widget.dart';
 import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
 import 'package:movie_tickets/injection.dart';
 import '../../data/models/models.dart';
 import 'booking_snack.dart';
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
-import 'package:movie_tickets/features/booking/data/models/models.dart';
-import 'package:movie_tickets/features/booking/data/models/seat.dart';
-import 'package:movie_tickets/features/booking/data/models/showing_seat.dart';
-import 'booking_snack.dart';
-
 class BookingSeatPage extends StatefulWidget {
+  final String websocketUrl;
   final MovieModel movie;
   final ShowingMovie showingMovie;
-  final String websocketUrl;
-  final String? userId;
+  final String userId;
 
   const BookingSeatPage({
-    super.key,
+    Key? key,
+    required this.websocketUrl,
     required this.movie,
     required this.showingMovie,
-    required this.websocketUrl,
-    this.userId,
-  });
+    required this.userId,
+  }) : super(key: key);
 
   @override
-  State<BookingSeatPage> createState() => _BookingSeatPageState();
+  _BookingSeatPageState createState() => _BookingSeatPageState();
 }
 
 class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProviderStateMixin {
@@ -47,7 +43,7 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
   final Map<String, double> seatPrices = {
     'Regular': 75000,
     'VIP': 95000,
-    'Sweet Box': 120000,
+    'Couple': 120000,
   };
 
   @override
@@ -74,10 +70,12 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
   }
 
   void _initializeBooking() {
-    // Use stored bloc reference
+    // Initialize in the correct order
     _bookingSeatBloc.add(ConnectToRealtimeEvent(widget.websocketUrl));
     _bookingSeatBloc.add(JoinShowingEvent(widget.showingMovie.showingId, userId: widget.userId));
     _bookingSeatBloc.add(LoadSeatsEvent(widget.showingMovie.screenId));
+    // Load seat statuses for this specific showing
+    _bookingSeatBloc.add(LoadSeatStatusesEvent(widget.showingMovie.showingId));
   }
 
   @override
@@ -90,8 +88,6 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
   void dispose() {
     _animationController.dispose();
     _transformationController.dispose();
-    
-    // Use stored bloc reference
     _bookingSeatBloc.add(const DisconnectEvent());
     super.dispose();
   }
@@ -107,7 +103,6 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
       final viewportWidth = viewportSize.width;
       final viewportHeight = viewportSize.height * 0.7;
       
-      // Calculate content dimensions based on available seats
       final bloc = context.read<BookingSeatBloc>();
       final state = bloc.state;
       
@@ -131,6 +126,17 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
   void _toggleSeatSelection(int seatId) {
     final state = _bookingSeatBloc.state;
 
+    // Use the helper method to check if seat is bookable
+    if (!state.isSeatBookable(seatId)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ghế này không thể đặt'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     if (state.selectedSeats.contains(seatId)) {
       _bookingSeatBloc.add(DeselectSeatEvent(seatId));
     } else {
@@ -149,6 +155,21 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
         ),
       );
       return;
+    }
+
+    // Check if any selected seats are no longer available
+    for (final seatId in state.selectedSeats) {
+      if (!state.isSeatBookable(seatId)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Ghế ${_getSeatDisplayName(state, seatId)} không còn khả dụng'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        // Remove unavailable seat from selection
+        _bookingSeatBloc.add(DeselectSeatEvent(seatId));
+        return;
+      }
     }
 
     // Reserve each selected seat
@@ -197,9 +218,7 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
     for (final seatId in state.selectedSeats) {
       final seat = _findSeatById(state, seatId);
       if (seat != null) {
-        // total += seatPrices[seat.seatType] ?? 0;
-        // Tạm thời
-        total += 10000; // Assuming seatType is a valid key in seatPrices
+        total += 10000; // Use your actual pricing logic
       }
     }
     return total;
@@ -208,13 +227,18 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
   List<String> _getSelectedSeatNames(BookingSeatState state) {
     final names = <String>[];
     for (final seatId in state.selectedSeats) {
-      final seat = _findSeatById(state, seatId);
-      if (seat != null) {
-        final rowName = _findRowNameBySeatId(state, seatId);
-        names.add('$rowName${seat.seatNumber}');
-      }
+      names.add(_getSeatDisplayName(state, seatId));
     }
     return names;
+  }
+
+  String _getSeatDisplayName(BookingSeatState state, int seatId) {
+    final seat = _findSeatById(state, seatId);
+    if (seat != null) {
+      final rowName = _findRowNameBySeatId(state, seatId);
+      return '$rowName${seat.seatNumber}';
+    }
+    return 'Unknown';
   }
 
   SetDto? _findSeatById(BookingSeatState state, int seatId) {
@@ -239,275 +263,21 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
     return '';
   }
 
-  Color _getSeatColor(BookingSeatState state, int seatId, String seatType) {
-    // Check if seat is selected
-    if (state.selectedSeats.contains(seatId)) {
-      return const Color(0xFF4CAF50);
-    }
+  Widget _buildScreen() => const Screen();
+
+
+  Widget _buildLegend() => const LegendWidget();
+
+
+  Widget _buildSeatRow(BookingSeatState state, RowSeatsDto rowData)
+    => SeatRowWidget(
+      rowData: rowData,
+      state: state,
+      toggleSeatSelection: _toggleSeatSelection,
+    );
+
     
-    // Check real-time status updates
-    final statusUpdate = state.seatStatusUpdates[seatId];
-    if (statusUpdate != null) {
-      switch (statusUpdate.status) {
-        case SeatStatus.Reserved:
-          return const Color(0xFFFFB74D);
-        case SeatStatus.Sold:
-          return const Color(0xFFE0E0E0);
-        case SeatStatus.TemporarilyReserved:
-          return const Color(0xFFFFB74D);
-        case SeatStatus.Available:
-          break;
-      }
-    }
-    
-    // Default colors by seat type
-    switch (seatType) {
-      case 'Regular':
-        return const Color(0xFFF5E6E8);
-      case 'VIP':
-        return const Color(0xFFE8F5E9);
-      case 'Sweet Box':
-        return const Color(0xFFFFF3E0);
-      default:
-        return Colors.grey;
-    }
-  }
-
-  bool _isSeatBookable(BookingSeatState state, int seatId) {
-    final statusUpdate = state.seatStatusUpdates[seatId];
-    if (statusUpdate != null) {
-      return statusUpdate.status == SeatStatus.Available;
-    }
-    return true; // Default to available if no status update
-  }
-
-  Widget _buildScreen() {
-    return Container(
-      width: 300,
-      height: 40,
-      margin: const EdgeInsets.only(top: 20, bottom: 40),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.grey.shade800,
-            Colors.grey.shade900,
-          ],
-        ),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: Colors.grey.shade700,
-          width: 1,
-        ),
-      ),
-      child: const Center(
-        child: Text(
-          'MÀN HÌNH',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLegend() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          const itemWidth = 90.0;
-          final availableWidth = constraints.maxWidth;
-          final itemsPerRow = (availableWidth / itemWidth).floor();
-          
-          if (itemsPerRow >= 6) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildLegendItem(const Color(0xFF4CAF50), 'Đang chọn'),
-                _buildLegendItem(const Color(0xFFE0E0E0), 'Đã đặt'),
-                _buildLegendItem(const Color(0xFFFFB74D), 'Tạm giữ'),
-                _buildLegendItem(const Color(0xFFF5E6E8), 'Thường'),
-                _buildLegendItem(const Color(0xFFE8F5E9), 'VIP'),
-                _buildLegendItem(const Color(0xFFFFF3E0), 'Sweet Box'),
-              ],
-            );
-          } else {
-            return Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildLegendItem(const Color(0xFF4CAF50), 'Đang chọn'),
-                    const SizedBox(width: 16),
-                    _buildLegendItem(const Color(0xFFE0E0E0), 'Đã đặt'),
-                    const SizedBox(width: 16),
-                    _buildLegendItem(const Color(0xFFFFB74D), 'Tạm giữ'),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildLegendItem(const Color(0xFFF5E6E8), 'Thường'),
-                    const SizedBox(width: 16),
-                    _buildLegendItem(const Color(0xFFE8F5E9), 'VIP'),
-                    const SizedBox(width: 16),
-                    _buildLegendItem(const Color(0xFFFFF3E0), 'Sweet Box'),
-                  ],
-                ),
-              ],
-            );
-          }
-        },
-      ),
-    );
-  }
-
-  Widget _buildLegendItem(Color color, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 14,
-            height: 14,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.3),
-                width: 1,
-              ),
-            ),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSeatRow(BookingSeatState state, RowSeatsDto rowData) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: rowData.seats.map((seat) {
-        final isBookable = _isSeatBookable(state, seat.seatId);
-        final seatColor = _getSeatColor(state, seat.seatId, rowData.seatType);
-        final isSelected = state.selectedSeats.contains(seat.seatId);
-        
-        return GestureDetector(
-          onTap: isBookable ? () => _toggleSeatSelection(seat.seatId) : null,
-          child: Container(
-            width: 44,
-            height: 44,
-            margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            decoration: BoxDecoration(
-              color: seatColor,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: isSelected
-                    ? const Color(0xFF4CAF50)
-                    : isBookable
-                        ? Colors.grey.shade300
-                        : Colors.grey.shade500,
-                width: 1.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Center(
-              child: Text(
-                '${rowData.rowName}${seat.seatNumber}',
-                style: TextStyle(
-                  color: isSelected
-                      ? Colors.white
-                      : isBookable
-                          ? Colors.black87
-                          : Colors.grey.shade600,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildConnectionStatus(String status) {
-    Color statusColor;
-    String statusText;
-    
-    switch (status) {
-      case 'connected':
-        statusColor = AppColor.DEFAULT;
-        statusText = 'Kết nối';
-        break;
-      case 'connecting':
-        statusColor = Colors.orange;
-        statusText = 'Đang kết nối...';
-        break;
-      case 'disconnected':
-        statusColor = Colors.red;
-        statusText = 'Mất kết nối';
-        break;
-      default:
-        statusColor = Colors.red;
-        statusText = 'Lỗi kết nối';
-    }
-    
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: statusColor.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: statusColor.withOpacity(0.5)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(
-              color: statusColor,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            statusText,
-            style: TextStyle(
-              color: statusColor,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildConnectionStatus(String status) => ConnectionStateWidget(status: status);
 
   @override
   Widget build(BuildContext context) {
@@ -525,17 +295,12 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: widget.showingMovie.cinemaName,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+              Text(
+                widget.showingMovie.cinemaName,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
               Text(
@@ -563,15 +328,20 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
       ),
       body: BlocConsumer<BookingSeatBloc, BookingSeatState>(
         listener: (context, state) {
-          // Only show error messages for NEW errors
           if (state.hasNewError && state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage!),
                 backgroundColor: Colors.red,
+                action: SnackBarAction(
+                  label: 'Đóng',
+                  textColor: Colors.white,
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  },
+                ),
               ),
             );
-            // Clear the error after showing it
             context.read<BookingSeatBloc>().add(const ClearErrorEvent());
           }
           
@@ -585,10 +355,24 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
           }
         },
         builder: (context, state) {
-          if (state.status == BookingSeatStatus.loading) {
+          // Show loading while data is not ready
+          if (!state.isDataReady && state.status == BookingSeatStatus.loading) {
             return const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppColor.DEFAULT),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColor.DEFAULT),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Đang tải dữ liệu ghế ngồi...',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
               ),
             );
           }
@@ -623,11 +407,7 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton(
-                    onPressed: () {
-                      context.read<BookingSeatBloc>().add(
-                        LoadSeatsEvent(widget.showingMovie.screenId),
-                      );
-                    },
+                    onPressed: () => _initializeBooking(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF4CAF50),
                     ),
@@ -658,10 +438,8 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         children: [
-                          // Screen indicator
                           _buildScreen(),
                           const SizedBox(height: 20),
-                          // Seat layout
                           if (state.rowSeats.isNotEmpty)
                             Align(
                               alignment: Alignment.centerLeft,
@@ -673,7 +451,7 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
                                   Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: state.rowSeats.map((rowData) => Container(
-                                      height: 44,
+                                      height: 48,
                                       width: 25,
                                       margin: const EdgeInsets.symmetric(vertical: 2),
                                       alignment: Alignment.center,
@@ -731,41 +509,47 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${widget.showingMovie.showingFormat} Phụ Đề ${widget.showingMovie.subtitleLanguage}',
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              '${widget.showingMovie.showingDate.toFormattedString()}, ${widget.showingMovie.startTime.HH_mm()}-${widget.showingMovie.endTime.HH_mm()}',
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              '${_calculateTotalPrice(state).toStringAsFixed(0)} đ',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            if (state.selectedSeats.isNotEmpty)
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               Text(
-                                'Ghế đã chọn: ${_getSelectedSeatNames(state).join(', ')}',
+                                '${widget.showingMovie.showingFormat} Phụ Đề ${widget.showingMovie.subtitleLanguage}',
                                 style: const TextStyle(
-                                  color: AppColor.DEFAULT,
-                                  fontSize: 12,
+                                  color: Colors.grey,
+                                  fontSize: 14,
                                 ),
                               ),
-                          ],
+                              Text(
+                                '${widget.showingMovie.showingDate.toFormattedString()}, ${widget.showingMovie.startTime.HH_mm()}-${widget.showingMovie.endTime.HH_mm()}',
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                '${_calculateTotalPrice(state).toStringAsFixed(0)} đ',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              if (state.selectedSeats.isNotEmpty)
+                                Text(
+                                  '${_getSelectedSeatNames(state).length} ghế',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                ],
+                              )
+                            ],
+                          ),
                         ),
+                        const SizedBox(width: 16),
                         Column(
                           children: [
                             if (state.status == BookingSeatStatus.reserving ||

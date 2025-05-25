@@ -61,3 +61,20 @@ class ReserveSeatRequest {
     };
   }
 }
+
+class CancelUserReservationRequest {
+  final int showingId;
+  final String userId;
+
+  CancelUserReservationRequest({
+    required this.showingId,
+    required this.userId,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'showingId': showingId,
+      'userId': userId,
+    };
+  }
+}
