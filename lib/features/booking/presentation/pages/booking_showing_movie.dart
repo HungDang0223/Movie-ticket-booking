@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_tickets/core/constants/app_color.dart';
 import 'package:movie_tickets/core/extensions/date_time_ext.dart';
+import 'package:movie_tickets/core/utils/authentication_helper.dart';
+import 'package:movie_tickets/core/utils/snackbar_utilies.dart';
 import 'package:movie_tickets/features/booking/presentation/pages/booking_seat.dart';
 import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
 import 'package:movie_tickets/injection.dart';
@@ -211,7 +213,17 @@ class _TheaterListState extends State<TheaterList> {
                           return Container(
                             alignment: Alignment.center,
                             child: ElevatedButton(
-                              onPressed: () {
+                              onPressed: () async {
+                                final isAuthenticated = await AuthenticationHelper.requireAuthentication(context);
+                                if (!isAuthenticated) {
+                                  SnackbarUtils.showAuthRequiredSnackbar(
+                                    context,
+                                    'Bạn cần đăng nhập để đặt chỗ ngồi',
+                                  );
+                                  return;
+                                }
+
+                                if (!context.mounted) return;
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => BookingSeatPage(
                                   movie: widget.movie,
                                   showingMovie: showing,

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:movie_tickets/core/services/networking/websocket_service.dart';
 import 'package:movie_tickets/features/authentication/data/models/auth_response.dart';
 import 'package:movie_tickets/features/booking/data/datasources/booking_seat_remote_data_source.dart';
@@ -16,26 +18,29 @@ class BookingSeatRepositoryImpl implements BookingSeatRepository {
 
   @override
   Future<List<RowSeatsDto>> getSeatsByScreen(int screenId) async {
-    try {
-      return await _bookingSeatRemoteDataSource.getSeatsByScreen(screenId);
-    } catch (e) {
-      throw Exception('Failed to get seats: $e');
-    }
+      final response = await _bookingSeatRemoteDataSource.getSeatsByScreen(screenId);
+      if (response.response.statusCode == HttpStatus.ok) {
+        if (response.data.isEmpty) {
+          throw Exception('No seats available for this screen.');
+        }
+        return response.data;
+      } else {
+        throw Exception('Failed to load seats: ${response.response.statusMessage}');
+      }
   }
 
   @override
   Future<RegularResponse> reserveSeat(ReserveSeatRequest request) async {
-    try {
-      return await _bookingSeatRemoteDataSource.reserveSeat(request);
-    } catch (e) {
-      throw Exception('Failed to reserve seat: $e');
-    }
+
+      final response = await _bookingSeatRemoteDataSource.reserveSeat(request);
+      return response.data;
   }
 
   @override
   Future<RegularResponse> confirmReservation(ReserveSeatRequest request) async {
     try {
-      return await _bookingSeatRemoteDataSource.confirmReservation(request);
+      final response = await _bookingSeatRemoteDataSource.confirmReservation(request);
+      return response.data;
     } catch (e) {
       throw Exception('Failed to confirm reservation: $e');
     }
@@ -44,7 +49,8 @@ class BookingSeatRepositoryImpl implements BookingSeatRepository {
   @override
   Future<RegularResponse> cancelReservation(ReserveSeatRequest request) async {
     try {
-      return await _bookingSeatRemoteDataSource.cancelReservation(request);
+      final response = await _bookingSeatRemoteDataSource.cancelReservation(request);
+      return response.data;
     } catch (e) {
       throw Exception('Failed to cancel reservation: $e');
     }

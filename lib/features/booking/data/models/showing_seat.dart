@@ -48,19 +48,16 @@ class ShowingSeat {
 class ReserveSeatRequest {
   final int showingId;
   final int seatId;
-  final int userId;
 
   ReserveSeatRequest({
     required this.showingId,
     required this.seatId,
-    required this.userId,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'showingId': showingId,
       'seatId': seatId,
-      'userId': userId,
     };
   }
 }

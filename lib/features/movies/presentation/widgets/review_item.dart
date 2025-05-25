@@ -123,13 +123,12 @@ class EnhancedReviewItem extends StatelessWidget {
                         _buildRatingStars(review.rating),
                         const SizedBox(width: 8),
                         Text(
-                          '${review.rating}/5',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        _formatDate(review.reviewDate),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[500],
                         ),
+                      ),
                       ],
                     ),
                   ],
@@ -193,17 +192,6 @@ class EnhancedReviewItem extends StatelessWidget {
           ),
           
           const SizedBox(height: 12),
-          
-          // Review date
-          Text(
-            _formatDate(review.reviewDate),
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[500],
-            ),
-          ),
-          
-          const SizedBox(height: 16),
           
           // Action buttons
           Row(

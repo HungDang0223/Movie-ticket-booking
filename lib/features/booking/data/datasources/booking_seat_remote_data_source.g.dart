@@ -24,19 +24,19 @@ class _BookingSeatRemoteDataSource implements BookingSeatRemoteDataSource {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<List<RowSeatsDto>> getSeatsByScreen(int screenId) async {
+  Future<HttpResponse<List<RowSeatsDto>>> getSeatsByScreen(int screenId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<List<RowSeatsDto>>(Options(
+    final _options = _setStreamType<HttpResponse<List<RowSeatsDto>>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
         .compose(
           _dio.options,
-          '/api/Screen/${screenId}/seats',
+          '/screen/${screenId}/seats',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -55,24 +55,26 @@ class _BookingSeatRemoteDataSource implements BookingSeatRemoteDataSource {
       errorLogger?.logError(e, s, _options);
       rethrow;
     }
-    return _value;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
   }
 
   @override
-  Future<RegularResponse> reserveSeat(ReserveSeatRequest request) async {
+  Future<HttpResponse<RegularResponse>> reserveSeat(
+      ReserveSeatRequest request) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(request.toJson());
-    final _options = _setStreamType<RegularResponse>(Options(
+    final _options = _setStreamType<HttpResponse<RegularResponse>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
     )
         .compose(
           _dio.options,
-          '/api/seat-reserve/reserve',
+          '/seat-reserve/reserve',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -89,24 +91,26 @@ class _BookingSeatRemoteDataSource implements BookingSeatRemoteDataSource {
       errorLogger?.logError(e, s, _options);
       rethrow;
     }
-    return _value;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
   }
 
   @override
-  Future<RegularResponse> confirmReservation(ReserveSeatRequest request) async {
+  Future<HttpResponse<RegularResponse>> confirmReservation(
+      ReserveSeatRequest request) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(request.toJson());
-    final _options = _setStreamType<RegularResponse>(Options(
+    final _options = _setStreamType<HttpResponse<RegularResponse>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
     )
         .compose(
           _dio.options,
-          '/api/seat-reserve/confirm',
+          '/seat-reserve/confirm',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -123,24 +127,26 @@ class _BookingSeatRemoteDataSource implements BookingSeatRemoteDataSource {
       errorLogger?.logError(e, s, _options);
       rethrow;
     }
-    return _value;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
   }
 
   @override
-  Future<RegularResponse> cancelReservation(ReserveSeatRequest request) async {
+  Future<HttpResponse<RegularResponse>> cancelReservation(
+      ReserveSeatRequest request) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(request.toJson());
-    final _options = _setStreamType<RegularResponse>(Options(
+    final _options = _setStreamType<HttpResponse<RegularResponse>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
     )
         .compose(
           _dio.options,
-          '/api/seat-reserve/cancel',
+          '/seat-reserve/cancel',
           queryParameters: queryParameters,
           data: _data,
         )
@@ -157,7 +163,8 @@ class _BookingSeatRemoteDataSource implements BookingSeatRemoteDataSource {
       errorLogger?.logError(e, s, _options);
       rethrow;
     }
-    return _value;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

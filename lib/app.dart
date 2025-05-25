@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_tickets/core/constants/my_const.dart';
 import 'package:movie_tickets/core/constants/app_color.dart';
+import 'package:movie_tickets/features/booking/presentation/bloc/booking_seat_bloc/booking_seat_bloc.dart';
 import 'package:movie_tickets/features/booking/presentation/bloc/showing_movie_bloc/showing_movie_bloc.dart';
 import 'package:movie_tickets/features/movies/presentation/bloc/bloc.dart';
 import 'package:movie_tickets/features/movies/presentation/pages/home_page.dart';
@@ -43,6 +44,8 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<MovieBloc>()),
         BlocProvider(create: (context) => sl<ReviewBloc>()),
         BlocProvider(create: (context) => sl<ShowingMovieBloc>()),
+
+        BlocProvider(create: (context) => sl<BookingSeatBloc>()),
       ],
       child: BlocBuilder<SettingsBloc, SettingsState>(
         builder: (context, state) {

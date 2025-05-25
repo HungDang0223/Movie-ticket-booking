@@ -32,20 +32,19 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
 
   Future<void> _onLoadSeats(LoadSeatsEvent event, Emitter<BookingSeatState> emit) async {
     emit(state.copyWith(status: BookingSeatStatus.loading));
-    
-    try {
       final rowSeats = await _repository.getSeatsByScreen(event.screenId);
+      if (rowSeats.isEmpty) {
+        emit(state.copyWith(
+          status: BookingSeatStatus.empty,
+          errorMessage: 'No seats available for this screen.',
+        ));
+        return;
+      }
       emit(state.copyWith(
         status: BookingSeatStatus.loaded,
         rowSeats: rowSeats,
         errorMessage: null,
       ));
-    } catch (e) {
-      emit(state.copyWith(
-        status: BookingSeatStatus.error,
-        errorMessage: e.toString(),
-      ));
-    }
   }
 
   Future<void> _onConnectToRealtime(ConnectToRealtimeEvent event, Emitter<BookingSeatState> emit) async {
@@ -108,7 +107,6 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
   Future<void> _onReserveSeat(ReserveSeatEvent event, Emitter<BookingSeatState> emit) async {
     emit(state.copyWith(status: BookingSeatStatus.reserving));
     
-    try {
       final response = await _repository.reserveSeat(event.request);
       if (response.status == 'success') {
         emit(state.copyWith(
@@ -118,15 +116,9 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
       } else {
         emit(state.copyWith(
           status: BookingSeatStatus.error,
-          errorMessage: response.message ?? 'Failed to reserve seat',
+          errorMessage: response.message,
         ));
       }
-    } catch (e) {
-      emit(state.copyWith(
-        status: BookingSeatStatus.error,
-        errorMessage: e.toString(),
-      ));
-    }
   }
 
   Future<void> _onConfirmReservation(ConfirmReservationEvent event, Emitter<BookingSeatState> emit) async {

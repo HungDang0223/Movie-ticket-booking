@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
-import 'package:movie_tickets/features/movies/presentation/widgets/start_rating_selector.dart';
-import '../../../../core/constants/app_color.dart';
-import '../../data/models/review_model.dart';
 
 class EnhancedAddReviewDialog extends StatefulWidget {
   final MovieModel movie;

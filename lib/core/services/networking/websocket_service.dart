@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:movie_tickets/core/constants/enums.dart';
 import 'package:movie_tickets/features/booking/data/models/seat.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:web_socket_channel/status.dart' as status;
 
 class WebSocketService {
   WebSocketChannel? _channel;
@@ -20,17 +19,18 @@ class WebSocketService {
 
   Future<void> connect(String websocketUrl) async {
     try {
-      _channel = WebSocketChannel.connect(Uri.parse(websocketUrl));
       _seatUpdateController = StreamController<SeatStatusUpdate>.broadcast();
       _connectionStatusController = StreamController<String>.broadcast();
-
+      
+      _connectionStatusController?.add('connecting');
+      
+      _channel = WebSocketChannel.connect(Uri.parse(websocketUrl));
+      
       _channel!.stream.listen(
         _handleMessage,
         onError: _handleError,
         onDone: _handleDisconnection,
       );
-
-      _connectionStatusController?.add('connected');
     } catch (e) {
       _connectionStatusController?.add('error: $e');
       throw Exception('Failed to connect to WebSocket: $e');
@@ -148,7 +148,7 @@ class WebSocketService {
   }
 
   Future<void> disconnect() async {
-    await _channel?.sink.close(status.goingAway);
+    await _channel?.sink.close(1000); // Using 1000 for normal closure
     _seatUpdateController?.close();
     _connectionStatusController?.close();
     _channel = null;

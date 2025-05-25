@@ -43,12 +43,8 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     if (result.isSuccess) {
       final user = result.data!;
       print(user);
-      if (user == null) {
-        emit(Unauthenticated());
-      } else {
-        emit(Authenticated(user));
-      }
-    }
+      emit(Authenticated(user));
+        }
   }
 
   void _onLoggedOut(LoggedOut event, Emitter<AuthenticationState> emit) {

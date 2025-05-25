@@ -114,9 +114,7 @@ Future<void> init() async {
   sl.registerFactory(() => MovieBloc(movieRepository: sl<MovieRepository>()));
   sl.registerFactory(() => ReviewBloc(reviewRepository: sl<ReviewRepository>()));
   sl.registerFactory(() => ShowingMovieBloc(repository: sl<ShowingMovieRepository>()));
-  sl.registerFactory(() => BookingSeatBloc(
-    repository: sl<BookingSeatRepository>(),
-  ));
+  sl.registerFactory(() => BookingSeatBloc(repository: sl<BookingSeatRepository>()));
   sl.registerFactory(() => PaymentBloc(paymentRepository: sl<PaymentRepository>()));
   sl.registerFactory(() => SettingsBloc(sl<SettingsRepository>()));
 }

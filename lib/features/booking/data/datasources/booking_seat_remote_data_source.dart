@@ -11,18 +11,18 @@ part 'booking_seat_remote_data_source.g.dart';
 abstract class BookingSeatRemoteDataSource {
   factory BookingSeatRemoteDataSource(Dio dio) = _BookingSeatRemoteDataSource;
 
-  @GET('/api/Screen/{screenId}/seats')
-  Future<List<RowSeatsDto>> getSeatsByScreen(@Path('screenId') int screenId);
+  @GET('/screen/{screenId}/seats')
+  Future<HttpResponse<List<RowSeatsDto>>> getSeatsByScreen(@Path('screenId') int screenId);
 
   // Reserve seat
-  @POST('/api/seat-reserve/reserve')
-  Future<RegularResponse> reserveSeat(@Body() ReserveSeatRequest request);
+  @POST('/seat-reserve/reserve')
+  Future<HttpResponse<RegularResponse>> reserveSeat(@Body() ReserveSeatRequest request);
 
   // Confirm reservation
-  @POST('/api/seat-reserve/confirm')
-  Future<RegularResponse> confirmReservation(@Body() ReserveSeatRequest request);
+  @POST('/seat-reserve/confirm')
+  Future<HttpResponse<RegularResponse>> confirmReservation(@Body() ReserveSeatRequest request);
 
   // Cancel reservation
-  @POST('/api/seat-reserve/cancel')
-  Future<RegularResponse> cancelReservation(@Body() ReserveSeatRequest request);
+  @POST('/seat-reserve/cancel')
+  Future<HttpResponse<RegularResponse>> cancelReservation(@Body() ReserveSeatRequest request);
 }

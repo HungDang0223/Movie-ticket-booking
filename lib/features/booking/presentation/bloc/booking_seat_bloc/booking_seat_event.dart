@@ -1,8 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 
 import '../../../data/models/models.dart';
-import '../../../data/models/seat.dart';
 
 abstract class BookingSeatEvent extends Equatable {
   const BookingSeatEvent();

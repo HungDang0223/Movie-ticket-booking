@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movie_tickets/core/utils/multi_devices.dart';
 import 'package:movie_tickets/core/utils/validators.dart';
 import 'package:movie_tickets/features/authentication/presentation/pages/input_email_page.dart';
-import 'package:movie_tickets/features/authentication/presentation/bloc/auth_bloc/bloc.dart';
-import 'package:movie_tickets/injection.dart';
 import 'package:movie_tickets/core/constants/my_const.dart';
 import 'package:movie_tickets/features/authentication/presentation/widgets/widget_btn_social.dart';
 import '../bloc/login_bloc/bloc.dart';

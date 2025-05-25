@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movie_tickets/features/authentication/data/repositories/auth_repository_impl.dart';
 import 'package:movie_tickets/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:movie_tickets/features/authentication/domain/usecases/login_use_case.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/login_bloc/bloc.dart';

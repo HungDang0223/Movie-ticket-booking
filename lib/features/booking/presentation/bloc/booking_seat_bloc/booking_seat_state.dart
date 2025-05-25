@@ -5,6 +5,7 @@ enum BookingSeatStatus {
   initial,
   loading,
   loaded,
+  empty,
   reserving,
   reserved,
   confirming,
