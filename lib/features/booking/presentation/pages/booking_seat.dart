@@ -563,13 +563,16 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
       ),
       body: BlocConsumer<BookingSeatBloc, BookingSeatState>(
         listener: (context, state) {
-          if (state.errorMessage != null) {
+          // Only show error messages for NEW errors
+          if (state.hasNewError && state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage!),
                 backgroundColor: Colors.red,
               ),
             );
+            // Clear the error after showing it
+            context.read<BookingSeatBloc>().add(const ClearErrorEvent());
           }
           
           if (state.status == BookingSeatStatus.reserved) {

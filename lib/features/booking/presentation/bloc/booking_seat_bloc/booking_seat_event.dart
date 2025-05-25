@@ -111,3 +111,8 @@ class ConnectionStatusChangedEvent extends BookingSeatEvent {
 class DisconnectEvent extends BookingSeatEvent {
   const DisconnectEvent();
 }
+
+// Add this new event to clear errors
+class ClearErrorEvent extends BookingSeatEvent {
+  const ClearErrorEvent();
+}

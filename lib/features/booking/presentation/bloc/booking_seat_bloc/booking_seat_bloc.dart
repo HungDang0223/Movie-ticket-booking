@@ -28,23 +28,33 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
     on<SeatStatusUpdatedEvent>(_onSeatStatusUpdated);
     on<ConnectionStatusChangedEvent>(_onConnectionStatusChanged);
     on<DisconnectEvent>(_onDisconnect);
+    on<ClearErrorEvent>(_onClearError); // Add handler for clearing errors
   }
 
   Future<void> _onLoadSeats(LoadSeatsEvent event, Emitter<BookingSeatState> emit) async {
-    emit(state.copyWith(status: BookingSeatStatus.loading));
+    emit(state.copyWith(status: BookingSeatStatus.loading, clearError: true));
+    try {
       final rowSeats = await _repository.getSeatsByScreen(event.screenId);
       if (rowSeats.isEmpty) {
         emit(state.copyWith(
           status: BookingSeatStatus.empty,
           errorMessage: 'No seats available for this screen.',
+          hasNewError: true,
         ));
         return;
       }
       emit(state.copyWith(
         status: BookingSeatStatus.loaded,
         rowSeats: rowSeats,
-        errorMessage: null,
+        clearError: true,
       ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: BookingSeatStatus.error,
+        errorMessage: 'Failed to load seats: $e',
+        hasNewError: true,
+      ));
+    }
   }
 
   Future<void> _onConnectToRealtime(ConnectToRealtimeEvent event, Emitter<BookingSeatState> emit) async {
@@ -65,12 +75,13 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
 
       emit(state.copyWith(
         connectionStatus: 'connecting',
-        errorMessage: null,
+        clearError: true,
       ));
     } catch (e) {
       emit(state.copyWith(
         connectionStatus: 'error',
         errorMessage: 'Failed to connect to realtime updates: $e',
+        hasNewError: true,
       ));
     }
   }
@@ -80,11 +91,12 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
       await _repository.joinShowing(event.showingId, userId: event.userId);
       emit(state.copyWith(
         currentShowingId: event.showingId,
-        errorMessage: null,
+        clearError: true,
       ));
     } catch (e) {
       emit(state.copyWith(
         errorMessage: 'Failed to join showing: $e',
+        hasNewError: true,
       ));
     }
   }
@@ -95,34 +107,44 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
       emit(state.copyWith(
         currentShowingId: null,
         selectedSeats: [],
-        errorMessage: null,
+        clearError: true,
       ));
     } catch (e) {
       emit(state.copyWith(
         errorMessage: 'Failed to leave showing: $e',
+        hasNewError: true,
       ));
     }
   }
 
   Future<void> _onReserveSeat(ReserveSeatEvent event, Emitter<BookingSeatState> emit) async {
-    emit(state.copyWith(status: BookingSeatStatus.reserving));
+    emit(state.copyWith(status: BookingSeatStatus.reserving, clearError: true));
     
+    try {
       final response = await _repository.reserveSeat(event.request);
       if (response.status == 'success') {
         emit(state.copyWith(
           status: BookingSeatStatus.reserved,
-          errorMessage: null,
+          clearError: true,
         ));
       } else {
         emit(state.copyWith(
           status: BookingSeatStatus.error,
           errorMessage: response.message,
+          hasNewError: true,
         ));
       }
+    } catch (e) {
+      emit(state.copyWith(
+        status: BookingSeatStatus.error,
+        errorMessage: e.toString(),
+        hasNewError: true,
+      ));
+    }
   }
 
   Future<void> _onConfirmReservation(ConfirmReservationEvent event, Emitter<BookingSeatState> emit) async {
-    emit(state.copyWith(status: BookingSeatStatus.confirming));
+    emit(state.copyWith(status: BookingSeatStatus.confirming, clearError: true));
     
     try {
       final response = await _repository.confirmReservation(event.request);
@@ -130,42 +152,46 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
         emit(state.copyWith(
           status: BookingSeatStatus.confirmed,
           selectedSeats: [], // Clear selected seats after confirmation
-          errorMessage: null,
+          clearError: true,
         ));
       } else {
         emit(state.copyWith(
           status: BookingSeatStatus.error,
           errorMessage: response.message ?? 'Failed to confirm reservation',
+          hasNewError: true,
         ));
       }
     } catch (e) {
       emit(state.copyWith(
         status: BookingSeatStatus.error,
         errorMessage: e.toString(),
+        hasNewError: true,
       ));
     }
   }
 
   Future<void> _onCancelReservation(CancelReservationEvent event, Emitter<BookingSeatState> emit) async {
-    emit(state.copyWith(status: BookingSeatStatus.canceling));
+    emit(state.copyWith(status: BookingSeatStatus.canceling, clearError: true));
     
     try {
       final response = await _repository.cancelReservation(event.request);
       if (response.status == 'success') {
         emit(state.copyWith(
           status: BookingSeatStatus.loaded,
-          errorMessage: null,
+          clearError: true,
         ));
       } else {
         emit(state.copyWith(
           status: BookingSeatStatus.error,
           errorMessage: response.message ?? 'Failed to cancel reservation',
+          hasNewError: true,
         ));
       }
     } catch (e) {
       emit(state.copyWith(
         status: BookingSeatStatus.error,
         errorMessage: e.toString(),
+        hasNewError: true,
       ));
     }
   }
@@ -174,18 +200,18 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
     final currentSelected = List<int>.from(state.selectedSeats);
     if (!currentSelected.contains(event.seatId)) {
       currentSelected.add(event.seatId);
-      emit(state.copyWith(selectedSeats: currentSelected));
+      emit(state.copyWith(selectedSeats: currentSelected, clearError: true));
     }
   }
 
   void _onDeselectSeat(DeselectSeatEvent event, Emitter<BookingSeatState> emit) {
     final currentSelected = List<int>.from(state.selectedSeats);
     currentSelected.remove(event.seatId);
-    emit(state.copyWith(selectedSeats: currentSelected));
+    emit(state.copyWith(selectedSeats: currentSelected, clearError: true));
   }
 
   void _onClearSelectedSeats(ClearSelectedSeatsEvent event, Emitter<BookingSeatState> emit) {
-    emit(state.copyWith(selectedSeats: []));
+    emit(state.copyWith(selectedSeats: [], clearError: true));
   }
 
   void _onSeatStatusUpdated(SeatStatusUpdatedEvent event, Emitter<BookingSeatState> emit) {
@@ -199,6 +225,10 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
     emit(state.copyWith(connectionStatus: event.status));
   }
 
+  void _onClearError(ClearErrorEvent event, Emitter<BookingSeatState> emit) {
+    emit(state.copyWith(clearError: true));
+  }
+
   void _onDisconnect(DisconnectEvent event, Emitter<BookingSeatState> emit) {
     _repository.disconnect();
     _seatUpdatesSubscription?.cancel();
@@ -209,6 +239,7 @@ class BookingSeatBloc extends Bloc<BookingSeatEvent, BookingSeatState> {
       currentShowingId: null,
       selectedSeats: [],
       seatStatusUpdates: {},
+      clearError: true,
     ));
   }
 

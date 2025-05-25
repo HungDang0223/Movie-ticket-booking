@@ -22,6 +22,7 @@ class BookingSeatState extends Equatable {
   final String? connectionStatus;
   final int? currentShowingId;
   final String? errorMessage;
+  final bool hasNewError; // Add this flag to track new errors
 
   const BookingSeatState({
     this.status = BookingSeatStatus.initial,
@@ -31,6 +32,7 @@ class BookingSeatState extends Equatable {
     this.connectionStatus,
     this.currentShowingId,
     this.errorMessage,
+    this.hasNewError = false, // Default to false
   });
 
   BookingSeatState copyWith({
@@ -41,6 +43,8 @@ class BookingSeatState extends Equatable {
     String? connectionStatus,
     int? currentShowingId,
     String? errorMessage,
+    bool? hasNewError,
+    bool clearError = false, // Add flag to clear error
   }) {
     return BookingSeatState(
       status: status ?? this.status,
@@ -49,7 +53,8 @@ class BookingSeatState extends Equatable {
       seatStatusUpdates: seatStatusUpdates ?? this.seatStatusUpdates,
       connectionStatus: connectionStatus ?? this.connectionStatus,
       currentShowingId: currentShowingId ?? this.currentShowingId,
-      errorMessage: errorMessage ?? this.errorMessage,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      hasNewError: hasNewError ?? (clearError ? false : this.hasNewError),
     );
   }
 
@@ -62,6 +67,7 @@ class BookingSeatState extends Equatable {
         connectionStatus,
         currentShowingId,
         errorMessage,
+        hasNewError,
       ];
 }
 
