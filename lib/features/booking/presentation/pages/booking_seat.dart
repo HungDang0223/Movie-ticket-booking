@@ -34,10 +34,13 @@ class BookingSeatPage extends StatefulWidget {
   _BookingSeatPageState createState() => _BookingSeatPageState();
 }
 
-class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProviderStateMixin {
+class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late TransformationController _transformationController;
   late AnimationController _animationController;
   late BookingSeatBloc _bookingSeatBloc;
+
+  bool _hasReservedSeats = false;
+  List<int> _userReservedSeats = [];
   
   // Seat prices by type
   final Map<String, double> seatPrices = {
@@ -54,7 +57,7 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    
+    WidgetsBinding.instance.addObserver(this);
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.black,
@@ -90,6 +93,37 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
     _transformationController.dispose();
     _bookingSeatBloc.add(const DisconnectEvent());
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    // Clean up seats when app goes to background or is paused
+    if (state == AppLifecycleState.paused || 
+        state == AppLifecycleState.detached) {
+      _performSeatCleanup();
+    }
+  }
+
+  // Override the back button behavior
+  Future<bool> _onWillPop() async {
+    await _performSeatCleanup();
+    return true; // Allow navigation
+  }
+
+  Future<void> _performSeatCleanup() async {
+    if (_hasReservedSeats && _userReservedSeats.isNotEmpty) {
+      print('Performing seat cleanup for seats: $_userReservedSeats');
+      
+      _bookingSeatBloc.add(ReleaseUserSeatsEvent(
+        userId: widget.userId,
+        showingId: widget.showingMovie.showingId,
+      ));
+      
+      _hasReservedSeats = false;
+      _userReservedSeats.clear();
+    }
   }
 
   void resetZoom() {
@@ -269,339 +303,424 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
   Widget _buildLegend() => const LegendWidget();
 
 
-  Widget _buildSeatRow(BookingSeatState state, RowSeatsDto rowData)
-    => SeatRowWidget(
-      rowData: rowData,
-      state: state,
-      toggleSeatSelection: _toggleSeatSelection,
+  Widget _buildSeatRow(BookingSeatState state, RowSeatsDto rowData) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: rowData.seats.map((seat) {
+        final isBookable = state.isSeatBookable(seat.seatId);
+        final seatColor = _getSeatColor(state, seat.seatId, rowData.seatType);
+        final isSelected = state.selectedSeats.contains(seat.seatId);
+        final effectiveStatus = state.getEffectiveSeatStatus(seat.seatId);
+        
+        return GestureDetector(
+          onTap: isBookable ? () => _toggleSeatSelection(seat.seatId) : null,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 44,
+            height: 44,
+            margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            decoration: BoxDecoration(
+              color: seatColor,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isSelected
+                    ? const Color(0xFF4CAF50)
+                    : isBookable
+                        ? Colors.grey.shade300
+                        : Colors.grey.shade500,
+                width: isSelected ? 2.0 : 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: isSelected 
+                      ? const Color(0xFF4CAF50).withOpacity(0.3)
+                      : Colors.black.withOpacity(0.1),
+                  blurRadius: isSelected ? 6 : 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Stack(
+              children: [
+                Center(
+                  child: Text(
+                    '${rowData.rowName}${seat.seatNumber}',
+                    style: TextStyle(
+                      color: AppColor.WHITE,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
     );
+  }
 
+  Color _getSeatColor(BookingSeatState state, int seatId, String seatType) {
+    // Check if seat is selected by current user
+    if (state.selectedSeats.contains(seatId)) {
+      return const Color(0xFF4CAF50); // Green for selected
+    }
+    
+    // Use the helper method to get effective status
+    final effectiveStatus = state.getEffectiveSeatStatus(seatId);
+    
+    switch (effectiveStatus) {
+      case SeatStatus.Reserved:
+        return const Color(0xFFFFB74D); // Orange for reserved
+      case SeatStatus.Sold:
+        return const Color(0xFFE0E0E0); // Gray for sold
+      case SeatStatus.TempReserved:
+        return const Color(0xFFFF8A65); // Light orange for temporarily reserved
+      case SeatStatus.Available:
+        // Return color based on seat type for available seats
+        switch (seatType) {
+          case 'Regular':
+            return const Color.fromARGB(255, 178, 145, 123);
+          case 'VIP':
+            return const Color.fromARGB(255, 135, 23, 51);
+          case 'Couple':
+            return AppColor.DEFAULT_2;
+          default:
+            return const Color(0xFFF5E6E8);
+        }
+    }
+  }
     
   Widget _buildConnectionStatus(String status) => ConnectionStateWidget(status: status);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(70),
-        child: AppBar(
-          backgroundColor: Colors.black,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: AppColor.DEFAULT),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.showingMovie.cinemaName,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) => 
+        didPop ? _performSeatCleanup() : Future.value(),
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(70),
+          child: AppBar(
+            backgroundColor: Colors.black,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_ios, color: AppColor.DEFAULT),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.showingMovie.cinemaName,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
+                Text(
+                  widget.showingMovie.screenName,
+                  style: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              BlocBuilder<BookingSeatBloc, BookingSeatState>(
+                builder: (context, state) {
+                  return _buildConnectionStatus(state.connectionStatus ?? 'connecting');
+                },
               ),
-              Text(
-                widget.showingMovie.screenName,
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 14,
-                ),
+              const SizedBox(width: 8),
+              IconButton(
+                icon: const Icon(Icons.refresh, color: Colors.red),
+                onPressed: resetZoom,
               ),
             ],
           ),
-          actions: [
-            BlocBuilder<BookingSeatBloc, BookingSeatState>(
-              builder: (context, state) {
-                return _buildConnectionStatus(state.connectionStatus ?? 'connecting');
-              },
-            ),
-            const SizedBox(width: 8),
-            IconButton(
-              icon: const Icon(Icons.refresh, color: Colors.red),
-              onPressed: resetZoom,
-            ),
-          ],
         ),
-      ),
-      body: BlocConsumer<BookingSeatBloc, BookingSeatState>(
-        listener: (context, state) {
-          if (state.hasNewError && state.errorMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage!),
-                backgroundColor: Colors.red,
-                action: SnackBarAction(
-                  label: 'Đóng',
-                  textColor: Colors.white,
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  },
-                ),
-              ),
-            );
-            context.read<BookingSeatBloc>().add(const ClearErrorEvent());
-          }
-          
-          if (state.status == BookingSeatStatus.reserved) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Ghế đã được đặt thành công!'),
-                backgroundColor: AppColor.GREEN,
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          // Show loading while data is not ready
-          if (!state.isDataReady && state.status == BookingSeatStatus.loading) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColor.DEFAULT),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Đang tải dữ liệu ghế ngồi...',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-          
-          if (state.status == BookingSeatStatus.error && state.rowSeats.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline,
-                    color: Colors.red,
-                    size: 64,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Không thể tải dữ liệu ghế ngồi',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    state.errorMessage ?? 'Đã xảy ra lỗi',
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () => _initializeBooking(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF4CAF50),
-                    ),
-                    child: const Text(
-                      'Thử lại',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-          
-          return Column(
-            children: [
-              // Seat layout container
-              Expanded(
-                child: InteractiveViewer(
-                  transformationController: _transformationController,
-                  minScale: 0.5,
-                  maxScale: 2.0,
-                  boundaryMargin: const EdgeInsets.all(150),
-                  constrained: false,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    physics: const NeverScrollableScrollPhysics(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          _buildScreen(),
-                          const SizedBox(height: 20),
-                          if (state.rowSeats.isNotEmpty)
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  // Row labels column
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: state.rowSeats.map((rowData) => Container(
-                                      height: 48,
-                                      width: 25,
-                                      margin: const EdgeInsets.symmetric(vertical: 2),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        rowData.rowName,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    )).toList(),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  // Seats grid
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: state.rowSeats.map((rowData) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 2),
-                                        child: _buildSeatRow(state, rowData),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
+        body: BlocConsumer<BookingSeatBloc, BookingSeatState>(
+          listener: (context, state) {
+            if (state.hasNewError && state.errorMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage!),
+                  backgroundColor: Colors.red,
+                  action: SnackBarAction(
+                    label: 'Đóng',
+                    textColor: Colors.white,
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    },
                   ),
                 ),
-              ),
-              
-              // Seat legend
-              _buildLegend(),
-              
-              // Movie info and booking button
-              Container(
-                padding: const EdgeInsets.all(16),
-                color: Colors.black,
+              );
+              context.read<BookingSeatBloc>().add(const ClearErrorEvent());
+            }
+            
+            if (state.status == BookingSeatStatus.reserved) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Ghế đã được đặt thành công!'),
+                  backgroundColor: AppColor.GREEN,
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            // Show loading while data is not ready
+            if (!state.isDataReady && state.status == BookingSeatStatus.loading) {
+              return const Center(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColor.DEFAULT),
+                    ),
+                    SizedBox(height: 16),
                     Text(
-                      widget.movie.title,
-                      style: const TextStyle(
+                      'Đang tải dữ liệu ghế ngồi...',
+                      style: TextStyle(
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${widget.showingMovie.showingFormat} Phụ Đề ${widget.showingMovie.subtitleLanguage}',
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Text(
-                                '${widget.showingMovie.showingDate.toFormattedString()}, ${widget.showingMovie.startTime.HH_mm()}-${widget.showingMovie.endTime.HH_mm()}',
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                '${_calculateTotalPrice(state).toStringAsFixed(0)} đ',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              if (state.selectedSeats.isNotEmpty)
-                                Text(
-                                  '${_getSelectedSeatNames(state).length} ghế',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Column(
+                  ],
+                ),
+              );
+            }
+            
+            if (state.status == BookingSeatStatus.error && state.rowSeats.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                      size: 64,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Không thể tải dữ liệu ghế ngồi',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      state.errorMessage ?? 'Đã xảy ra lỗi',
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () => _initializeBooking(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4CAF50),
+                      ),
+                      child: const Text(
+                        'Thử lại',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            
+            return Column(
+              children: [
+                // Seat layout container
+                Expanded(
+                  child: InteractiveViewer(
+                    transformationController: _transformationController,
+                    minScale: 0.5,
+                    maxScale: 2.0,
+                    boundaryMargin: const EdgeInsets.all(150),
+                    constrained: false,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const NeverScrollableScrollPhysics(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
                           children: [
-                            if (state.status == BookingSeatStatus.reserving ||
-                                state.status == BookingSeatStatus.confirming ||
-                                state.status == BookingSeatStatus.canceling)
-                              const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                ),
-                              )
-                            else
-                              ElevatedButton(
-                                onPressed: state.selectedSeats.isNotEmpty ? () async {
-                                  await _reserveSeats();
-                                  // Nếu ghế chưa có ai đặt thì chuyển sang trang đặt đồ ăn
-                                  if (state.errorMessage == null) {
-                                    
-                                    _proceedToSnacks();
-                                  }
-                                } : null,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF4CAF50),
-                                  disabledBackgroundColor: Colors.grey,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 15),
-                                  elevation: 3,
-                                  shadowColor: const Color(0xFF4CAF50).withOpacity(0.3),
-                                ),
-                                child: const Text(
-                                  'ĐẶT VÉ',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
+                            _buildScreen(),
+                            const SizedBox(height: 20),
+                            if (state.rowSeats.isNotEmpty)
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Row labels column
+                                    Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: state.rowSeats.map((rowData) => Container(
+                                        height: 48,
+                                        width: 25,
+                                        margin: const EdgeInsets.symmetric(vertical: 2),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          rowData.rowName,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      )).toList(),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    // Seats grid
+                                    Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: state.rowSeats.map((rowData) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 2),
+                                          child: _buildSeatRow(state, rowData),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ],
                                 ),
                               ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
+                
+                // Seat legend
+                _buildLegend(),
+                
+                // Movie info and booking button
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  color: Colors.black,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.movie.title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${widget.showingMovie.showingFormat} Phụ Đề ${widget.showingMovie.subtitleLanguage}',
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Text(
+                                  '${widget.showingMovie.showingDate.toFormattedString()}, ${widget.showingMovie.startTime.HH_mm()}-${widget.showingMovie.endTime.HH_mm()}',
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                  '${_calculateTotalPrice(state).toStringAsFixed(0)} đ',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                if (state.selectedSeats.isNotEmpty)
+                                  Text(
+                                    '${_getSelectedSeatNames(state).length} ghế',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Column(
+                            children: [
+                              if (state.status == BookingSeatStatus.reserving ||
+                                  state.status == BookingSeatStatus.confirming ||
+                                  state.status == BookingSeatStatus.canceling)
+                                const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                )
+                              else
+                                ElevatedButton(
+                                  onPressed: state.selectedSeats.isNotEmpty ? () async {
+                                    await _reserveSeats();
+                                    // Nếu ghế chưa có ai đặt thì chuyển sang trang đặt đồ ăn
+                                    if (state.errorMessage == null) {
+                                      
+                                      _proceedToSnacks();
+                                    }
+                                  } : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF4CAF50),
+                                    disabledBackgroundColor: Colors.grey,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 15),
+                                    elevation: 3,
+                                    shadowColor: const Color(0xFF4CAF50).withOpacity(0.3),
+                                  ),
+                                  child: const Text(
+                                    'ĐẶT VÉ',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

@@ -71,6 +71,45 @@ class WebSocketService {
                   : null,
             );
           }).toList();
+
+        case 'seatReleased':
+          final update = SeatStatusUpdate(
+            seatId: data['seatId'] as int,
+            status: SeatStatus.Available,
+            reservedBy: data['releasedBy'] as String?,
+            reservationExpiresAt: null,
+          );
+          _seatUpdateController?.add(update);
+          break;
+        case 'seatSold':
+          final update = SeatStatusUpdate(
+            seatId: data['seatId'] as int,
+            status: SeatStatus.Sold,
+            reservedBy: data['soldTo'] as String?,
+            reservationExpiresAt: null,
+          );
+          _seatUpdateController?.add(update);
+          break;
+
+        case 'reservationExpired':
+          final updates = SeatStatusUpdate(
+              seatId: data['seatId'] as int,
+              status: SeatStatus.Available,
+              reservedBy: null,
+              reservationExpiresAt: null,
+            );
+          _seatUpdateController?.add(updates);
+          break;
+        
+        case 'bulkReservationExpired':
+          final updates = (data['updates'] as List).map((updateData) {
+            return SeatStatusUpdate(
+              seatId: updateData['seatId'] as int,
+              status: SeatStatus.Available,
+              reservedBy: null,
+              reservationExpiresAt: null,
+            );
+          }).toList();
           
           for (final update in updates) {
             _seatUpdateController?.add(update);
@@ -130,7 +169,7 @@ class WebSocketService {
     if (!isConnected) return;
 
     final message = {
-      'type': 'leaveShowing',
+      'type': 'leftShowing',
     };
 
     _channel?.sink.add(jsonEncode(message));
