@@ -1,6 +1,8 @@
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:localization/localization.dart';
 import 'package:movie_tickets/core/commons/app_nav_bar.dart';
+import 'package:movie_tickets/core/commons/chat_screen.dart';
+import 'package:movie_tickets/core/commons/reservation_screen.dart';
 import 'package:movie_tickets/core/configs/routes.dart';
 import 'package:movie_tickets/core/configs/size_config.dart';
 import 'package:flutter/material.dart';
@@ -134,7 +136,7 @@ class _MainScreenState extends State<MainScreen> {
       ticketPrice: 10000,
       selectedSnacks: {"Snack1": 10000, "Snack2": 10000},
       snacksPrice: 10000),
-    const HomePage(), // Replace with GroupPage when available
+    const ReservationListScreen(),
     const SettingPage(),
   ];
 

@@ -40,10 +40,10 @@
               "client_type": 3
             },
             {
-              "client_id": "965619098215-pgg8an47alp79ofq4ll71oum4a3jaae3.apps.googleusercontent.com",
+              "client_id": "965619098215-47o5crrdear7gusijk2qs92s8c01mq43.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.movietickets"
+                "bundle_id": "com.example.movieTickets"
               }
             }
           ]
@@ -84,10 +84,10 @@
               "client_type": 3
             },
             {
-              "client_id": "965619098215-pgg8an47alp79ofq4ll71oum4a3jaae3.apps.googleusercontent.com",
+              "client_id": "965619098215-47o5crrdear7gusijk2qs92s8c01mq43.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.movietickets"
+                "bundle_id": "com.example.movieTickets"
               }
             }
           ]
