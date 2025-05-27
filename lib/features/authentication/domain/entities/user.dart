@@ -1,16 +1,16 @@
 abstract class User {
   final String userId;
   final String fullName;
-  final String? email;
-  final String? phoneNumber;
+  final String email;
+  final String phoneNumber;
   final DateTime dateOfBirth;
   final String gender;
-  final String? address;
+  final String address;
   final String? accountStatus;
   final String role;
   final bool isDeleted;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   final int rankId;
   final int totalPoints;
   final int totalPaid;
@@ -24,18 +24,18 @@ abstract class User {
       required this.email,
       required this.phoneNumber,
       required this.dateOfBirth,
-      required this.gender,
+      this.gender = "Nam",
       required this.address,
-      required this.accountStatus,
-      required this.role,
-      required this.isDeleted,
-      required this.createdAt,
-      required this.updatedAt,
+      this.accountStatus = "active",
+      this.role = 'user',
+      this.isDeleted = false,
+      this.createdAt,
+      this.updatedAt,
       required this.rankId,
-      required this.totalPoints,
-      required this.totalPaid,
-      required this.photoPath,
-      required this.refreshToken,
-      required this.refreshTokenExpiry});
+      this.totalPoints = 0,
+      this.totalPaid = 0,
+      this.photoPath,
+      this.refreshToken,
+      this.refreshTokenExpiry});
   
 }

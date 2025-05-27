@@ -43,7 +43,8 @@ class MovieRepositoryImpl extends MovieRepository {
       if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.sendTimeout) {
-        throw ServerException(message: 'Connection timeout. Please check your internet connection.');
+            print("Connection timed out: ${e.message}");
+        return Result.fromFailure(NetworkFailure("Connection timed out. Please try again later."));
       }
       return Result.fromFailure(ServerFailure("DioException: ${e.message}"));
     } catch (e) {

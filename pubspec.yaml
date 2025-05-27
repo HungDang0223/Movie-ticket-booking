@@ -65,7 +65,6 @@ dependencies:
   flutter_stripe: ^11.0.0
   web_socket: ^1.0.1
   web_socket_channel: ^3.0.3
-  signalr_netcore: ^1.4.3
   dartz: ^0.10.1
   supabase_flutter: ^2.9.0
   mime: ^2.0.0

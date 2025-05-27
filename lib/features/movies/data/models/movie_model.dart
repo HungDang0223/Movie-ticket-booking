@@ -76,6 +76,29 @@ class MovieModel extends Movie with EquatableMixin {
     };
   }
 
+  factory MovieModel.empty() {
+    return MovieModel(
+      movieId: 0,
+      title: '',
+      releaseDate: DateTime.now(),
+      duration: 0,
+      rating: 0.0,
+      synopsis: '',
+      posterUrl: '',
+      trailerUrl: '',
+      censor: '',
+      cast: '',
+      directors: '',
+      genre: '',
+      showingDate: DateTime.now(),
+      endDate: DateTime.now(),
+      showingStatus: '',
+      isSpecial: false,
+      favouritesCount: 0,
+      isFavourited: false
+    );
+  }
+
   @override
   List<Object?> get props => [
         movieId,

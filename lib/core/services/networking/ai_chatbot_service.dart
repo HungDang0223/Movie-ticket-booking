@@ -1,261 +1,9 @@
-// import 'dart:convert';
-// import 'package:firebase_ai/firebase_ai.dart';
-
-// class AIChatbotService {
-//   late GenerativeModel _model;
-//   ChatSession? _chat;
-//   ReservationModel? _currentReservation;
-//   String _language = 'vi'; // Mặc định tiếng Việt
-
-//   void initialize({String language = 'vi'}) {
-//     _language = language;
-//     _model = FirebaseAI.googleAI().generativeModel(
-//       model: 'gemini-2.0-flash',
-//       generationConfig: GenerationConfig(
-//         maxOutputTokens: 1000,
-//         temperature: 0.7,
-//         topP: 0.9,
-//       ),
-//     );
-//   }
-
-//   Future<void> startChatWithReservation(ReservationModel reservation) async {
-//     _currentReservation = reservation;
-    
-//     final systemPrompt = _buildSystemPrompt(reservation);
-
-//     _chat = _model.startChat(history: [
-//       Content.text(systemPrompt),
-//       Content.model([TextPart(_getWelcomeMessage(reservation.customerName))])
-//     ]);
-//   }
-
-//   String _buildSystemPrompt(ReservationModel reservation) {
-//     final Map<String, String> prompts = {
-//       'vi': '''
-//         Bạn là trợ lý AI cho ứng dụng đặt vé xem phim. Bạn có quyền truy cập vào thông tin đặt chỗ của khách hàng.
-//         Luôn lịch sự, thân thiện và chuyên nghiệp. Bạn có thể hỗ trợ:
-//         - Trả lời câu hỏi về đặt chỗ của họ
-//         - Thay đổi đặt chỗ (thời gian, số khách, yêu cầu đặc biệt)
-//         - Cung cấp thông tin về ứng dụng đặt vé xem phim
-//         - Hỗ trợ hủy vé
-
-//         Thông tin đặt chỗ hiện tại:
-//         ${reservation.toContextString()}
-
-//         Hướng dẫn:
-//         - Luôn xác nhận danh tính khách hàng trước khi thay đổi
-//         - Thể hiện sự đồng cảm và hiểu biết
-//         - Nếu cần thay đổi, hãy giải thích những gì bạn đang làm
-//         - Giữ phản hồi ngắn gọn nhưng hữu ích
-//         - Luôn gọi khách hàng bằng tên khi thích hợp
-//         - Chỉ trả lời bằng tiếng Việt
-//       ''',
-//       'en': '''
-//         You are a helpful assistant for movie booking ticket application chatbot. You have access to the customer's reservation details.
-//         Always be polite, friendly and professional. You can help with:
-//         - Answering questions about their reservation
-//         - Making changes to their reservation (time, guests, special requests)
-//         - Providing information for movie booking ticket application
-//         - Helping with cancellations
-
-//         Current reservation context:
-//         ${reservation.toContextString()}
-
-//         Instructions:
-//         - Always confirm the customer's identity before making changes
-//         - Be empathetic and understanding
-//         - If you need to make changes, explain what you're doing
-//         - Keep responses concise but helpful
-//         - Always address the customer by name when appropriate
-//         - Only respond in English
-//       ''',
-//       'zh': '''
-//         您是电影订票应用程序聊天机器人的有用助手。您可以访问客户的预订详细信息。
-//         总是要礼貌、友好和专业。您可以帮助：
-//         - 回答有关他们预订的问题
-//         - 更改他们的预订（时间、客人、特殊要求）
-//         - 提供电影订票应用程序的信息
-//         - 帮助取消
-
-//         当前预订上下文：
-//         ${reservation.toContextString()}
-
-//         说明：
-//         - 在进行更改之前始终确认客户身份
-//         - 要有同理心和理解
-//         - 如果您需要进行更改，请解释您在做什么
-//         - 保持回复简洁但有用
-//         - 在适当的时候总是称呼客户的姓名
-//         - 只用中文回复
-//       ''',
-//     };
-
-//     return prompts[_language] ?? prompts['en']!;
-//   }
-
-//   String _getWelcomeMessage(String customerName) {
-//     final Map<String, String> messages = {
-//       'vi': 'Xin chào $customerName! Tôi thấy bạn có một đặt chỗ với chúng tôi. Tôi có thể hỗ trợ gì cho bạn hôm nay?',
-//       'en': 'Hello $customerName! I can see you have a reservation with us. How can I assist you today?',
-//       'zh': '您好 $customerName！我看到您在我们这里有预订。今天我可以为您提供什么帮助吗？',
-//     };
-
-//     return messages[_language] ?? messages['en']!;
-//   }
-
-//   Future<String> sendMessage(String message) async {
-//     if (_chat == null) {
-//       throw Exception('Chat not initialized. Please start chat with reservation first.');
-//     }
-
-//     try {
-//       final response = await _chat!.sendMessage(Content.text(message));
-//       return response.text ?? _getErrorMessage();
-//     } catch (e) {
-//       return _getTechnicalErrorMessage();
-//     }
-//   }
-
-//   String _getErrorMessage() {
-//     final Map<String, String> messages = {
-//       'vi': 'Tôi xin lỗi, nhưng tôi không thể xử lý yêu cầu của bạn. Vui lòng thử lại.',
-//       'en': 'I apologize, but I could not process your request. Please try again.',
-//       'zh': '很抱歉，我无法处理您的请求。请再试一次。',
-//     };
-    
-//     return messages[_language] ?? messages['en']!;
-//   }
-
-//   String _getTechnicalErrorMessage() {
-//     final Map<String, String> messages = {
-//       'vi': 'Tôi đang gặp một số khó khăn kỹ thuật. Vui lòng thử lại sau một lát.',
-//       'en': 'I\'m experiencing some technical difficulties. Please try again in a moment.',
-//       'zh': '我遇到了一些技术困难。请稍后再试。',
-//     };
-    
-//     return messages[_language] ?? messages['en']!;
-//   }
-
-//   // Method để thay đổi ngôn ngữ trong runtime
-//   void setLanguage(String language) {
-//     _language = language;
-//   }
-
-//   String getCurrentLanguage() {
-//     return _language;
-//   }
-
-//   Future<void> updateReservationContext(ReservationModel updatedReservation) async {
-//     _currentReservation = updatedReservation;
-    
-//     if (_chat != null) {
-//       final updateMessage = _getUpdateMessage(updatedReservation);
-//       await _chat!.sendMessage(Content.text(updateMessage));
-//     }
-//   }
-
-//   String _getUpdateMessage(ReservationModel reservation) {
-//     final Map<String, String> messages = {
-//       'vi': 'CẬP NHẬT HỆ THỐNG: Đặt chỗ đã được cập nhật. Chi tiết mới: ${reservation.toContextString()}',
-//       'en': 'SYSTEM UPDATE: Reservation has been updated. New details: ${reservation.toContextString()}',
-//       'zh': '系统更新：预订已更新。新详细信息：${reservation.toContextString()}',
-//     };
-    
-//     return messages[_language] ?? messages['en']!;
-//   }
-
-//   ReservationModel? getCurrentReservation() {
-//     return _currentReservation;
-//   }
-
-//   void resetChat() {
-//     _chat = null;
-//     _currentReservation = null;
-//   }
-
-//   bool get isChatActive => _chat != null;
-
-//   // Danh sách ngôn ngữ được hỗ trợ
-//   static List<String> getSupportedLanguages() {
-//     return ['vi', 'en', 'zh'];
-//   }
-// }
-
-// class ReservationModel {
-//   final String id;
-//   final String customerName;
-//   final String email;
-//   final String phone;
-//   final DateTime reservationDate;
-//   final String time;
-//   final int numberOfGuests;
-//   final String tableType;
-//   final String specialRequests;
-//   final String status;
-
-//   ReservationModel({
-//     required this.id,
-//     required this.customerName,
-//     required this.email,
-//     required this.phone,
-//     required this.reservationDate,
-//     required this.time,
-//     required this.numberOfGuests,
-//     required this.tableType,
-//     this.specialRequests = '',
-//     this.status = 'confirmed',
-//   });
-
-//   Map<String, dynamic> toJson() {
-//     return {
-//       'id': id,
-//       'customerName': customerName,
-//       'email': email,
-//       'phone': phone,
-//       'reservationDate': reservationDate.toIso8601String(),
-//       'time': time,
-//       'numberOfGuests': numberOfGuests,
-//       'tableType': tableType,
-//       'specialRequests': specialRequests,
-//       'status': status,
-//     };
-//   }
-
-//   factory ReservationModel.fromJson(Map<String, dynamic> json) {
-//     return ReservationModel(
-//       id: json['id'],
-//       customerName: json['customerName'],
-//       email: json['email'],
-//       phone: json['phone'],
-//       reservationDate: DateTime.parse(json['reservationDate']),
-//       time: json['time'],
-//       numberOfGuests: json['numberOfGuests'],
-//       tableType: json['tableType'],
-//       specialRequests: json['specialRequests'] ?? '',
-//       status: json['status'] ?? 'confirmed',
-//     );
-//   }
-
-//   String toContextString() {
-//     return '''
-// Reservation Details:
-// - ID: $id
-// - Customer: $customerName
-// - Email: $email  
-// - Phone: $phone
-// - Date: ${reservationDate.day}/${reservationDate.month}/${reservationDate.year}
-// - Time: $time
-// - Guests: $numberOfGuests people
-// - Table Type: $tableType
-// - Special Requests: $specialRequests
-// - Status: $status
-// ''';
-//   }
-// }
-
 import 'dart:convert';
+import 'dart:io';
 import 'package:firebase_ai/firebase_ai.dart';
+import 'package:movie_tickets/features/authentication/data/models/user_model.dart';
+import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
+import 'package:movie_tickets/features/movies/domain/repositories/movie_repository.dart';
 
 // Model cho response từ AI
 class AIChatResponse {
@@ -324,42 +72,81 @@ class ChatAction {
 class AIChatbotService {
   late GenerativeModel _model;
   ChatSession? _chat;
-  ReservationModel? _currentReservation;
+  UserModel? _currentUser;
   String _language = 'vi';
+  final MovieRepository? movieRepository;
+  List<MovieModel>? _cachedMovies;
+
+  AIChatbotService({this.movieRepository});
 
   void initialize({String language = 'vi'}) {
     _language = language;
     _model = FirebaseAI.googleAI().generativeModel(
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.0-flash-exp',
       generationConfig: GenerationConfig(
-        maxOutputTokens: 1500,
+        maxOutputTokens: 2000,
         temperature: 0.7,
         topP: 0.9,
       ),
     );
   }
 
-  Future<void> startChatWithReservation(ReservationModel reservation) async {
-    _currentReservation = reservation;
+  Future<void> startChatWithReservation(UserModel user) async {
+    _currentUser = user;
     
-    final systemPrompt = _buildSystemPrompt(reservation);
+    // Load movies cache for better search
+    await _loadMoviesCache();
+    
+    final systemPrompt = _buildSystemPrompt();
 
     _chat = _model.startChat(history: [
       Content.text(systemPrompt),
-      Content.model([TextPart(_getWelcomeMessage(reservation.customerName))])
+      Content.model([TextPart(_getWelcomeMessage(_currentUser!.fullName))])
     ]);
   }
 
-  String _buildSystemPrompt(ReservationModel reservation) {
+  Future<void> _loadMoviesCache() async {
+    if (movieRepository != null) {
+      try {
+        final result = await movieRepository!.getListShowingMovies();
+        if (result.isSuccess && result.data != null) {
+          _cachedMovies = result.data;
+        }
+      } catch (e) {
+        print('Error loading movies cache: $e');
+      }
+    }
+  }
+
+  String _buildSystemPrompt() {
+    final moviesList = _cachedMovies?.map((movie) => 
+      'ID: ${movie.movieId}, Tên: "${movie.title}", Thể loại: ${movie.genre}'
+    ).join('\n') ?? '';
+
     final Map<String, String> prompts = {
       'vi': '''
         Bạn là trợ lý AI cho ứng dụng đặt vé xem phim. Bạn có thể hỗ trợ khách hàng điều hướng trong app.
 
-        CÁC TÍNH NĂNG BỠI BẠN CÓ THỂ HỖ TRỢ:
-        1. Trả lời câu hỏi về đặt vé
-        2. Điều hướng đến các trang khác nhau
-        3. Tạo các button action cho người dùng
-        4. Gọi API để lấy dữ liệu
+        DANH SÁCH PHIM HIỆN TẠI:
+        $moviesList
+
+        CÁC TÍNH NĂNG BạN CÓ THỂ HỖ TRỢ:
+        1. Tìm kiếm phim theo tên (không cần chính xác 100%)
+        2. Đặt vé cho phim cụ thể
+        3. Điều hướng đến các trang khác nhau
+        4. Trả lời câu hỏi về phim
+        5. Xử lý hình ảnh người dùng gửi - mô tả nội dung và tìm phim liên quan
+
+        KHI NGƯỜI DÙNG GỬI HÌNH ẢNH:
+        - Mô tả chi tiết nội dung hình ảnh
+        - Nếu hình ảnh liên quan đến phim (poster, cảnh phim, diễn viên), tìm phim tương ứng
+        - Đề xuất đặt vé nếu tìm thấy phim phù hợp
+        - Trả lời câu hỏi về hình ảnh nếu người dùng hỏi
+
+        KHI NGƯỜI DÙNG MUỐN ĐẶT VÉ CHO PHIM:
+        - Tìm phim trong danh sách dựa trên tên (sử dụng fuzzy matching)
+        - Tạo button điều hướng đến trang đặt vé với movieId
+        - Nếu không tìm thấy phim chính xác, đề xuất phim tương tự
 
         CÁC ROUTE AVAILABLE:
         - /home: Trang chủ
@@ -370,12 +157,6 @@ class AIChatbotService {
         - /payment: Thanh toán
         - /setting: Cài đặt
 
-        CÁC API ENDPOINTS:
-        - GET /api/movies: Lấy danh sách phim
-        - GET /api/movies/{id}: Lấy chi tiết phim
-        - GET /api/showings/{movieId}: Lấy lịch chiếu
-        - GET /api/theaters: Lấy danh sách rạp
-
         ĐỊNH DẠNG RESPONSE:
         Bạn PHẢI trả về JSON với format:
         {
@@ -385,78 +166,58 @@ class AIChatbotService {
               "type": "navigate|api_call|button",
               "label": "Nhãn hiển thị",
               "route": "/route_path",
-              "parameters": {"key": "value"},
-              "apiEndpoint": "/api/endpoint",
-              "buttonId": "unique_id"
+              "parameters": {"movieId": "id_cua_phim"},
+              "apiEndpoint": "/api/endpoint"
             }
           ]
         }
 
-        VÍ DỤ:
-        - Khi user hỏi "Tôi muốn xem phim": Tạo button điều hướng đến trang chủ
-        - Khi user hỏi "Phim gì hay?": Gọi API lấy danh sách phim
-        - Khi user chọn phim: Điều hướng đến trang chi tiết
+        VÍ DỤ XỬ LÝ ĐẶT VÉ:
+        User: "Tôi muốn đặt vé xem Spider-Man"
+        Response: {
+          "message": "Tôi tìm thấy phim Spider-Man cho bạn! Bạn có muốn xem lịch chiếu không?",
+          "actions": [
+            {
+              "type": "navigate",
+              "label": "🎬 Đặt vé Spider-Man",
+              "route": "/showing_movie_booking",
+              "parameters": {"movieId": "123"}
+            }
+          ]
+        }
 
-        Thông tin đặt chỗ hiện tại:
-        ${reservation.toContextString()}
+        VÍ DỤ XỬ LÝ HÌNH ẢNH:
+        User gửi poster phim Spider-Man
+        Response: {
+          "message": "Tôi thấy đây là poster phim Spider-Man! Đây là một bộ phim siêu anh hùng rất hay. Bạn có muốn đặt vé xem không?",
+          "actions": [
+            {
+              "type": "navigate", 
+              "label": "🎬 Đặt vé Spider-Man",
+              "route": "/showing_movie_booking",
+              "parameters": {"movieId": "123"}
+            },
+            {
+              "type": "navigate",
+              "label": "📋 Xem chi tiết phim", 
+              "route": "/movie_detail",
+              "parameters": {"movieId": "123"}
+            }
+          ]
+        }
 
         LUÔN trả về JSON hợp lệ và chỉ sử dụng tiếng Việt.
       ''',
-      'en': '''
-        You are an AI assistant for movie booking ticket application. You can help customers navigate through the app.
-
-        FEATURES YOU CAN SUPPORT:
-        1. Answer questions about movie booking
-        2. Navigate to different pages
-        3. Create action buttons for users
-        4. Call APIs to fetch data
-
-        AVAILABLE ROUTES:
-        - /home: Home page
-        - /movie_detail: Movie details (needs movieId)
-        - /showing_movie_booking: Book tickets (needs movieId)
-        - /seat_booking: Select seats (needs movie + showingMovie)
-        - /snack_booking: Select snacks
-        - /payment: Payment
-        - /setting: Settings
-
-        API ENDPOINTS:
-        - GET /api/movies: Get movie list
-        - GET /api/movies/{id}: Get movie details
-        - GET /api/showings/{movieId}: Get showtimes
-        - GET /api/theaters: Get theater list
-
-        RESPONSE FORMAT:
-        You MUST return JSON with format:
-        {
-          "message": "Your message",
-          "actions": [
-            {
-              "type": "navigate|api_call|button",
-              "label": "Display label",
-              "route": "/route_path",
-              "parameters": {"key": "value"},
-              "apiEndpoint": "/api/endpoint",
-              "buttonId": "unique_id"
-            }
-          ]
-        }
-
-        Current reservation context:
-        ${reservation.toContextString()}
-
-        ALWAYS return valid JSON and only respond in English.
-      ''',
     };
 
-    return prompts[_language] ?? prompts['en']!;
+    return prompts[_language] ?? prompts['vi']!;
   }
 
   String _getWelcomeMessage(String customerName) {
     final welcomeResponse = {
       "message": _language == 'vi' 
-        ? "Xin chào $customerName! Tôi có thể giúp bạn đặt vé xem phim, tìm phim hay, hoặc điều hướng trong ứng dụng. Bạn cần hỗ trợ gì?"
-        : "Hello $customerName! I can help you book movie tickets, find great movies, or navigate through the app. What do you need help with?",
+        ? "Xin chào $customerName! 🎬 Tôi có thể giúp bạn đặt vé xem phim, tìm phim hay, hoặc trả lời câu hỏi về bất kỳ hình ảnh nào bạn gửi. Bạn cần hỗ trợ gì?"
+        : "Hello $customerName! 🎬 I can help you book movie tickets, find great movies, or answer questions about any images you send. What do you need help with?",
       "actions": [
         {
           "type": "navigate",
@@ -464,9 +225,9 @@ class AIChatbotService {
           "route": "/home"
         },
         {
-          "type": "api_call",
-          "label": _language == 'vi' ? "🎭 Phim hay nhất" : "🎭 Top Movies",
-          "apiEndpoint": "/api/movies/trending"
+          "type": "button",
+          "label": _language == 'vi' ? "🔍 Tìm phim yêu thích" : "🔍 Search Movies",
+          "buttonId": "search_movies"
         },
         {
           "type": "navigate",
@@ -479,34 +240,269 @@ class AIChatbotService {
     return jsonEncode(welcomeResponse);
   }
 
-  Future<AIChatResponse> sendMessage(String message) async {
+  // Tìm phim dựa trên tên (fuzzy search)
+  MovieModel? _findMovieByName(String movieName) {
+    if (_cachedMovies == null || _cachedMovies!.isEmpty) return null;
+
+    final searchName = movieName.toLowerCase().trim();
+    
+    // Exact match first
+    var movie = _cachedMovies!.firstWhere(
+      (movie) => movie.title.toLowerCase() == searchName,
+      orElse: () => MovieModel.empty(),
+    );
+    
+    if (movie.movieId != 0) return movie;
+    
+    // Partial match
+    movie = _cachedMovies!.firstWhere(
+      (movie) => movie.title.toLowerCase().contains(searchName) ||
+                 searchName.contains(movie.title.toLowerCase()),
+      orElse: () => MovieModel.empty(),
+    );
+    
+    if (movie.movieId != 0) return movie;
+    
+    return null;
+  }
+
+  // Tìm phim tương tự
+  List<MovieModel> _findSimilarMovies(String movieName, {int limit = 3}) {
+    if (_cachedMovies == null || _cachedMovies!.isEmpty) return [];
+
+    final searchName = movieName.toLowerCase().trim();
+    final similarMovies = <MovieModel>[];
+    
+    for (final movie in _cachedMovies!) {
+      final title = movie.title.toLowerCase();
+      
+      // Check if any word in search matches any word in title
+      final searchWords = searchName.split(' ');
+      final titleWords = title.split(' ');
+      
+      bool hasMatch = false;
+      for (final searchWord in searchWords) {
+        for (final titleWord in titleWords) {
+          if (searchWord.length >= 3 && titleWord.contains(searchWord)) {
+            hasMatch = true;
+            break;
+          }
+        }
+        if (hasMatch) break;
+      }
+      
+      if (hasMatch) {
+        similarMovies.add(movie);
+      }
+    }
+    
+    return similarMovies.take(limit).toList();
+  }
+
+  Future<AIChatResponse> sendMessage(String message, {File? imageFile}) async {
     if (_chat == null) {
       throw Exception('Chat not initialized. Please start chat with reservation first.');
     }
 
     try {
-      final response = await _chat!.sendMessage(Content.text(message));
-      final responseText = response.text ?? '{"message": "Lỗi xử lý", "actions": []}';
+      Content content;
       
-      // Parse JSON response from AI
-      try {
-        final jsonResponse = jsonDecode(responseText);
-        return AIChatResponse.fromJson(jsonResponse);
-      } catch (e) {
-        // Nếu AI không trả về JSON, wrap thành response thông thường
+      if (imageFile != null) {
+        // Handle image + text message - FIXED VERSION
+        final imageBytes = await imageFile.readAsBytes();
+        
+        // Create proper image part with mime type detection
+        String mimeType = 'image/jpeg'; // default
+        final extension = imageFile.path.toLowerCase().split('.').last;
+        switch (extension) {
+          case 'png':
+            mimeType = 'image/png';
+            break;
+          case 'jpg':
+          case 'jpeg':
+            mimeType = 'image/jpeg';
+            break;
+          case 'webp':
+            mimeType = 'image/webp';
+            break;
+        }
+
+        // content = Content.multi([
+        //   TextPart(message.isNotEmpty ? message : 'Hãy mô tả hình ảnh này và tìm phim liên quan nếu có.'),
+        //   Content.data(mimeType, imageBytes),
+        // ]);
+        content = Content.inlineData(mimeType, imageBytes);
+      } else {
+        content = Content.text(message);
+      }
+
+      final response = await _chat!.sendMessage(content);
+      final responseText = response.text ?? '';
+      
+      if (responseText.isEmpty) {
         return AIChatResponse(
-          message: responseText,
-          actions: null,
+          message: _language == 'vi' 
+            ? 'Xin lỗi, tôi không hiểu câu hỏi của bạn. Vui lòng thử lại.'
+            : 'Sorry, I did not understand your question. Please try again.',
         );
       }
+
+      // Try to parse as JSON first with better error handling
+      return _parseAIResponse(responseText, message, imageFile != null);
+      
     } catch (e) {
+      print('Error in sendMessage: $e');
       return AIChatResponse(
         message: _language == 'vi' 
           ? 'Tôi đang gặp một số khó khăn kỹ thuật. Vui lòng thử lại sau một lát.'
           : 'I\'m experiencing some technical difficulties. Please try again in a moment.',
-        actions: null,
       );
     }
+  }
+
+  AIChatResponse _parseAIResponse(String responseText, String originalMessage, bool hasImage) {
+    // Clean response text - remove markdown code blocks if present
+    String cleanedResponse = responseText.trim();
+    if (cleanedResponse.startsWith('```json')) {
+      cleanedResponse = cleanedResponse.substring(7);
+    }
+    if (cleanedResponse.startsWith('```')) {
+      cleanedResponse = cleanedResponse.substring(3);
+    }
+    if (cleanedResponse.endsWith('```')) {
+      cleanedResponse = cleanedResponse.substring(0, cleanedResponse.length - 3);
+    }
+    cleanedResponse = cleanedResponse.trim();
+
+    // Try to parse as JSON
+    try {
+      final jsonResponse = jsonDecode(cleanedResponse);
+      return AIChatResponse.fromJson(jsonResponse);
+    } catch (e) {
+      print('JSON parse error: $e');
+      print('Response text: $cleanedResponse');
+      
+      // If not JSON, handle as text response
+      if (hasImage) {
+        return _handleImageResponse(cleanedResponse, originalMessage);
+      } else {
+        return _handleTextResponse(cleanedResponse, originalMessage);
+      }
+    }
+  }
+
+  AIChatResponse _handleImageResponse(String responseText, String originalMessage) {
+    // For image responses, try to extract movie information
+    final lowerResponse = responseText.toLowerCase();
+    
+    // Look for movie names in the response
+    if (_cachedMovies != null) {
+      for (final movie in _cachedMovies!) {
+        if (lowerResponse.contains(movie.title.toLowerCase())) {
+          return AIChatResponse(
+            message: responseText,
+            actions: [
+              ChatAction(
+                type: 'navigate',
+                label: '🎬 Đặt vé ${movie.title}',
+                route: '/showing_movie_booking',
+                parameters: {'movieId': movie.movieId.toString()},
+              ),
+              ChatAction(
+                type: 'navigate',
+                label: '📋 Xem chi tiết phim',
+                route: '/movie_detail',
+                parameters: {'movieId': movie.movieId.toString()},
+              ),
+            ],
+          );
+        }
+      }
+    }
+    
+    // Default image response without actions
+    return AIChatResponse(message: responseText);
+  }
+
+  AIChatResponse _handleTextResponse(String responseText, String originalMessage) {
+    // Check if user wants to book a movie
+    final lowerMessage = originalMessage.toLowerCase();
+    
+    if (lowerMessage.contains('đặt vé') || 
+        lowerMessage.contains('đặt suất') ||
+        lowerMessage.contains('xem phim') ||
+        lowerMessage.contains('book') ||
+        lowerMessage.contains('ticket')) {
+      
+      // Extract movie name from message
+      final movieName = _extractMovieName(originalMessage);
+      if (movieName.isNotEmpty) {
+        final movie = _findMovieByName(movieName);
+        
+        if (movie != null) {
+          return AIChatResponse(
+            message: 'Tôi tìm thấy phim "${movie.title}" cho bạn! Bạn có muốn xem lịch chiếu và đặt vé không?',
+            actions: [
+              ChatAction(
+                type: 'navigate',
+                label: '🎬 Đặt vé ${movie.title}',
+                route: '/showing_movie_booking',
+                parameters: {'movieId': movie.movieId.toString()},
+              ),
+              ChatAction(
+                type: 'navigate',
+                label: '📋 Xem chi tiết phim',
+                route: '/movie_detail',
+                parameters: {'movieId': movie.movieId.toString()},
+              ),
+            ],
+          );
+        } else {
+          // Try to find similar movies
+          final similarMovies = _findSimilarMovies(movieName);
+          if (similarMovies.isNotEmpty) {
+            final actions = similarMovies.map((movie) => ChatAction(
+              type: 'navigate',
+              label: '🎬 ${movie.title}',
+              route: '/showing_movie_booking',
+              parameters: {'movieId': movie.movieId.toString()},
+            )).toList();
+            
+            return AIChatResponse(
+              message: 'Tôi không tìm thấy phim "$movieName" chính xác, nhưng có những phim tương tự:',
+              actions: actions,
+            );
+          }
+        }
+      }
+    }
+    
+    // Default response
+    return AIChatResponse(message: responseText);
+  }
+
+  String _extractMovieName(String message) {
+    // Simple extraction - can be improved with better NLP
+    final lowerMessage = message.toLowerCase();
+    
+    // Remove common booking phrases
+    final cleanMessage = lowerMessage
+        .replaceAll('tôi muốn đặt vé xem', '')
+        .replaceAll('tôi muốn đặt vé cho', '')
+        .replaceAll('đặt vé xem', '')
+        .replaceAll('đặt vé cho', '')
+        .replaceAll('đặt suất chiếu cho', '')
+        .replaceAll('xem phim', '')
+        .replaceAll('phim', '')
+        .trim();
+    
+    // If there are quotes, extract content between them
+    final quoteMatch = RegExp(r'"([^"]*)"').firstMatch(cleanMessage);
+    if (quoteMatch != null) {
+      return quoteMatch.group(1) ?? '';
+    }
+    
+    return cleanMessage;
   }
 
   // Method để xử lý action từ AI
@@ -526,7 +522,6 @@ class AIChatbotService {
   }
 
   Future<AIChatResponse> _handleApiCall(ChatAction action, Map<String, dynamic>? data) async {
-    // Simulate API call - thay thế bằng actual API call
     await Future.delayed(Duration(milliseconds: 500));
     
     final message = _language == 'vi' 
@@ -556,6 +551,25 @@ class AIChatbotService {
   }
 
   Future<AIChatResponse> _handleButtonAction(ChatAction action, Map<String, dynamic>? data) async {
+    switch (action.buttonId) {
+      case 'search_movies':
+        if (_cachedMovies != null && _cachedMovies!.isNotEmpty) {
+          final randomMovies = (_cachedMovies!..shuffle()).take(5).toList();
+          final actions = randomMovies.map((movie) => ChatAction(
+            type: 'navigate',
+            label: '🎬 ${movie.title}',
+            route: '/showing_movie_booking',
+            parameters: {'movieId': movie.movieId.toString()},
+          )).toList();
+          
+          return AIChatResponse(
+            message: 'Đây là một số phim hay bạn có thể quan tâm:',
+            actions: actions,
+          );
+        }
+        break;
+    }
+    
     final message = _language == 'vi' 
       ? "Đã thực hiện action: ${action.label}"
       : "Executed action: ${action.label}";
@@ -574,77 +588,15 @@ class AIChatbotService {
     return _language;
   }
 
-  Future<void> updateReservationContext(ReservationModel updatedReservation) async {
-    _currentReservation = updatedReservation;
-    
-    if (_chat != null) {
-      final updateMessage = _getUpdateMessage(updatedReservation);
-      await _chat!.sendMessage(Content.text(updateMessage));
-    }
-  }
-
-  String _getUpdateMessage(ReservationModel reservation) {
-    final updateResponse = {
-      "message": _language == 'vi' 
-        ? "Thông tin đặt chỗ đã được cập nhật"
-        : "Reservation information has been updated",
-      "actions": []
-    };
-    
-    return jsonEncode(updateResponse);
-  }
-
-  ReservationModel? getCurrentReservation() {
-    return _currentReservation;
+  UserModel? getCurrentUser() {
+    return _currentUser;
   }
 
   void resetChat() {
     _chat = null;
-    _currentReservation = null;
+    _currentUser = null;
+    _cachedMovies = null;
   }
 
   bool get isChatActive => _chat != null;
-}
-
-// Existing ReservationModel stays the same
-class ReservationModel {
-  final String id;
-  final String customerName;
-  final String email;
-  final String phone;
-  final DateTime reservationDate;
-  final String time;
-  final int numberOfGuests;
-  final String tableType;
-  final String specialRequests;
-  final String status;
-
-  ReservationModel({
-    required this.id,
-    required this.customerName,
-    required this.email,
-    required this.phone,
-    required this.reservationDate,
-    required this.time,
-    required this.numberOfGuests,
-    required this.tableType,
-    this.specialRequests = '',
-    this.status = 'confirmed',
-  });
-
-  String toContextString() {
-    return '''
-Reservation Details:
-- ID: $id
-- Customer: $customerName
-- Email: $email  
-- Phone: $phone
-- Date: ${reservationDate.day}/${reservationDate.month}/${reservationDate.year}
-- Time: $time
-- Guests: $numberOfGuests people
-- Table Type: $tableType
-- Special Requests: $specialRequests
-- Status: $status
-''';
-  }
 }

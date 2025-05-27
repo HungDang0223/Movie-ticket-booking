@@ -61,8 +61,8 @@ Future<void> init() async {
       'Accept': 'application/json',
       'ngrok-skip-browser-warning':'true',
     },
-    connectTimeout: const Duration(seconds: 30),
-    receiveTimeout: const Duration(seconds: 30),
+    connectTimeout: const Duration(seconds: 15),
+    receiveTimeout: const Duration(seconds: 15),
     sendTimeout: const Duration(seconds: 5),
   ))..interceptors.add(LogInterceptor(responseBody: true));
 

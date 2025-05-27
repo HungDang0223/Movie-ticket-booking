@@ -140,7 +140,7 @@ class _DateSelectorState extends State<DateSelector> {
                         // width: 45,
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: selectedDate == date ? Colors.red : Colors.transparent,
+                          color: selectedDate.day == date.day ? AppColor.DEFAULT_2 : Colors.transparent,
                           shape: BoxShape.circle,
                         ),
                         alignment: Alignment.center,

@@ -1,0 +1,2 @@
+D:/KLTN/movie_tickets/android/app/.cxx/Debug/t2855724/x86/CMakeFiles/edit_cache.dir
+D:/KLTN/movie_tickets/android/app/.cxx/Debug/t2855724/x86/CMakeFiles/rebuild_cache.dir

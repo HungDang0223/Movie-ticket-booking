@@ -2,7 +2,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:localization/localization.dart';
 import 'package:movie_tickets/core/commons/app_nav_bar.dart';
 import 'package:movie_tickets/core/commons/chat_screen.dart';
-import 'package:movie_tickets/core/commons/reservation_screen.dart';
 import 'package:movie_tickets/core/configs/routes.dart';
 import 'package:movie_tickets/core/configs/size_config.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +15,7 @@ import 'package:movie_tickets/features/movies/presentation/bloc/bloc.dart';
 import 'package:movie_tickets/features/movies/presentation/pages/home_page.dart';
 import 'package:movie_tickets/features/payment/presentation/bloc/payment_bloc.dart';
 import 'package:movie_tickets/features/payment/presentation/pages/payment_page.dart';
+import 'package:movie_tickets/features/sc_splash.dart';
 import 'package:movie_tickets/features/setting/presentation/bloc/settings_bloc.dart';
 import 'package:movie_tickets/features/setting/presentation/bloc/setting_event.dart';
 import 'package:movie_tickets/features/setting/presentation/bloc/settings_state.dart';
@@ -97,7 +97,7 @@ class MyApp extends StatelessWidget {
               ? Locale(state.languageCode, state.countryCode)
               : const Locale('vi', 'VN'),
             localeResolutionCallback: AppLocalizations.localeResolutionCallback,
-            home: const MainScreen(), // Use SplashScreen as the initial screen
+          home: const SplashScreen(),
           );
         },
       ),
@@ -136,7 +136,7 @@ class _MainScreenState extends State<MainScreen> {
       ticketPrice: 10000,
       selectedSnacks: {"Snack1": 10000, "Snack2": 10000},
       snacksPrice: 10000),
-    const ReservationListScreen(),
+    const ChatScreen(),
     const SettingPage(),
   ];
 

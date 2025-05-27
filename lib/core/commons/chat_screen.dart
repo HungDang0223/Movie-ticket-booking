@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
+import 'package:movie_tickets/core/constants/app_color.dart';
+import 'package:movie_tickets/core/constants/strings.dart';
 import 'dart:convert';
 
 import 'package:movie_tickets/core/services/networking/ai_chatbot_service.dart';
+import 'package:movie_tickets/features/authentication/data/models/user_model.dart';
 
 class ChatScreen extends StatefulWidget {
   final String? userId;
-  final ReservationModel? reservation;
+  final UserModel? user;
 
   const ChatScreen({
     Key? key,
     this.userId,
-    this.reservation,
+    this.user,
   }) : super(key: key);
 
   @override
@@ -33,8 +37,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _initializeChat() async {
     _chatService.initialize(language: 'vi');
     
-    if (widget.reservation != null) {
-      await _chatService.startChatWithReservation(widget.reservation!);
+    if (widget.user != null) {
+      await _chatService.startChatWithReservation(widget.user!);
       // Thêm welcome message
       final welcomeResponse = await _chatService.sendMessage("Xin chào!");
       setState(() {
@@ -170,7 +174,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _handleApiCall(ChatAction action) async {
     try {
       final endpoint = action.apiEndpoint;
-      final response = await http.get(Uri.parse('https://your-api-domain.com$endpoint'));
+      final response = await http.get(Uri.parse('$baseURL$endpoint'));
       
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -224,7 +228,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   // Mock API calls - thay thế bằng actual API calls
   Future<dynamic> _loadMovieData(String movieId) async {
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
     return {
       'id': movieId,
       'title': 'Sample Movie',
@@ -234,7 +238,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<dynamic> _loadShowingData(String showingId) async {
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
     return {
       'id': showingId,
       'movieId': '123',
@@ -258,15 +262,15 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Movie Bot 🤖'),
-        backgroundColor: Colors.purple,
+        title: const Text('Movie Bot 🤖'),
+        backgroundColor: AppColor.DEFAULT_2,
         foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final message = _messages[index];
@@ -283,10 +287,10 @@ class _ChatScreenState extends State<ChatScreen> {
                   SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: SvgPicture.asset(
+                      'assets/icons/typing.svg',
+                    ),
                   ),
-                  SizedBox(width: 8),
-                  Text('Bot đang suy nghĩ...'),
                 ],
               ),
             ),
@@ -298,26 +302,27 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildMessageBubble(ChatMessage message) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: message.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!message.isUser) ...[
-            CircleAvatar(
+            const CircleAvatar(
               radius: 16,
-              backgroundColor: Colors.purple,
+              backgroundColor: AppColor.DEFAULT,
               child: Icon(Icons.smart_toy, color: Colors.white, size: 16),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
           ],
           Flexible(
             child: Column(
               crossAxisAlignment: message.isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: message.isUser ? Colors.purple : Colors.grey[200],
+                    color: message.isUser ? AppColor.DEFAULT : Colors.grey[200],
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -328,7 +333,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 if (message.actions != null && message.actions!.isNotEmpty) ...[
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
                     runSpacing: 4,
@@ -340,7 +345,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _getActionColor(action.type),
                           foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         ),
                       );
                     }).toList(),
@@ -350,8 +355,8 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           if (message.isUser) ...[
-            SizedBox(width: 8),
-            CircleAvatar(
+            const SizedBox(width: 8),
+            const CircleAvatar(
               radius: 16,
               backgroundColor: Colors.blue,
               child: Icon(Icons.person, color: Colors.white, size: 16),
@@ -365,13 +370,13 @@ class _ChatScreenState extends State<ChatScreen> {
   Icon _getActionIcon(String type) {
     switch (type) {
       case 'navigate':
-        return Icon(Icons.arrow_forward, size: 16);
+        return const Icon(Icons.arrow_forward, size: 16);
       case 'api_call':
-        return Icon(Icons.download, size: 16);
+        return const Icon(Icons.download, size: 16);
       case 'button':
-        return Icon(Icons.touch_app, size: 16);
+        return const Icon(Icons.touch_app, size: 16);
       default:
-        return Icon(Icons.help, size: 16);
+        return const Icon(Icons.help, size: 16);
     }
   }
 
@@ -390,8 +395,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildInputArea() {
     return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
@@ -414,17 +419,17 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 filled: true,
                 fillColor: Colors.grey[100],
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
               onSubmitted: _sendMessage,
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           FloatingActionButton(
             mini: true,
             onPressed: () => _sendMessage(_messageController.text),
-            backgroundColor: Colors.purple,
-            child: Icon(Icons.send, color: Colors.white),
+            backgroundColor: AppColor.DEFAULT,
+            child: const Icon(Icons.send, color: Colors.white),
           ),
         ],
       ),
@@ -444,4 +449,22 @@ class ChatMessage {
     this.actions,
     required this.timestamp,
   });
+  factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    return ChatMessage(
+      text: json['text'],
+      isUser: json['isUser'],
+      actions: (json['actions'] as List<dynamic>?)
+          ?.map((action) => ChatAction.fromJson(action))
+          .toList(),
+      timestamp: DateTime.parse(json['timestamp']),
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'text': text,
+      'isUser': isUser,
+      'actions': actions?.map((action) => action.toJson()).toList(),
+      'timestamp': timestamp.toIso8601String(),
+    };
+  }
 }
