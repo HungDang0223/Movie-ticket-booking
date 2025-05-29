@@ -49,7 +49,7 @@ class FragmentHostActivity: FlutterActivity() {
 
                     if (token != null) {
                         ZaloPaySDK.getInstance().payOrder(
-                            this@FragmentHostActivity, token, "demozpdk://app",
+                            this@FragmentHostActivity, token, "movie_tickets://app",
                             object : PayOrderListener {
                                 override fun onPaymentCanceled(zpTransToken: String?, appTransID: String?) {
                                     Log.d(tagCanel, "[TransactionId]: $zpTransToken, [appTransID]: $appTransID")

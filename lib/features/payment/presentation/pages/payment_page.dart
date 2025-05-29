@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:movie_tickets/core/constants/app_color.dart';
+import 'package:movie_tickets/core/utils/snackbar_utilies.dart';
 import 'package:movie_tickets/features/payment/domain/services/vnpay_payment_service.dart';
 import 'package:movie_tickets/features/payment/domain/services/zalopay_payment_service.dart';
 import 'package:movie_tickets/features/payment/presentation/bloc/bloc.dart';
@@ -75,19 +76,19 @@ class _PaymentPageState extends State<PaymentPage> {
     {
       'id': 'momo',
       'name': 'Ví MoMo',
-      'icon': 'icons/momo.png',
+      'icon': 'assets/icons/momo.png',
       'color': const Color(0xFFAE2070),
     },
     {
       'id': 'zalopay',
       'name': 'ZaloPay',
-      'icon': 'icons/zalopay.png',
+      'icon': 'assets/icons/zalopay.png',
       'color': const Color(0xFF0068FF),
     },
     {
       'id': 'vnpay',
       'name': 'VNPay',
-      'icon': 'icons/vnpay.png',
+      'icon': 'assets/icons/vnpay.png',
       'color': const Color(0xFF004A9F),
     },
   ];
@@ -98,6 +99,7 @@ class _PaymentPageState extends State<PaymentPage> {
     'CGVNEW20': 20.0, // 20% off
     'MOVIE50K': 50000.0, // 50,000 VND off
   };
+  
   @override
   void initState() {
     super.initState();
@@ -182,11 +184,9 @@ class _PaymentPageState extends State<PaymentPage> {
 
   void processPayment(BuildContext context) async {
     if (selectedPaymentMethod == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng chọn phương thức thanh toán'),
-          backgroundColor: Colors.red,
-        ),
+      SnackbarUtils.showErrorSnackbar(
+        context,
+        'Vui lòng chọn phương thức thanh toán',
       );
       return;
     }
@@ -378,13 +378,13 @@ class _PaymentPageState extends State<PaymentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColor.DEFAULT,
         elevation: 0,
-        title: const Text('Thanh toán', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text('Thanh toán', style: TextStyle(fontWeight: FontWeight.bold, color: AppColor.WHITE)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.red),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColor.WHITE),
+          tooltip: 'Quay lại',
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -449,7 +449,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     _buildVoucherSection(),
                     const SizedBox(height: 20),
                     // Build payment methods list
-                    const Text('Phương thức thanh toán', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text('Phương thức thanh toán', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
                     _buildPaymentMethodsList(),
                     const SizedBox(height: 20),
@@ -459,11 +459,11 @@ class _PaymentPageState extends State<PaymentPage> {
                       child: ElevatedButton(
                         onPressed: () => processPayment(context),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4CAF50),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: AppColor.DEFAULT_2,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        child: Text('THANH TOÁN ${totalAmount.toStringAsFixed(0)} đ', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        child: Text('THANH TOÁN ${totalAmount.toStringAsFixed(0)} đ', style: const TextStyle(fontSize: 16, color: AppColor.WHITE, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],
@@ -477,8 +477,8 @@ class _PaymentPageState extends State<PaymentPage> {
   Widget _buildTicketInfoCard() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade900,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade800, width: 1),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -487,7 +487,6 @@ class _PaymentPageState extends State<PaymentPage> {
           Text(
             widget.movieTitle,
             style: const TextStyle(
-              color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -533,7 +532,6 @@ class _PaymentPageState extends State<PaymentPage> {
           Text(
             value,
             style: const TextStyle(
-              color: Colors.white,
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -560,7 +558,6 @@ class _PaymentPageState extends State<PaymentPage> {
           Text(
             '${amount >= 0 ? "" : "-"}${amount.abs().toStringAsFixed(0)} đ',
             style: TextStyle(
-              color: textColor ?? Colors.white,
               fontSize: isBold ? 16 : 14,
               fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
             ),
@@ -577,7 +574,6 @@ class _PaymentPageState extends State<PaymentPage> {
         const Text(
           'Mã giảm giá',
           style: TextStyle(
-            color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -632,15 +628,12 @@ class _PaymentPageState extends State<PaymentPage> {
               Expanded(
                 child: TextField(
                   controller: _voucherController,
-                  style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     hintText: 'Nhập mã giảm giá',
                     hintStyle: const TextStyle(color: Colors.grey),
-                    filled: true,
-                    fillColor: Colors.grey.shade900,
+                    filled: false,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
@@ -653,7 +646,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   backgroundColor: AppColor.DEFAULT_2,
                   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 ),
-                child: const Text('ÁP DỤNG'),
+                child: const Text('ÁP DỤNG', style: TextStyle(color: AppColor.WHITE),),
               ),
             ],
           ),
@@ -669,10 +662,10 @@ class _PaymentPageState extends State<PaymentPage> {
         return Container(
           margin: const EdgeInsets.only(bottom: 8),
           decoration: BoxDecoration(
-            color: isSelected ? method['color'].withOpacity(0.2) : Colors.grey.shade900,
+            color: isSelected ? method['color'].withOpacity(0.2) : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isSelected ? method['color'] : Colors.transparent,
+              color: isSelected ? method['color'] : AppColor.GRAY1,
               width: 1,
             ),
           ),
@@ -701,6 +694,10 @@ class _PaymentPageState extends State<PaymentPage> {
                     decoration: BoxDecoration(
                       color: method['color'].withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isSelected ? method['color'] : AppColor.GRAY1,
+                        width: 1,
+                      ),
                     ),
                     child: Image.asset(
                       method['icon'],
@@ -717,7 +714,6 @@ class _PaymentPageState extends State<PaymentPage> {
                         Text(
                           method['name'],
                           style: TextStyle(
-                            color: Colors.white,
                             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                           ),
                         ),
