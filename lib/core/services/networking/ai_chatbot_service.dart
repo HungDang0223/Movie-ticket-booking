@@ -4,6 +4,7 @@ import 'package:firebase_ai/firebase_ai.dart';
 import 'package:movie_tickets/features/authentication/data/models/user_model.dart';
 import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
 import 'package:movie_tickets/features/movies/domain/repositories/movie_repository.dart';
+import 'package:movie_tickets/injection.dart';
 
 // Model cho response từ AI
 class AIChatResponse {
@@ -74,10 +75,9 @@ class AIChatbotService {
   ChatSession? _chat;
   UserModel? _currentUser;
   String _language = 'vi';
-  final MovieRepository? movieRepository;
+  final MovieRepository movieRepository = sl<MovieRepository>();
   List<MovieModel>? _cachedMovies;
 
-  AIChatbotService({this.movieRepository});
 
   void initialize({String language = 'vi'}) {
     _language = language;
@@ -96,7 +96,7 @@ class AIChatbotService {
     
     // Load movies cache for better search
     await _loadMoviesCache();
-    
+
     final systemPrompt = _buildSystemPrompt();
 
     _chat = _model.startChat(history: [
@@ -106,36 +106,36 @@ class AIChatbotService {
   }
 
   Future<void> _loadMoviesCache() async {
-    if (movieRepository != null) {
-      try {
-        final result = await movieRepository!.getListShowingMovies();
-        if (result.isSuccess && result.data != null) {
-          _cachedMovies = result.data;
-        }
-      } catch (e) {
-        print('Error loading movies cache: $e');
+    try {
+      final result = await movieRepository.getListShowingMovies();
+      if (result.isSuccess && result.data != null) {
+        _cachedMovies = result.data;
       }
+    } catch (e) {
+      print('Error loading movies cache: $e');
     }
-  }
+    }
 
   String _buildSystemPrompt() {
-    final moviesList = _cachedMovies?.map((movie) => 
-      'ID: ${movie.movieId}, Tên: "${movie.title}", Thể loại: ${movie.genre}'
-    ).join('\n') ?? '';
 
     final Map<String, String> prompts = {
       'vi': '''
         Bạn là trợ lý AI cho ứng dụng đặt vé xem phim. Bạn có thể hỗ trợ khách hàng điều hướng trong app.
 
-        DANH SÁCH PHIM HIỆN TẠI:
-        $moviesList
+        NHỚ DANH SÁCH PHIM HIỆN TẠI:
+        $_cachedMovies
 
-        CÁC TÍNH NĂNG BạN CÓ THỂ HỖ TRỢ:
+        CÁC TÍNH NĂNG BẠN CÓ THỂ HỖ TRỢ:
         1. Tìm kiếm phim theo tên (không cần chính xác 100%)
         2. Đặt vé cho phim cụ thể
         3. Điều hướng đến các trang khác nhau
         4. Trả lời câu hỏi về phim
         5. Xử lý hình ảnh người dùng gửi - mô tả nội dung và tìm phim liên quan
+        5. Đưa ra danh sách phim hiện tại để người dùng chọn
+
+        KHI NGƯỜI CHỌN PHIM:
+        - Tìm phim trong danh sách dựa trên tên (sử dụng fuzzy matching)
+        - Tạo button điều hướng đến trang đặt vé với movieId
 
         KHI NGƯỜI DÙNG GỬI HÌNH ẢNH:
         - Mô tả chi tiết nội dung hình ảnh
@@ -150,7 +150,7 @@ class AIChatbotService {
 
         CÁC ROUTE AVAILABLE:
         - /home: Trang chủ
-        - /movie_detail: Chi tiết phim (cần movieId)
+        - /movie_detail: Chi tiết phim (cần movie)
         - /showing_movie_booking: Đặt vé (cần movieId)
         - /seat_booking: Chọn ghế (cần movie + showingMovie)
         - /snack_booking: Chọn đồ ăn
@@ -326,11 +326,6 @@ class AIChatbotService {
             mimeType = 'image/webp';
             break;
         }
-
-        // content = Content.multi([
-        //   TextPart(message.isNotEmpty ? message : 'Hãy mô tả hình ảnh này và tìm phim liên quan nếu có.'),
-        //   Content.data(mimeType, imageBytes),
-        // ]);
         content = Content.inlineData(mimeType, imageBytes);
       } else {
         content = Content.text(message);
@@ -361,32 +356,20 @@ class AIChatbotService {
   }
 
   AIChatResponse _parseAIResponse(String responseText, String originalMessage, bool hasImage) {
-    // Clean response text - remove markdown code blocks if present
-    String cleanedResponse = responseText.trim();
-    if (cleanedResponse.startsWith('```json')) {
-      cleanedResponse = cleanedResponse.substring(7);
-    }
-    if (cleanedResponse.startsWith('```')) {
-      cleanedResponse = cleanedResponse.substring(3);
-    }
-    if (cleanedResponse.endsWith('```')) {
-      cleanedResponse = cleanedResponse.substring(0, cleanedResponse.length - 3);
-    }
-    cleanedResponse = cleanedResponse.trim();
-
     // Try to parse as JSON
     try {
-      final jsonResponse = jsonDecode(cleanedResponse);
+      responseText = responseText.substring(responseText.indexOf('{'), responseText.lastIndexOf('}') + 1);
+      final jsonResponse = jsonDecode(responseText);
       return AIChatResponse.fromJson(jsonResponse);
     } catch (e) {
       print('JSON parse error: $e');
-      print('Response text: $cleanedResponse');
-      
+      print('Response text: $responseText');
+
       // If not JSON, handle as text response
       if (hasImage) {
-        return _handleImageResponse(cleanedResponse, originalMessage);
+        return _handleImageResponse(responseText, originalMessage);
       } else {
-        return _handleTextResponse(cleanedResponse, originalMessage);
+        return _handleTextResponse(responseText, originalMessage);
       }
     }
   }

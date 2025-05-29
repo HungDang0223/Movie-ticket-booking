@@ -69,6 +69,26 @@ class UserModel extends User with EquatableMixin {
     };
   }
 
+  factory UserModel.empty() {
+    return UserModel(
+      userId: "",
+      fullName: "",
+      email: "",
+      phoneNumber: "",
+      dateOfBirth: DateTime.now(),
+      gender: "Nam",
+      address: "",
+      accountStatus: "active",
+      role: "user",
+      isDeleted: false,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+      rankId: 1,
+      totalPoints: 0,
+      totalPaid: 0,
+    );
+  }
+
   @override
   List<Object?> get props => [
         userId,

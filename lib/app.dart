@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_tickets/core/constants/my_const.dart';
 import 'package:movie_tickets/core/constants/app_color.dart';
+import 'package:movie_tickets/features/authentication/data/models/user_model.dart';
 import 'package:movie_tickets/features/booking/presentation/bloc/booking_seat_bloc/booking_seat_bloc.dart';
 import 'package:movie_tickets/features/booking/presentation/bloc/showing_movie_bloc/showing_movie_bloc.dart';
 import 'package:movie_tickets/features/movies/presentation/bloc/bloc.dart';
@@ -136,7 +137,7 @@ class _MainScreenState extends State<MainScreen> {
       ticketPrice: 10000,
       selectedSnacks: {"Snack1": 10000, "Snack2": 10000},
       snacksPrice: 10000),
-    const ChatScreen(),
+    ChatScreen(user: UserModel.empty()),
     const SettingPage(),
   ];
 
