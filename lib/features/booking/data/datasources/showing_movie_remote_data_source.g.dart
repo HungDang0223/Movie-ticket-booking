@@ -9,11 +9,7 @@ part of 'showing_movie_remote_data_source.dart';
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations
 
 class _ShowingMovieRemoteDataSource implements ShowingMovieRemoteDataSource {
-  _ShowingMovieRemoteDataSource(
-    this._dio, {
-    this.baseUrl,
-    this.errorLogger,
-  }) {
+  _ShowingMovieRemoteDataSource(this._dio, {this.baseUrl, this.errorLogger}) {
     baseUrl ??= 'http://192.168.1.2:5000/api/v1/showing';
   }
 
@@ -35,29 +31,24 @@ class _ShowingMovieRemoteDataSource implements ShowingMovieRemoteDataSource {
     };
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options =
-        _setStreamType<HttpResponse<List<ShowingMovieResponse>>>(Options(
-      method: 'GET',
-      headers: _headers,
-      extra: _extra,
-    )
-            .compose(
-              _dio.options,
-              '',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            )));
+    final _options = _setStreamType<HttpResponse<List<ShowingMovieResponse>>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
     final _result = await _dio.fetch<List<dynamic>>(_options);
     late List<ShowingMovieResponse> _value;
     try {
       _value = _result.data!
-          .map((dynamic i) =>
-              ShowingMovieResponse.fromJson(i as Map<String, dynamic>))
+          .map(
+            (dynamic i) =>
+                ShowingMovieResponse.fromJson(i as Map<String, dynamic>),
+          )
           .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
@@ -80,10 +71,7 @@ class _ShowingMovieRemoteDataSource implements ShowingMovieRemoteDataSource {
     return requestOptions;
   }
 
-  String _combineBaseUrls(
-    String dioBaseUrl,
-    String? baseUrl,
-  ) {
+  String _combineBaseUrls(String dioBaseUrl, String? baseUrl) {
     if (baseUrl == null || baseUrl.trim().isEmpty) {
       return dioBaseUrl;
     }

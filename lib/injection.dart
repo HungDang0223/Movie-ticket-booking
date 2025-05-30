@@ -17,8 +17,10 @@ import 'package:movie_tickets/features/authentication/presentation/bloc/signup_b
 import 'package:movie_tickets/features/booking/data/datasources/booking_seat_remote_data_source.dart';
 import 'package:movie_tickets/features/booking/data/datasources/showing_movie_remote_data_source.dart';
 import 'package:movie_tickets/features/booking/data/repositories/booking_seat_repository_impl.dart';
+import 'package:movie_tickets/features/booking/data/repositories/booking_snack_repository_impl.dart';
 import 'package:movie_tickets/features/booking/data/repositories/showing_movie_repository_impl.dart';
 import 'package:movie_tickets/features/booking/domain/repositories/booking_seat_repository.dart';
+import 'package:movie_tickets/features/booking/domain/repositories/booking_snack_repository.dart';
 import 'package:movie_tickets/features/booking/domain/repositories/showing_movie_repository.dart';
 import 'package:movie_tickets/features/booking/presentation/bloc/bloc.dart';
 import 'package:movie_tickets/features/movies/data/datasources/movie_remote_datasource.dart';
@@ -39,6 +41,9 @@ import 'package:movie_tickets/features/setting/data/datasources/settings_local_d
 import 'package:movie_tickets/features/setting/data/repositories/settings_repository_impl.dart';
 import 'package:movie_tickets/features/setting/domain/repositories/settings_repository.dart';
 import 'package:movie_tickets/features/setting/presentation/bloc/settings_bloc.dart';
+import 'package:movie_tickets/features/venues/data/datasouces/cinema_remote_data_source.dart';
+import 'package:movie_tickets/features/venues/data/repositories/cinema_repository_impl.dart';
+import 'package:movie_tickets/features/venues/domain/repositories/cinema_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final GetIt sl = GetIt.instance;
@@ -82,7 +87,8 @@ Future<void> init() async {
   sl.registerSingleton<ShowingMovieRemoteDataSource>(ShowingMovieRemoteDataSource(sl()));
   sl.registerSingleton<SettingsLocalDataSource>(SettingsLocalDataSourceImpl(sl<SharedPrefService>()));
   sl.registerSingleton<BookingSeatRemoteDataSource>(BookingSeatRemoteDataSource(sl()));
-  
+  sl.registerSingleton<CinemaRemoteDataSource>(CinemaRemoteDataSource(sl()));
+  // sl.registerSingleton<BookingSnackRemoteDataSource>(BookingSnackRemoteDataSource(sl()));
 
   // Register repository
   sl.registerLazySingleton<AuthRepository>(() => AuthReposImpl(
@@ -92,14 +98,16 @@ Future<void> init() async {
   ));
   sl.registerLazySingleton<MovieRepository>(() => MovieRepositoryImpl());
   sl.registerLazySingleton<ReviewRepository>(() => ReviewRepositoryImpl());
-  sl.registerLazySingleton<ShowingMovieRepository>(() => ShowingMovieRepositoryImpl());
+  sl.registerLazySingleton<CinemaRepository>(() => CinemaRepositoryImpl(sl()));
+  sl.registerLazySingleton<ShowingMovieRepository>(() => ShowingMovieRepositoryImpl(sl()));
   sl.registerLazySingleton<SettingsRepository>(() => SettingsRepositoryImpl(sl<SettingsLocalDataSource>(), sl<AuthRepository>()));
   sl.registerLazySingleton<PaymentRepository>(() => PaymentRepositoryImpl());
   sl.registerLazySingleton<BookingSeatRepository>(() => BookingSeatRepositoryImpl(
     apiService: sl<BookingSeatRemoteDataSource>(),
     webSocketService: sl<WebSocketService>(),
   ));
-  
+  sl.registerLazySingleton<BookingSnackRepository>(() => BookingSnackRepositoryImpl());
+
   // Register use cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => SignUpUseCase(sl()));

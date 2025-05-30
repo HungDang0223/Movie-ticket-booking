@@ -112,6 +112,7 @@ class AIChatbotService {
         _cachedMovies = result.data;
       }
     } catch (e) {
+      _cachedMovies = [];
       print('Error loading movies cache: $e');
     }
     }
@@ -122,8 +123,9 @@ class AIChatbotService {
       'vi': '''
         Bạn là trợ lý AI cho ứng dụng đặt vé xem phim. Bạn có thể hỗ trợ khách hàng điều hướng trong app.
 
-        NHỚ DANH SÁCH PHIM HIỆN TẠI:
+        NHỚ DANH SÁCH PHIM HIỆN TẠI NẾU CÓ:
         $_cachedMovies
+        NẾU RỖNG HOẶC GẶP LỖI KHI LẤY DỮ LIỆU THÌ HÃY THÔNG BÁO VỚI NGƯỜI DÙNG KHI NGƯỜI DÙNG CÓ CÂU HỎI LIÊN QUAN.
 
         CÁC TÍNH NĂNG BẠN CÓ THỂ HỖ TRỢ:
         1. Tìm kiếm phim theo tên (không cần chính xác 100%)

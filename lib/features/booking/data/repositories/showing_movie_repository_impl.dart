@@ -11,7 +11,9 @@ import 'package:movie_tickets/injection.dart';
 
 class ShowingMovieRepositoryImpl extends ShowingMovieRepository {
 
-  final ShowingMovieRemoteDataSource remoteDataSource = sl<ShowingMovieRemoteDataSource>();
+  final ShowingMovieRemoteDataSource remoteDataSource;
+  ShowingMovieRepositoryImpl(this.remoteDataSource);
+
   @override
   Future<Result<List<ShowingMovieResponse>>> getShowingMovies(int cinemaId, DateTime date) async {
     try {
