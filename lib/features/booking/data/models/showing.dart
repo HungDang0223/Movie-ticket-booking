@@ -2,6 +2,7 @@
 class ShowingMovie {
   final int showingId;
   final int screenId;
+  final String title;
   final String cinemaName;
   final String screenName;
   final String startTime;
@@ -15,6 +16,7 @@ class ShowingMovie {
   const ShowingMovie({
     required this.showingId,
     required this.screenId,
+    required this.title,
     required this.cinemaName,
     required this.screenName,
     required this.startTime,
@@ -29,6 +31,7 @@ class ShowingMovie {
     return ShowingMovie(
       showingId: json['showingId'] as int,
       screenId: json['screenId'] as int,
+      title: json['title'] as String,
       cinemaName: json['cinemaName'] as String,
       screenName: json['screenName'] as String,
       startTime: json['startTime'] as String,
@@ -45,6 +48,7 @@ class ShowingMovie {
     return {
       'showingId': showingId,
       'screenId': screenId,
+      'title': title,
       'cinemaName': cinemaName,
       'screenName': screenName,
       'startTime': startTime,

@@ -11,16 +11,23 @@ part 'showing_movie_remote_data_source.g.dart';
 abstract class ShowingMovieRemoteDataSource {
   factory ShowingMovieRemoteDataSource(Dio dio) = _ShowingMovieRemoteDataSource;
 
-  @GET('')
-  Future<HttpResponse<List<ShowingMovieResponse>>> getShowingMovies(
-    @Query('movie') int movieId,
+  // /movie/{movieId}?date={date}
+  // /cinema/{cinemaId}?date={date}
+  @GET('/movie/{movieId}')
+  Future<HttpResponse<List<ShowingMovieResponse>>> getShowingMoviesByMovieId(
+    @Path('movieId') int movieId,
     @Query('date') DateTime data
   );
   
+  @GET('/cinema/{cinemaId}')
+  Future<HttpResponse<List<ShowingMovieResponse>>> getShowingMoviesByCinemaId(
+    @Path('cinemaId') int cinemaId,
+    @Query('date') DateTime data
+  );
 }
 //**
 // {
-//   CinemaName: "TC Vincom Bà Triệu"
+//   Name: tên rạp hoặc tên phim
 //   Showing: [
 //     {
 //       "showingId": 35,
@@ -48,25 +55,25 @@ abstract class ShowingMovieRemoteDataSource {
 // }
 // Model class for the response from the showing movie API.
 class ShowingMovieResponse {
-  final String cinemaName;
+  final String name; // cinema name or movie name
   final List<ShowingMovie> showingMovies;
   const ShowingMovieResponse({
-    required this.cinemaName,
+    required this.name,
     required this.showingMovies,
   });
   factory ShowingMovieResponse.fromJson(Map<String, dynamic> json) {
-    final cinemaName = json['CinemaName'] as String;
+    final name = json['Name'] as String;
     final showingMovies = (json['Showings'] as List)
         .map((e) => ShowingMovie.fromJson(e))
         .toList();
     return ShowingMovieResponse(
-      cinemaName: cinemaName,
+      name: name,
       showingMovies: showingMovies,
     );
   }
   @override
   String toString() {
     // TODO: implement toString
-    return "Cinema name: $cinemaName, showings: ${showingMovies.length}";
+    return "Cinema name: $name, showings: ${showingMovies.length}";
   }
 }

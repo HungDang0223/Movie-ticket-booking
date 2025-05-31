@@ -362,7 +362,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<dynamic> _loadShowingData(int showingId) async {
-    final response = await _showingMovieRepository.getShowingMovies(showingId, DateTime.now());
+    final response = await _showingMovieRepository.getShowingMoviesByMovieId(showingId, DateTime.now());
     if (response.isSuccess) {
       return response.data;
     } else {

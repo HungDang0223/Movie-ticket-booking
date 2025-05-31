@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_tickets/core/constants/my_const.dart';
-import 'package:movie_tickets/core/constants/app_color.dart';
 import 'package:movie_tickets/features/authentication/data/models/user_model.dart';
 import 'package:movie_tickets/features/booking/presentation/bloc/booking_seat_bloc/booking_seat_bloc.dart';
 import 'package:movie_tickets/features/booking/presentation/bloc/showing_movie_bloc/showing_movie_bloc.dart';
@@ -21,7 +20,7 @@ import 'package:movie_tickets/features/setting/presentation/bloc/settings_bloc.d
 import 'package:movie_tickets/features/setting/presentation/bloc/setting_event.dart';
 import 'package:movie_tickets/features/setting/presentation/bloc/settings_state.dart';
 import 'package:movie_tickets/features/setting/presentation/pages/setting_page.dart';
-import 'package:movie_tickets/features/venues/presentation/pages/venues_page.dart';
+import 'package:movie_tickets/features/venues/presentation/pages/cinema_page.dart';
 import 'package:movie_tickets/injection.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/login_bloc/bloc.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/signup_bloc/bloc.dart';
@@ -116,18 +115,25 @@ class MyApp extends StatelessWidget {
 
 // First, create a new widget to handle the bottom navigation
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  int initialIndex;
+  MainScreen(this.initialIndex, {super.key});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
-  
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+  }
+
   final List<Widget> _screens = [
     const HomePage(),
-    const VenuesPage(),
+    const CinemaPage(),
     const PaymentPage(
       movieTitle: "movieTitle",
       theaterName: "theaterName",

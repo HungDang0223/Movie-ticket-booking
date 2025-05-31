@@ -30,7 +30,6 @@ class SettingsTile extends StatelessWidget {
       title: Text(
         title,
         style: const TextStyle(
-          color: Colors.black87,
           fontWeight: FontWeight.w500,
         ),
       ),

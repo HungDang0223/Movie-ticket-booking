@@ -10,7 +10,7 @@ abstract class CinemaRemoteDataSource {
   factory CinemaRemoteDataSource(Dio dio, {String baseUrl}) = _CinemaRemoteDataSource;
 
   @GET('/cinema')
-  Future<HttpResponse<List<CinemaResponse>>> getCinemas();
+  Future<HttpResponse<CinemaResponse>> getCinemas();
 
   @GET('/cinema/city/{cityId}')
   Future<HttpResponse<List<Cinema>>> getCinemasByCityId(@Path('cityId') int cityId);

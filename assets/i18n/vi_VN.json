@@ -1,7 +1,8 @@
 {
   "app": {
     "title": "Đặt Vé Phim"
-  },  "auth": {
+  },  
+  "auth": {
     "login": "Đăng Nhập",
     "signup": "Đăng Ký",
     "email": "Email",
@@ -63,7 +64,8 @@
       "topRated": "Đánh giá cao nhất",
       "lowestRated": "Đánh giá thấp nhất"
     }
-  },  "settings": {
+  },  
+  "settings": {
     "settings": "Cài Đặt",
     "accountSettings": "Cài Đặt Tài Khoản",
     "profileInformation": "Thông Tin Cá Nhân",
@@ -113,13 +115,16 @@
     "specialOffers": "Ưu Đãi Đặc Biệt",
     "specialOffersDesc": "Nhận thông báo về các ưu đãi và khuyến mãi đặc biệt"
   },
-  "venues": {
-    "movieVenues": "Rạp Chiếu Phim",
-    "theaters": "Nhà Hát",
+  "cinemas": {
+    "cinema": "Rạp Chiếu Phim",
     "capacity": "Sức Chứa",
     "location": "Vị Trí",
     "selectSeat": "Chọn Ghế",
-    "bookNow": "Đặt Ngay"
+    "bookNow": "Đặt Ngay",
+    "searchCinemas": "Tìm Rạp Chiếu Phim...",
+    "cinemaDetails": "Chi Tiết Rạp Chiếu",
+    "noCinemasFound": "Không tìm thấy rạp chiếu phim nào",
+    "cinemaName": "Tên Rạp"
   },
   "common": {
     "cancel": "Hủy",
@@ -144,6 +149,7 @@
     "on": "vào",
     "from": "từ",
     "to": "đến",
+    "all": "Tất cả",
     "viewAll": "Xem Tất Cả",
     "viewMore": "Xem Thêm",
     "viewLess": "Xem Ít Hơn",
@@ -161,6 +167,8 @@
     "retry": "Thử lại",
     "search": "Tìm kiếm",
     "searchHint": "Tìm kiếm phim, rạp chiếu, diễn viên...",
-    "sortBy": "Sắp xếp theo"
+    "sortBy": "Sắp xếp theo",
+    "address": "Địa chỉ",
+    "location": "Vị trí"
   }
 }

@@ -20,22 +20,55 @@ class _ShowingMovieRemoteDataSource implements ShowingMovieRemoteDataSource {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<HttpResponse<List<ShowingMovieResponse>>> getShowingMovies(
+  Future<HttpResponse<List<ShowingMovieResponse>>> getShowingMoviesByMovieId(
     int movieId,
     DateTime data,
   ) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'movie': movieId,
-      r'date': data.toIso8601String(),
-    };
+    final queryParameters = <String, dynamic>{r'date': data.toIso8601String()};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<List<ShowingMovieResponse>>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '',
+            '/movie/${movieId}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<ShowingMovieResponse> _value;
+    try {
+      _value = _result.data!
+          .map(
+            (dynamic i) =>
+                ShowingMovieResponse.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<List<ShowingMovieResponse>>> getShowingMoviesByCinemaId(
+    int cinemaId,
+    DateTime data,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'date': data.toIso8601String()};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<HttpResponse<List<ShowingMovieResponse>>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/cinema/${cinemaId}',
             queryParameters: queryParameters,
             data: _data,
           )

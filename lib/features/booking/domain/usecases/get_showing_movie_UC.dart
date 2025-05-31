@@ -11,7 +11,7 @@ class GetShowingMovieUc implements UseCase<List<ShowingMovieResponse>, GetShowin
 
   @override
   Future<Result<List<ShowingMovieResponse>>> call(GetShowingMovieParams params) async {
-    return await repository.getShowingMovies(params.cinemaId, params.date);
+    return await repository.getShowingMoviesByMovieId(params.cinemaId, params.date);
   }
 }
 

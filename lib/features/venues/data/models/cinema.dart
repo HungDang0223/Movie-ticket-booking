@@ -69,6 +69,6 @@ class CinemaResponse {
     cinemasByCity.forEach((key, value) {
       data[key] = value.map((e) => e.toJson()).toList();
     });
-    return {'data': data};
+    return data;
   }
 }

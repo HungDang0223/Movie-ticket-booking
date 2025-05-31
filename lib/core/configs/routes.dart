@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movie_tickets/app.dart';
 import 'package:movie_tickets/features/authentication/presentation/pages/email_verification_page.dart';
 import 'package:movie_tickets/features/booking/presentation/pages/booking_seat.dart';
 import 'package:movie_tickets/features/booking/presentation/pages/booking_showing_movie.dart';
@@ -14,11 +15,16 @@ import 'package:movie_tickets/features/setting/presentation/pages/change_passwor
 import 'package:movie_tickets/features/setting/presentation/pages/password_verification_page.dart';
 import 'package:movie_tickets/features/setting/presentation/pages/setting_page.dart';
 import 'package:movie_tickets/features/setting/presentation/pages/user_info_page.dart';
+import 'package:movie_tickets/features/venues/data/models/cinema.dart';
+import 'package:movie_tickets/features/venues/presentation/pages/cinema_detail_page.dart';
 
 class Routes {
   static const String home = '/home';
+  static const String cinema = '/cinema';
+  static const String movie = '/movie';
   static const String login = '/login';
   static const String signup = '/signup';
+  static const String cinemaDetail = '/cinema_detail';
   static const String movieDetail = '/movie_detail';
   static const String showingMovieBooking = '/showing_movie_booking';
   static const String seatBooking = '/seat_booking';
@@ -36,7 +42,10 @@ class AppRoutes {
   static Route onGenerateRoutes(RouteSettings settings) {
     switch (settings.name) {
       case '/home':
-        return _materialRoute(const HomePage());
+        return _materialRoute(MainScreen(0));
+
+      case '/cinema':
+        return _materialRoute(MainScreen(1));
 
       case '/login':
         return _materialRoute(const LoginPage());
@@ -44,19 +53,25 @@ class AppRoutes {
       case '/signup':
         return _materialRoute(const SignupPage());
 
+      case '/cinema_detail':
+        final cinema = settings.arguments as Cinema;
+        return _materialRoute(CinemaDetailPage(cinema: cinema));
+
       case '/movie_detail':
         final movie = settings.arguments as MovieModel;
         return _materialRoute(MovieDetailScreen(movie: movie,));
 
-      case '/showing_movie_booking':
-        final movie = settings.arguments as MovieModel;
-        return _materialRoute(ShowingMovieBookingScreen(movie: movie));
-        
+      case 'Routes.showingMovieBooking':
+        final args = settings.arguments as Map<String, dynamic>;
+        final movie = args['movie'] as MovieModel?;
+        final cinema = args['cinema'] as Cinema?;
+        return _materialRoute(ShowingMovieBookingScreen(movie: movie, cinema: cinema));
+
       case '/seat_booking':
         // movie + movie showing
         final args = settings.arguments as Map<String, dynamic>;
         return _materialRoute(BookingSeatPage(
-          movie: args['movie'],
+          title: args['title'],
           showingMovie: args['showingMovie'],
           websocketUrl: args['websocketUrl'],
           userId: args['userId'],

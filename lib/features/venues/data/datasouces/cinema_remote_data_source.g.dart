@@ -20,12 +20,12 @@ class _CinemaRemoteDataSource implements CinemaRemoteDataSource {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<HttpResponse<List<CinemaResponse>>> getCinemas() async {
+  Future<HttpResponse<CinemaResponse>> getCinemas() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<HttpResponse<List<CinemaResponse>>>(
+    final _options = _setStreamType<HttpResponse<CinemaResponse>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -35,14 +35,10 @@ class _CinemaRemoteDataSource implements CinemaRemoteDataSource {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<CinemaResponse> _value;
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late CinemaResponse _value;
     try {
-      _value = _result.data!
-          .map(
-            (dynamic i) => CinemaResponse.fromJson(i as Map<String, dynamic>),
-          )
-          .toList();
+      _value = CinemaResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

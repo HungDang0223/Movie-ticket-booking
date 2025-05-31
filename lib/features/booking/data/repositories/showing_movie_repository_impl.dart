@@ -15,32 +15,45 @@ class ShowingMovieRepositoryImpl extends ShowingMovieRepository {
   ShowingMovieRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<Result<List<ShowingMovieResponse>>> getShowingMovies(int cinemaId, DateTime date) async {
+  Future<Result<List<ShowingMovieResponse>>> getShowingMoviesByMovieId(int movieId, DateTime date) async {
     try {
-      final httpResponse = await remoteDataSource.getShowingMovies(cinemaId, date);
+      final httpResponse = await remoteDataSource.getShowingMoviesByMovieId(movieId, date);
       if (httpResponse.response.statusCode == 200) {
         final response = httpResponse.data;
         print(response);
         return Result.success(response);
       } 
-      else if (httpResponse.response.statusCode == HttpStatus.badRequest) {
+      else {
         // Handle 400 errors
         final responseBody = httpResponse.response.data;
         final errorMessage = responseBody["message"] ?? "Invalid request data";
         return Result.fromFailure(ServerFailure("Bad Request: $errorMessage"));
-      } else if (httpResponse.response.statusCode == HttpStatus.notFound) {
-        // 404 error
-        final responseBody = httpResponse.response.data;
-        final errorMessage = responseBody["message"] ?? "No data found";
-        return Result.fromFailure(ServerFailure("$errorMessage"));
       }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return Result.fromFailure(DioExceptionFailure("${e.response!.data['message']}"));
+      }
+      return Result.fromFailure(DioExceptionFailure("DioException: ${e.message}"));
+    } catch (e) {
+      return Result.fromFailure(ServerFailure("Unexpected error occurred: $e"));
+    }
+  }
+
+  @override
+  Future<Result<List<ShowingMovieResponse>>> getShowingMoviesByCinemaId(int cinemaId, DateTime date) async {
+    try {
+      final httpResponse = await remoteDataSource.getShowingMoviesByCinemaId(cinemaId, date);
+      if (httpResponse.response.statusCode == 200) {
+        final response = httpResponse.data;
+        print(response);
+        return Result.success(response);
+      } 
       else {
-        return Result.fromFailure(ServerFailure(httpResponse.response.statusMessage ?? "Unknown server error"));
+        // Handle 400 errors
+        final responseBody = httpResponse.response.data;
+        final errorMessage = responseBody["message"] ?? "Invalid request data";
+        return Result.fromFailure(ServerFailure("Bad Request: $errorMessage"));
       }
-    } on ServerException catch (e) {
-      return Result.fromFailure(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Result.fromFailure(NetworkFailure(e.message));
     } on DioException catch (e) {
       if (e.response != null) {
         return Result.fromFailure(DioExceptionFailure("${e.response!.data['message']}"));

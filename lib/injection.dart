@@ -23,6 +23,7 @@ import 'package:movie_tickets/features/booking/domain/repositories/booking_seat_
 import 'package:movie_tickets/features/booking/domain/repositories/booking_snack_repository.dart';
 import 'package:movie_tickets/features/booking/domain/repositories/showing_movie_repository.dart';
 import 'package:movie_tickets/features/booking/presentation/bloc/bloc.dart';
+import 'package:movie_tickets/features/booking/presentation/bloc/booking_snack_bloc/booking_snack_bloc.dart';
 import 'package:movie_tickets/features/movies/data/datasources/movie_remote_datasource.dart';
 import 'package:movie_tickets/features/movies/data/datasources/review_remote_datasource.dart';
 import 'package:movie_tickets/features/movies/data/repositories/movie_repository_impl.dart';
@@ -44,6 +45,7 @@ import 'package:movie_tickets/features/setting/presentation/bloc/settings_bloc.d
 import 'package:movie_tickets/features/venues/data/datasouces/cinema_remote_data_source.dart';
 import 'package:movie_tickets/features/venues/data/repositories/cinema_repository_impl.dart';
 import 'package:movie_tickets/features/venues/domain/repositories/cinema_repository.dart';
+import 'package:movie_tickets/features/venues/presentation/bloc/cinema_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final GetIt sl = GetIt.instance;
@@ -125,4 +127,6 @@ Future<void> init() async {
   sl.registerFactory(() => BookingSeatBloc(repository: sl<BookingSeatRepository>()));
   sl.registerFactory(() => PaymentBloc(paymentRepository: sl<PaymentRepository>()));
   sl.registerFactory(() => SettingsBloc(sl<SettingsRepository>()));
+  sl.registerFactory(() => CinemaBloc(sl()));
+  sl.registerFactory(() => BookingSnackBloc(repository: sl<BookingSnackRepository>()));
 }

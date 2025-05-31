@@ -115,13 +115,16 @@
     "specialOffers": "Special Offers",
     "specialOffersDesc": "Get notified about special deals and promotions"
   },
-  "venues": {
-    "movieVenues": "Movie Venues",
-    "theaters": "Theaters",
+  "cinemas": {
+    "cinema": "Cinemas",
     "capacity": "Capacity",
     "location": "Location",
     "selectSeat": "Select Seat",
-    "bookNow": "Book Now"
+    "bookNow": "Book Now",
+    "searchCinems": "Search Cinemas...",
+    "noCinemasFound": "No cinemas found",
+    "cinemaDetails": "Cinema Details",
+    "cinemaName": "Cinema Name"
   },
   "common": {
     "cancel": "Cancel",
@@ -147,6 +150,7 @@
     "on": "on",
     "from": "from",
     "to": "to",
+    "all": "All",
     "viewAll": "View All",
     "viewMore": "View More",
     "viewLess": "View Less",
@@ -159,6 +163,8 @@
     "searchHint": "Search for movies, theaters, or reviews...",
     "noResults": "No results found",
     "somethingWentWrong": "Something went wrong",
-    "sortBy": "Sort By"
+    "sortBy": "Sort By",
+    "address": "Address",
+    "location": "Location"
   }
 }

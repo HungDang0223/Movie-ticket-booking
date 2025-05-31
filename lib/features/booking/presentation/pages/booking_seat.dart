@@ -18,14 +18,14 @@ import 'booking_snack.dart';
 
 class BookingSeatPage extends StatefulWidget {
   final String websocketUrl;
-  final MovieModel movie;
+  final String title;
   final ShowingMovie showingMovie;
   final String userId;
 
   const BookingSeatPage({
     Key? key,
     required this.websocketUrl,
-    required this.movie,
+    required this.title,
     required this.showingMovie,
     required this.userId,
   }) : super(key: key);
@@ -236,7 +236,7 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
       context,
       MaterialPageRoute(
         builder: (context) => SnackSelectionScreen(
-          movieTitle: widget.movie.title,
+          movieTitle: widget.title,
           theaterName: widget.showingMovie.cinemaName,
           showTime: "${widget.showingMovie.startTime} - ${widget.showingMovie.endTime}",
           showDate: widget.showingMovie.showingDate.toIso8601String(),
@@ -617,7 +617,7 @@ class _BookingSeatPageState extends State<BookingSeatPage> with SingleTickerProv
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.movie.title,
+                        widget.title,
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,

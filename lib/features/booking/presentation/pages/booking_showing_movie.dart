@@ -6,15 +6,19 @@ import 'package:movie_tickets/core/constants/app_color.dart';
 import 'package:movie_tickets/core/extensions/date_time_ext.dart';
 import 'package:movie_tickets/core/utils/authentication_helper.dart';
 import 'package:movie_tickets/core/utils/snackbar_utilies.dart';
+import 'package:movie_tickets/features/booking/data/models/models.dart';
 import 'package:movie_tickets/features/booking/presentation/pages/booking_seat.dart';
 import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
+import 'package:movie_tickets/features/venues/data/models/cinema.dart';
 import 'package:movie_tickets/injection.dart';
 
 import '../bloc/bloc.dart';
 
 class ShowingMovieBookingScreen extends StatefulWidget {
-  final MovieModel movie;
-  const ShowingMovieBookingScreen({super.key, required this.movie});
+  // take movie or cinema as argument
+  MovieModel? movie;
+  Cinema? cinema;
+  ShowingMovieBookingScreen({super.key, this.movie, this.cinema});
 
   @override
   State<ShowingMovieBookingScreen> createState() => _ShowingMovieBookingScreenState();
@@ -22,6 +26,13 @@ class ShowingMovieBookingScreen extends StatefulWidget {
 
 class _ShowingMovieBookingScreenState extends State<ShowingMovieBookingScreen> {
   DateTime selectedDate = DateTime.now();
+  ShowingMovieBloc showingMovieBloc = sl<ShowingMovieBloc>();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   void onDateSelected(DateTime date) {
     setState(() {
@@ -38,7 +49,7 @@ class _ShowingMovieBookingScreenState extends State<ShowingMovieBookingScreen> {
           onPressed: () {},
         ),
         title: Text(
-          widget.movie.title,
+          widget.movie != null ? widget.movie!.title : widget.cinema!.cinemaName,
           style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
         backgroundColor: Colors.white,
@@ -61,7 +72,7 @@ class _ShowingMovieBookingScreenState extends State<ShowingMovieBookingScreen> {
           DateSelector(
             onDateSelected: onDateSelected,
           ),
-          Expanded(child: TheaterList(movie: widget.movie, selectedDate: selectedDate,)),
+          Expanded(child: TheaterList(movie: widget.movie, cinema: widget.cinema, selectedDate: selectedDate,)),
           BottomNavigationBar(
             backgroundColor: Colors.black,
             selectedItemColor: Colors.white,
@@ -162,22 +173,38 @@ class _DateSelectorState extends State<DateSelector> {
 }
 
 class TheaterList extends StatefulWidget {
-  final MovieModel movie;
+  final MovieModel? movie;
+  final Cinema? cinema;
   final DateTime selectedDate;
-  const TheaterList({super.key, required this.movie, required this.selectedDate});
+  const TheaterList({super.key, required this.movie, required this.cinema, required this.selectedDate});
 
   @override
   State<TheaterList> createState() => _TheaterListState();
 }
 
 class _TheaterListState extends State<TheaterList> {
+
+  final ShowingMovieBloc showingMovieBloc = sl<ShowingMovieBloc>();
+
+  @override
+  void initState() {
+    
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
+    if (widget.movie != null) {
+      showingMovieBloc..add(GetShowingMovieEvent(movieId: widget.movie!.movieId, date: widget.selectedDate));
+    } else if (widget.cinema != null) {
+      showingMovieBloc..add(GetShowingMovieByCinemaIdEvent(cinemaId: widget.cinema!.cinemaId, date: widget.selectedDate));
+    } else {
+      // Handle error or show a message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No movie or cinema provided')),
+      );
+    }
     return BlocBuilder<ShowingMovieBloc, ShowingMovieState>(
-      bloc: sl<ShowingMovieBloc>()..add(GetShowingMovieEvent(
-        movieId: widget.movie.movieId,
-        date: widget.selectedDate,
-      )),
+      bloc: showingMovieBloc,
       builder: (context, state) {
         if (state is ShowingMovieLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -190,7 +217,7 @@ class _TheaterListState extends State<TheaterList> {
               return ExpansionTile(
                 initiallyExpanded: index == 0 ? true : false,
                 title: Text(
-                  cinemaShowings[index].cinemaName,
+                  cinemaShowings[index].name,
                   style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
                 ),
                 iconColor: Colors.red,
@@ -225,7 +252,7 @@ class _TheaterListState extends State<TheaterList> {
 
                                 if (!context.mounted) return;
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => BookingSeatPage(
-                                  movie: widget.movie,
+                                  title: showing.title,
                                   showingMovie: showing,
                                   websocketUrl: 'ws://192.168.1.2:5000/ws/seat-reservation',
                                   userId: '43810148fb5b11efa5ff4c22c67a10e0',

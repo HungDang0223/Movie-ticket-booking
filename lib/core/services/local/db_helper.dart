@@ -25,6 +25,8 @@ class DbHelper {
 
     // Sample data for Showing
     final showing1 = ShowingMovie(
+      title: "Avengers: Endgame",
+      
       showingId: 1,
       cinemaName: "CGV Aeon Mall",
       screenName: "Screen 1",

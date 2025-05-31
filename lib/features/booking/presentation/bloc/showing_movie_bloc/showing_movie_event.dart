@@ -14,3 +14,13 @@ class GetShowingMovieEvent extends ShowingMovieEvent {
   @override
   List<Object?> get props => [movieId, date];
 }
+
+class GetShowingMovieByCinemaIdEvent extends ShowingMovieEvent {
+  final int cinemaId;
+  final DateTime date;
+
+  GetShowingMovieByCinemaIdEvent({required this.cinemaId, required this.date});
+
+  @override
+  List<Object?> get props => [cinemaId, date];
+}

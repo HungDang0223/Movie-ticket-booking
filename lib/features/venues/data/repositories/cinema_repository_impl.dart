@@ -16,23 +16,21 @@ class CinemaRepositoryImpl extends CinemaRepository with CacheMixin {
   CinemaRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<Result<List<CinemaResponse>>> GetCinemas() async {
-    return await getCachedData<List<CinemaResponse>>(
+  Future<Result<CinemaResponse>> getCinemas() async {
+    return await getCachedData<CinemaResponse>(
       'all_cinemas', // cache key
       const Duration(days: 7), // cache duration - cinemas ít thay đổi
       () => _fetchCinemasFromApi(), // fetch function
       (cinemas) => {
-        'cinemas': cinemas.map((cinema) => cinema.toJson()).toList(),
+        'cinemas': cinemas.toJson(),
         'timestamp': DateTime.now().toIso8601String(),
       }, // toJson
-      (json) => (json['cinemas'] as List)
-          .map((item) => CinemaResponse.fromJson(item as Map<String, dynamic>))
-          .toList(), // fromJson
+      (json) => CinemaResponse.fromJson(json)
     );
   }
 
   @override
-  Future<Result<List<Cinema>>> GetCinemasByCity(int cityId) async {
+  Future<Result<List<Cinema>>> getCinemasByCityId(int cityId) async {
     return await getCachedData<List<Cinema>>(
       'cinemas_city_$cityId', // cache key với cityId
       const Duration(days: 1), // cache 1 ngày cho cinema theo city
@@ -49,7 +47,7 @@ class CinemaRepositoryImpl extends CinemaRepository with CacheMixin {
   }
   
   @override
-  Future<Result<List<Cinema>>> GetCinemasByCityName(String cityName) async {
+  Future<Result<List<Cinema>>> getCinemasByCityName(String cityName) async {
     // Normalize city name để làm cache key
     final normalizedCityName = cityName.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '_');
     
@@ -69,12 +67,12 @@ class CinemaRepositoryImpl extends CinemaRepository with CacheMixin {
   }
 
   // Helper methods để fetch từ API
-  Future<Result<List<CinemaResponse>>> _fetchCinemasFromApi() async {
+  Future<Result<CinemaResponse>> _fetchCinemasFromApi() async {
     try {
       final httpResponse = await remoteDataSource.getCinemas();
       if (httpResponse.response.statusCode == HttpStatus.ok) {
         final response = httpResponse.data;
-        print('Fetched ${response.length} cinemas from API');
+        print('Fetched ${response} cinemas from API');
         return Result.success(response);
       } else {
         return Result.fromFailure(
@@ -136,18 +134,16 @@ class CinemaRepositoryImpl extends CinemaRepository with CacheMixin {
   }
 
   // Utility methods để force refresh cache
-  Future<Result<List<CinemaResponse>>> refreshCinemas() async {
-    return await getCachedData<List<CinemaResponse>>(
+  Future<Result<CinemaResponse>> refreshCinemas() async {
+    return await getCachedData<CinemaResponse>(
       'all_cinemas',
       const Duration(days: 7),
       () => _fetchCinemasFromApi(),
       (cinemas) => {
-        'cinemas': cinemas.map((cinema) => cinema.toJson()).toList(),
+        'cinemas': cinemas.toJson(),
         'timestamp': DateTime.now().toIso8601String(),
       },
-      (json) => (json['cinemas'] as List)
-          .map((item) => CinemaResponse.fromJson(item as Map<String, dynamic>))
-          .toList(),
+      (json) => CinemaResponse.fromJson(json),
       forceRefresh: true, // Force refresh
     );
   }
