@@ -38,7 +38,7 @@ class MainActivity : FlutterFragmentActivity() {
                     val tagError = "[onPaymentError]"
                     val tagCanel = "[onPaymentCancel]"
                     val token = call.argument<String>("zptoken")
-                        ZaloPaySDK.getInstance().payOrder(this@MainActivity, token !!, "demozpdk://app",object: PayOrderListener {
+                        ZaloPaySDK.getInstance().payOrder(this@MainActivity, token !!, "movietickets://app",object: PayOrderListener {
                             override fun onPaymentCanceled(zpTransToken: String?, appTransID: String?) {
                                 Log.d(tagCanel, String.format("[TransactionId]: %s, [appTransID]: %s", zpTransToken, appTransID))
                                 result.success("User Canceled")

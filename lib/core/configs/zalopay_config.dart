@@ -3,6 +3,6 @@ class ZaloPayConfig {
   static const String key1 = "sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn";
   static const String key2 = "trMrHtvjo6myautxDUiAcYsVtaeQ8nhf";
 
-  static const String appUser = "demozpdk";
+  static const String appUser = "movietickets";
   static int transIdDefault = 1;
 }

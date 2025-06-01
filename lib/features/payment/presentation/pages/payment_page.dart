@@ -11,6 +11,7 @@ import 'package:movie_tickets/core/utils/snackbar_utilies.dart';
 import 'package:movie_tickets/features/payment/domain/services/vnpay_payment_service.dart';
 import 'package:movie_tickets/features/payment/domain/services/zalopay_payment_service.dart';
 import 'package:movie_tickets/features/payment/presentation/bloc/bloc.dart';
+import 'package:movie_tickets/injection.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'payment_success_page.dart';
@@ -54,6 +55,7 @@ class _PaymentPageState extends State<PaymentPage> {
   PaymentCard? selectedCard;
   final CardService _cardService = CardService();
   final cardController = CardFormEditController();
+  late PaymentBloc bloc = sl<PaymentBloc>();
 
   static const EventChannel eventChannel = EventChannel('flutter.native/eventPayOrder');
   static const MethodChannel platform = MethodChannel('flutter.native/channelPayOrder');
@@ -103,7 +105,7 @@ class _PaymentPageState extends State<PaymentPage> {
   @override
   void initState() {
     super.initState();
-    // platform.invokeMethod('startFragmentHostActivity');
+    bloc = sl<PaymentBloc>();
     if (Platform.isIOS) {
       eventChannel.receiveBroadcastStream().listen(
         (dynamic event) => _onEvent(event as Map<dynamic, dynamic>),
@@ -223,44 +225,7 @@ class _PaymentPageState extends State<PaymentPage> {
         return;
       } 
       if (selectedPaymentMethod == 'zalopay') {
-        setState(() {
-          isProcessing = true; // Show loading indicator while creating order
-        });
-
-        try {
-          // Step 1: Create the order
-          final order = await ZalopayPaymentService.instance.createOrder(totalAmount.round());
-
-          if (order != null) {
-            final zpTransToken = order.zptranstoken;
-
-            // Step 2: Start payment via native Android (invoke MethodChannel)
-            final result = await platform.invokeMethod('payOrder', {
-              "zptoken": zpTransToken,
-            });
-
-            // Step 3: Handle result
-            print("payOrder Result: '$result'.");
-
-            if (result == "Payment Success") {
-              paymentSuccess = true;
-              // Navigate to success screen or show dialog
-              print("✅ Payment success");
-            } else if (result == "User Canceled") {
-              print("⚠️ User canceled the payment");
-            } else {
-              print("❌ Payment failed");
-            }
-          } else {
-            print("❌ Failed to create order or missing token.");
-          }
-        } catch (e) {
-          print("Exception during ZaloPay flow: $e");
-        } finally {
-          setState(() {
-            isProcessing = false; // Always hide loading
-          });
-        }
+        bloc.add(ProcessZaloPayPayment(totalAmount));
       }
 
       if (selectedPaymentMethod == 'vnpay') {
@@ -317,49 +282,6 @@ class _PaymentPageState extends State<PaymentPage> {
     }
     
   }
-
-// void processPayment(BuildContext context) async {
-//     if (selectedPaymentMethod == null) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(
-//           content: Text('Vui lòng chọn phương thức thanh toán'),
-//           backgroundColor: Colors.red,
-//         ),
-//       );
-//       return;
-//     }
-
-//     setState(() {
-//       isProcessing = true;
-//     });
-
-//     try {
-//       // Dispatch event based on selected payment method
-//       if (selectedPaymentMethod == 'zalopay') {
-//         // Call the ZaloPay payment processing BLoC event
-//         BlocProvider.of<PaymentBloc>(context).add(ProcessZaloPayPayment(totalAmount));
-//       } else if (selectedPaymentMethod == 'card' || selectedPaymentMethod == 'visa') {
-//         // Process Stripe payment
-//         await StripePaymentService.instance.processPaymentWithSheet(totalAmount);
-//         return;
-//       } 
-//       // Add other payment processing logic (like MoMo, VNPay, etc.) here...
-      
-//     } catch (e) {
-//       setState(() {
-//         isProcessing = false;
-//       });
-
-//       // Handle exceptions accordingly
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(
-//           content: Text('An error occurred: ${e.toString()}'),
-//           backgroundColor: Colors.red,
-//         ),
-//       );
-//     }
-//   }
-
   // Show bottom sheet for card selection or input
   Future<void> _showCardSelectionBottomSheet() async {
     
@@ -389,15 +311,12 @@ class _PaymentPageState extends State<PaymentPage> {
         ),
       ),
       body: BlocListener<PaymentBloc, PaymentState>(
+        bloc: bloc,
         listener: (context, state) {
           if (state is PaymentProcessing) {
-            setState(() {
-              isProcessing = true; // Show loading indicator
-            });
+            CircularProgressIndicator();
           } else if (state is PaymentSuccess) {
-            setState(() {
-              isProcessing = false;
-              // Navigate to success page
+            WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
@@ -434,9 +353,7 @@ class _PaymentPageState extends State<PaymentPage> {
             );
           }
         },
-        child: isProcessing
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
+        child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
