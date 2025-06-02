@@ -43,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Flexible(
-                    flex: 2,
+                    flex: 1,
                     child: Center(
                       child: _buildTopWelcome(),
                     ),
@@ -51,6 +51,7 @@ class _LoginPageState extends State<LoginPage> {
                   Flexible(
                     flex: 5,
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _buildLoginForm(),
                         _buildBottomSignUp(),

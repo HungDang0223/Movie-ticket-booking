@@ -1,6 +1,7 @@
 // lib/features/movies/presentation/widgets/review_widgets.dart
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
+import 'package:movie_tickets/core/constants/app_color.dart';
 
 class ReviewWidgets {
   /// Header widget cho review section
@@ -12,56 +13,67 @@ class ReviewWidgets {
   ) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Row(
+      child: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              Icons.chat_bubble_outline,
-              color: Theme.of(context).primaryColor,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${'review.Review'.i18n()} & ${'review.Comment'.i18n()}',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                Text(
-                  '$reviewCount ${reviewCount == 1 ? 'review' : 'reviews'}',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
-                  ),
+                child: Icon(
+                  Icons.chat_bubble_outline,
+                  color: Theme.of(context).primaryColor,
+                  size: 24,
                 ),
-              ],
-            ),
-          ),
-          ScaleTransition(
-            scale: CurvedAnimation(
-              parent: fabController,
-              curve: Curves.easeInOut,
-            ),
-            child: FloatingActionButton.small(
-              onPressed: onAddReview,
-              backgroundColor: Theme.of(context).primaryColor,
-              elevation: 4,
-              child: const Icon(
-                Icons.add,
-                color: Colors.white,
               ),
-            ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${'review.Review'.i18n()} & ${'review.Comment'.i18n()}',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '$reviewCount ${reviewCount == 1 ? 'review' : 'reviews'}',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ScaleTransition(
+                scale: CurvedAnimation(
+                  parent: fabController,
+                  curve: Curves.easeInOut,
+                ),
+                child: FloatingActionButton.small(
+                  onPressed: onAddReview,
+                  backgroundColor: Theme.of(context).primaryColor,
+                  elevation: 4,
+                  child: const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
           ),
+          SizedBox(height: 8,),
+          Row(
+            children: [
+              Spacer(),
+              Text("Xem tất cả", style: TextStyle(color: AppColor.DEFAULT_2),)
+            ],
+          )
         ],
       ),
     );

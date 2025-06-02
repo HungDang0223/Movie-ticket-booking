@@ -14,7 +14,6 @@ class BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.black12,
@@ -35,22 +34,17 @@ class BottomNavBar extends StatelessWidget {
           BottomNavigationBarItem(
             icon: Icon(Icons.movie_filter_outlined),
             activeIcon: Icon(Icons.movie_filter),
-            label: 'Chọn phim',
+            label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.theaters_outlined),
             activeIcon: Icon(Icons.theaters),
-            label: 'Chọn rạp',
+            label: 'Phim',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.fastfood_outlined),
-            activeIcon: Icon(Icons.fastfood),
-            label: 'Bắp nước',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group_outlined),
-            activeIcon: Icon(Icons.group),
-            label: 'Nhóm phim',
+            icon: Icon(Icons.movie_creation_outlined),
+            activeIcon: Icon(Icons.movie_creation_rounded),
+            label: 'Rạp',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outlined),

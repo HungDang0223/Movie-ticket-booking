@@ -37,14 +37,10 @@ class _MyAppBarState extends State<MyAppBar> {
           'cinemas.cinema'.i18n(),
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 24,
+            fontSize: 20,
           ),
         ),
-        centerTitle: false,
-      ),
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios),
-        onPressed: () => Navigator.pop(context),
+        centerTitle: true,
       ),
       actions: [
         IconButton(

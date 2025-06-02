@@ -1,90 +1,3 @@
-// import 'dart:developer';
-// import 'dart:io';
-// import 'dart:async';
-
-// import 'package:dio/dio.dart';
-// import 'package:movie_tickets/core/errors/exceptions.dart';
-// import 'package:movie_tickets/core/errors/failures.dart';
-// import 'package:movie_tickets/core/utils/result.dart';
-// import 'package:movie_tickets/features/movies/data/datasources/movie_remote_datasource.dart';
-// import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
-// import 'package:movie_tickets/features/movies/domain/repositories/movie_repository.dart';
-// import 'package:movie_tickets/injection.dart';
-
-// class MovieRepositoryImpl extends MovieRepository {
-  
-//   final MovieRemoteDatasource _movieRemoteDatasource = MovieRemoteDatasource(sl<Dio>());
-
-//   @override
-//   Future<Result<List<MovieModel>>> getListShowingMovies() async {
-//     try {
-//       final httpResponse = await _movieRemoteDatasource.getListShowingMovies();
-      
-//       if (httpResponse.response.statusCode == HttpStatus.ok) {
-//         final response = httpResponse.data;
-//         log("Response: ${httpResponse.data[0]}", name: "Get list movies UC");
-//         return Result.success(response);
-//       } 
-//       else if (httpResponse.response.statusCode == HttpStatus.badRequest) {
-//         // Handle 400 errors
-//         final responseBody = httpResponse.response.data;
-//         final errorMessage = responseBody["message"] ?? "Bad request";
-//         return Result.fromFailure(ServerFailure("Bad Request: $errorMessage"));
-//       }
-//       else {
-//         return Result.fromFailure(ServerFailure(httpResponse.response.statusMessage ?? "Unknown server error"));
-//       }
-      
-//     } on ServerException catch (e) {
-//       return Result.fromFailure(ServerFailure(e.message));
-//     } on NetworkException catch (e) {
-//       return Result.fromFailure(NetworkFailure(e.message));
-//     } on DioException catch (e) {
-//       if (e.type == DioExceptionType.connectionTimeout ||
-//           e.type == DioExceptionType.receiveTimeout ||
-//           e.type == DioExceptionType.sendTimeout) {
-//             print("Connection timed out: ${e.message}");
-//         return Result.fromFailure(NetworkFailure("Connection timed out. Please try again later."));
-//       }
-//       return Result.fromFailure(ServerFailure("DioException: ${e.message}"));
-//     } catch (e) {
-//       return Result.fromFailure(ServerFailure("Unexpected error occurred: $e"));
-//     }
-//   }
-  
-//   @override
-//   Future<Result<MovieModel>> getMovieDetail(int id) async {
-//     try {
-//       final httpResponse = await _movieRemoteDatasource.getMovieById(id);
-      
-//       if (httpResponse.response.statusCode == HttpStatus.ok) {
-//         final response = httpResponse.data;
-//         log("Response: ${httpResponse.data}", name: "Get list movies UC");
-//         return Result.success(response);
-//       } 
-//       else if (httpResponse.response.statusCode == HttpStatus.badRequest) {
-//         // Handle 400 errors
-//         final responseBody = httpResponse.response.data;
-//         final errorMessage = responseBody["message"] ?? "Bad request";
-//         return Result.fromFailure(ServerFailure("Bad Request: $errorMessage"));
-//       }
-//       else {
-//         return Result.fromFailure(ServerFailure(httpResponse.response.statusMessage ?? "Unknown server error"));
-//       }
-      
-//     } on ServerException catch (e) {
-//       return Result.fromFailure(ServerFailure(e.message));
-//     } on NetworkException catch (e) {
-//       return Result.fromFailure(NetworkFailure(e.message));
-//     } on DioException catch (e) {
-//       return Result.fromFailure(ServerFailure("DioException: ${e.message}"));
-//     } catch (e) {
-//       return Result.fromFailure(ServerFailure("Unexpected error occurred: $e"));
-//     }
-//   }
-
-// }
-
 import 'dart:developer';
 import 'dart:io';
 import 'dart:async';
@@ -106,48 +19,81 @@ class MovieRepositoryImpl extends MovieRepository with CacheMixin {
   @override
   Future<Result<List<MovieModel>>> getListShowingMovies() async {
     return await getCachedData<List<MovieModel>>(
-      'showing_movies', // cache key
-      const Duration(minutes: 30), // cache 30 phút - movies showing thay đổi không thường xuyên
-      () => _fetchShowingMoviesFromApi(), // fetch function
+      'showing_movies',
+      const Duration(minutes: 30),
+      () => _fetchShowingMoviesFromApi(),
       (movies) => {
         'movies': movies.map((movie) => movie.toJson()).toList(),
         'timestamp': DateTime.now().toIso8601String(),
         'type': 'showing_movies',
-      }, // toJson
+      },
       (json) => (json['movies'] as List)
           .map((item) => MovieModel.fromJson(item as Map<String, dynamic>))
-          .toList(), // fromJson
+          .toList(),
+    );
+  }
+
+  @override
+  Future<Result<List<MovieModel>>> getListUpcomingMovies() async {
+    return await getCachedData<List<MovieModel>>(
+      'upcoming_movies',
+      const Duration(minutes: 30),
+      () => _fetchUpcomingMoviesFromApi(),
+      (movies) => {
+        'movies': movies.map((movie) => movie.toJson()).toList(),
+        'timestamp': DateTime.now().toIso8601String(),
+        'type': 'upcoming_movies',
+      },
+      (json) => (json['movies'] as List)
+          .map((item) => MovieModel.fromJson(item as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  @override
+  Future<Result<List<MovieModel>>> getAllMovies() async {
+    return await getCachedData<List<MovieModel>>(
+      'all_movies',
+      const Duration(minutes: 30),
+      () => _fetchAllMoviesFromApi(),
+      (movies) => {
+        'movies': movies.map((movie) => movie.toJson()).toList(),
+        'timestamp': DateTime.now().toIso8601String(),
+        'type': 'all_movies',
+      },
+      (json) => (json['movies'] as List)
+          .map((item) => MovieModel.fromJson(item as Map<String, dynamic>))
+          .toList(),
     );
   }
   
   @override
   Future<Result<MovieModel>> getMovieDetail(int id) async {
     return await getCachedData<MovieModel>(
-      'movie_detail_$id', // cache key với movie ID
-      const Duration(hours: 24), // cache 24 giờ - movie detail ít thay đổi
-      () => _fetchMovieDetailFromApi(id), // fetch function
+      'movie_detail_$id',
+      const Duration(hours: 24),
+      () => _fetchMovieDetailFromApi(id),
       (movie) => {
         'movie': movie.toJson(),
         'movieId': id,
         'timestamp': DateTime.now().toIso8601String(),
         'type': 'movie_detail',
-      }, // toJson
-      (json) => MovieModel.fromJson(json['movie'] as Map<String, dynamic>), // fromJson
+      },
+      (json) => MovieModel.fromJson(json['movie'] as Map<String, dynamic>),
     );
   }
 
-  // Helper methods để fetch từ API
-  Future<Result<List<MovieModel>>> _fetchShowingMoviesFromApi() async {
+  // Helper methods to fetch from API and filter
+  Future<Result<List<MovieModel>>> _fetchAllMoviesFromApi() async {
     try {
-      final httpResponse = await _movieRemoteDatasource.getListShowingMovies();
+      final httpResponse = await _movieRemoteDatasource.getListMovies();
       
       if (httpResponse.response.statusCode == HttpStatus.ok) {
         final response = httpResponse.data;
-        log("Fetched ${response.length} showing movies from API", name: "Get list movies UC");
+        log("Fetched ${response.length} movies from API", name: "Get all movies");
         return Result.success(response);
       } 
       else if (httpResponse.response.statusCode == HttpStatus.badRequest) {
-        // Handle 400 errors
         final responseBody = httpResponse.response.data;
         final errorMessage = responseBody["message"] ?? "Bad request";
         return Result.fromFailure(ServerFailure("Bad Request: $errorMessage"));
@@ -173,6 +119,38 @@ class MovieRepositoryImpl extends MovieRepository with CacheMixin {
     }
   }
 
+  Future<Result<List<MovieModel>>> _fetchShowingMoviesFromApi() async {
+    final allMoviesResult = await _fetchAllMoviesFromApi();
+    
+    if (allMoviesResult.isSuccess) {
+      final allMovies = allMoviesResult.data!;
+      final showingMovies = allMovies.where((movie) => 
+        movie.showingStatus.toLowerCase() == 'showing'
+      ).toList();
+      
+      log("Filtered ${showingMovies.length} showing movies", name: "Get showing movies");
+      return Result.success(showingMovies);
+    } else {
+      return allMoviesResult;
+    }
+  }
+
+  Future<Result<List<MovieModel>>> _fetchUpcomingMoviesFromApi() async {
+    final allMoviesResult = await _fetchAllMoviesFromApi();
+    
+    if (allMoviesResult.isSuccess) {
+      final allMovies = allMoviesResult.data!;
+      final upcomingMovies = allMovies.where((movie) => 
+        movie.showingStatus.toLowerCase() == 'upcoming'
+      ).toList();
+      
+      log("Filtered ${upcomingMovies.length} upcoming movies", name: "Get upcoming movies");
+      return Result.success(upcomingMovies);
+    } else {
+      return allMoviesResult;
+    }
+  }
+
   Future<Result<MovieModel>> _fetchMovieDetailFromApi(int id) async {
     try {
       final httpResponse = await _movieRemoteDatasource.getMovieById(id);
@@ -183,7 +161,6 @@ class MovieRepositoryImpl extends MovieRepository with CacheMixin {
         return Result.success(response);
       } 
       else if (httpResponse.response.statusCode == HttpStatus.badRequest) {
-        // Handle 400 errors
         final responseBody = httpResponse.response.data;
         final errorMessage = responseBody["message"] ?? "Bad request";
         return Result.fromFailure(ServerFailure("Bad Request: $errorMessage"));
@@ -203,7 +180,7 @@ class MovieRepositoryImpl extends MovieRepository with CacheMixin {
     }
   }
 
-  // Utility methods để force refresh cache
+  // Utility methods to force refresh cache
   Future<Result<List<MovieModel>>> refreshShowingMovies() async {
     return await getCachedData<List<MovieModel>>(
       'showing_movies',
@@ -217,7 +194,24 @@ class MovieRepositoryImpl extends MovieRepository with CacheMixin {
       (json) => (json['movies'] as List)
           .map((item) => MovieModel.fromJson(item as Map<String, dynamic>))
           .toList(),
-      forceRefresh: true, // Force refresh
+      forceRefresh: true,
+    );
+  }
+
+  Future<Result<List<MovieModel>>> refreshUpcomingMovies() async {
+    return await getCachedData<List<MovieModel>>(
+      'upcoming_movies',
+      const Duration(minutes: 30),
+      () => _fetchUpcomingMoviesFromApi(),
+      (movies) => {
+        'movies': movies.map((movie) => movie.toJson()).toList(),
+        'timestamp': DateTime.now().toIso8601String(),
+        'type': 'upcoming_movies',
+      },
+      (json) => (json['movies'] as List)
+          .map((item) => MovieModel.fromJson(item as Map<String, dynamic>))
+          .toList(),
+      forceRefresh: true,
     );
   }
 
@@ -237,9 +231,13 @@ class MovieRepositoryImpl extends MovieRepository with CacheMixin {
     );
   }
 
-  // Methods để clear cache cụ thể
+  // Methods to clear cache
   Future<void> clearShowingMoviesCache() async {
     await CacheService.clearCache('showing_movies');
+  }
+
+  Future<void> clearUpcomingMoviesCache() async {
+    await CacheService.clearCache('upcoming_movies');
   }
 
   Future<void> clearMovieDetailCache(int id) async {
@@ -248,7 +246,7 @@ class MovieRepositoryImpl extends MovieRepository with CacheMixin {
 
   Future<void> clearAllMovieCache() async {
     await clearShowingMoviesCache();
-    // Clear all movie detail caches would require tracking all IDs
-    // Alternative: clear all cache starting with 'movie_detail_'
+    await clearUpcomingMoviesCache();
+    await CacheService.clearCache('all_movies');
   }
 }

@@ -1,124 +1,181 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:movie_tickets/core/constants/app_color.dart';
 
-class HomeAppBar extends StatelessWidget {
-  final bool isScrolled;
-  const HomeAppBar({super.key, required this.isScrolled});
+class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0x88000000), // Đen với độ trong suốt 50%
+            Color(0x44000000), // Đen với độ trong suốt 25%
+            Colors.transparent, // Hoàn toàn trong suốt
+          ],
+          stops: [0.0, 0.7, 1.0], // Điều chỉnh vị trí chuyển màu
+        ),
+      ),
+      child: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent, // Thay AppColor.DEFAULT_2 bằng transparent
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
+        // Icon drawer bên trái
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(
+              Icons.menu,
+              color: Colors.white,
+              size: 24,
+            ),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+        // Title ở giữa
+        title: const Text(
+          'TICKAT',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        // Actions bên phải
+        actions: [
+          // Icon chatbot
+          InkWell(
+            onTap: () {
+              // Xử lý khi nhấn chatbot
+              // Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(user: null)));
+            },
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              child: Image.asset(
+                'assets/icons/bot.png', 
+                width: 30, 
+                height: 30,
+              ),
+            ),
+          ),
+          // Icon person
+          IconButton(
+            icon: const Icon(
+              Icons.person_outline,
+              color: Colors.white,
+              size: 24,
+            ),
+            onPressed: () {
+              // Xử lý khi nhấn profile
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Mở profile'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 8), // Padding cuối
+        ],
+      ),
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+// Phiên bản có thể tùy chỉnh độ mờ
+class CustomTransparentAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final double opacity; // Độ mờ từ 0.0 đến 1.0
+  
+  const CustomTransparentAppBar({
+    Key? key,
+    this.opacity = 0.5, // Mặc định 50% độ mờ
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SliverAppBar(
-      pinned: true,
-      expandedHeight: 60,
-      backgroundColor: AppColor.DEFAULT_2,
-      systemOverlayStyle: const SystemUiOverlayStyle(
-        statusBarColor: AppColor.DEFAULT_2,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
-      ),
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          padding: const EdgeInsets.only(top: 5, left: 16),
-          child: AnimatedOpacity(
-            opacity: isScrolled ? 0.0 : 1.0,
-            duration: const Duration(milliseconds: 250),
-            child: const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Chọn vị trí',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
-                ),
-                Row(
-                  children: [
-                    Text(
-                      'TP.HCM',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Icon(Icons.keyboard_arrow_down),
-                  ],
-                ),
-              ],
-            ),
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.black.withOpacity(opacity),
+            Colors.black.withOpacity(opacity * 0.5),
+            Colors.transparent,
+          ],
+          stops: const [0.0, 0.6, 1.0],
         ),
       ),
-      actions: [
-        AnimatedOpacity(
-          opacity: isScrolled ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 250),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: const Row(
-              children: [
-                Icon(Icons.location_on, size: 16),
-                SizedBox(width: 4),
-                Text(
-                  'TP.HCM',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+      child: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(
+              Icons.menu,
+              color: Colors.white,
+              size: 24,
             ),
+            onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        const Spacer(),
-        Container(
-          width: MediaQuery.of(context).size.width * 0.6,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: AnimatedOpacity(
-            opacity: isScrolled ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 250),
+        title: const Text(
+          'TICKAT',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          InkWell(
+            onTap: () {
+              // Xử lý chatbot
+            },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              decoration: BoxDecoration(
-                color: Colors.white30,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.white70, width: 1),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 4.0,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(Icons.search, size: 20, color: Colors.white70),
-                  SizedBox(width: 4),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: TextField(
-                        textAlign: TextAlign.start,
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          hintText: 'Tìm kiếm...',
-                          border: InputBorder.none,
-                          hintStyle: TextStyle(fontSize: 14, color: Colors.white70),
-                        ),
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                    ),
-                  ),
-                ],
+              padding: const EdgeInsets.all(8),
+              child: Image.asset(
+                'assets/icons/bot.png', 
+                width: 30, 
+                height: 30,
               ),
             ),
           ),
-        ),
-      ],
+          IconButton(
+            icon: const Icon(
+              Icons.person_outline,
+              color: Colors.white,
+              size: 24,
+            ),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Mở profile'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
     );
   }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

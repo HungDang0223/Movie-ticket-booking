@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:localization/localization.dart';
 import 'package:movie_tickets/core/constants/app_color.dart';
-import 'package:movie_tickets/features/venues/data/models/cinema.dart';
-import 'package:movie_tickets/features/venues/presentation/bloc/cinema_bloc.dart';
-import 'package:movie_tickets/features/venues/presentation/bloc/cinema_event.dart';
-import 'package:movie_tickets/features/venues/presentation/bloc/cinema_state.dart';
-import 'package:movie_tickets/features/venues/presentation/widgets/app_bar.dart';
+import 'package:movie_tickets/features/cinema/data/models/cinema.dart';
+import 'package:movie_tickets/features/cinema/presentation/bloc/cinema_bloc.dart';
+import 'package:movie_tickets/features/cinema/presentation/bloc/cinema_event.dart';
+import 'package:movie_tickets/features/cinema/presentation/bloc/cinema_state.dart';
+import 'package:movie_tickets/features/cinema/presentation/widgets/app_bar.dart';
 import 'package:movie_tickets/injection.dart';
 import 'package:shimmer/shimmer.dart';
 

@@ -91,7 +91,7 @@ class AIChatbotService {
     );
   }
 
-  Future<void> startChatWithReservation(UserModel user) async {
+  Future<void> startChatWithReservation(UserModel? user) async {
     _currentUser = user;
     
     // Load movies cache for better search

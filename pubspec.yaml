@@ -99,7 +99,9 @@ flutter:
     - assets/icons/
     - assets/images/
     - assets/data/
-    - assets/images/movie/
+    - assets/images/banners/
+    - assets/images/snacks/
+    - assets/images/movies/
     - assets/images/events/
     - assets/images/plays/
     - assets/images/casts/

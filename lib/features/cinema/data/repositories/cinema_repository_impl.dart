@@ -5,9 +5,9 @@ import 'package:movie_tickets/core/errors/exceptions.dart';
 import 'package:movie_tickets/core/errors/failures.dart';
 import 'package:movie_tickets/core/services/local/cache_data_service.dart';
 import 'package:movie_tickets/core/utils/result.dart';
-import 'package:movie_tickets/features/venues/data/datasouces/cinema_remote_data_source.dart';
-import 'package:movie_tickets/features/venues/data/models/cinema.dart';
-import 'package:movie_tickets/features/venues/domain/repositories/cinema_repository.dart';
+import 'package:movie_tickets/features/cinema/data/datasouces/cinema_remote_data_source.dart';
+import 'package:movie_tickets/features/cinema/data/models/cinema.dart';
+import 'package:movie_tickets/features/cinema/domain/repositories/cinema_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CinemaRepositoryImpl extends CinemaRepository with CacheMixin {

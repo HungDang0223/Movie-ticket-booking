@@ -15,7 +15,6 @@ abstract class Movie {
   final DateTime showingDate;
   final DateTime endDate;
   final String showingStatus;
-  final bool isSpecial;
   final int favouritesCount;
   final bool isFavourited;
 
@@ -35,7 +34,6 @@ abstract class Movie {
       required this.showingDate,
       required this.endDate,
       required this.showingStatus,
-      required this.isSpecial,
       required this.favouritesCount,
       required this.isFavourited});
 }

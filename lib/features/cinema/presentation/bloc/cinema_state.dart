@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:movie_tickets/features/venues/data/models/cinema.dart';
+import 'package:movie_tickets/features/cinema/data/models/cinema.dart';
 
 class CinemaState extends Equatable {
   const CinemaState();

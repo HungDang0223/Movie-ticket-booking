@@ -8,7 +8,7 @@ import '../../../data/models/review_model.dart';
 
 class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
   final ReviewRepository reviewRepository;
-  static const int _pageSize = 2;
+  static const int _pageSize = 5;
 
   ReviewBloc({required this.reviewRepository}) : super(const ReviewInitial()) {
     on<LoadMovieReviews>(_onLoadMovieReviews);

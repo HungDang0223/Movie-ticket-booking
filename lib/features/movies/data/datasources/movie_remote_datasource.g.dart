@@ -20,7 +20,7 @@ class _MovieRemoteDatasource implements MovieRemoteDatasource {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<HttpResponse<List<MovieModel>>> getListShowingMovies() async {
+  Future<HttpResponse<List<MovieModel>>> getListMovies() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};

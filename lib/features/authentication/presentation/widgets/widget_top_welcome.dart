@@ -7,18 +7,25 @@ class WidgetTopWelcome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        const SizedBox(
-          width: 172,
-          child: WidgetLogoFindSeat(),
-        ),
-        const SizedBox(height: 20),
-        Text('Welcome Buddies', style: AppFont.MEDIUM_WHITE_22),
-        Text(' Login to book your seat, I said its your seat',
-            style: AppFont.MEDIUM_WHITE_14),
-      ],
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Spacer(),
+          // const SizedBox(
+          //   width: 172,
+          //   child: Center(
+          //     child: Text(
+          //       "TICKAT",
+          //       style: TextStyle(fontSize: 36, color: Colors.white, fontWeight: FontWeight.bold),
+          //     ),
+          //   ),
+          // ),
+          Text('Chào mừng trở lại', style: AppFont.MEDIUM_WHITE_22),
+          Text(' Đăng nhập và trải nghiệm cùng ứng dụng',
+              style: AppFont.MEDIUM_WHITE_14),
+        ],
+      ),
     );
   }
 }

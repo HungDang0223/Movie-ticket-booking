@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:movie_tickets/core/constants/strings.dart';
-import 'package:movie_tickets/features/venues/data/models/cinema.dart';
+import 'package:movie_tickets/features/cinema/data/models/cinema.dart';
 import 'package:retrofit/retrofit.dart';
 
 part 'cinema_remote_data_source.g.dart';

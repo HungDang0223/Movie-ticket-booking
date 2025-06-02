@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+import 'package:movie_tickets/core/constants/app_color.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
@@ -146,11 +148,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
-                            color: Colors.white,
+                            color: AppColor.DEFAULT_2,
                             strokeWidth: 2,
                           ),
                         )
-                      : const Text('Lưu thay đổi'),
+                      : const Text('Lưu thay đổi', style: TextStyle(color: AppColor.DEFAULT_2),),
                 ),
               ),
             ],

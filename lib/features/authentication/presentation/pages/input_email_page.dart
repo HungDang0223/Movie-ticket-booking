@@ -54,12 +54,12 @@ class _InputEmailPageState extends State<InputEmailPage> {
             });
           }
         },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Flexible(
-              flex: 1,
-              child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Center(
                 child: Column(
                   children: [
                     Text(
@@ -79,10 +79,7 @@ class _InputEmailPageState extends State<InputEmailPage> {
                   ],
                 ),
               ),
-            ),
-            Flexible(
-              flex: 3,
-              child: Column(
+              Column(
                 children: [
                   Container(
                     height: 50,
@@ -107,42 +104,48 @@ class _InputEmailPageState extends State<InputEmailPage> {
                       ),
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: AppColor.WHITE
-                      ),
-                      child: isSending == true
-                        ? const Center(
-                          child: CircularProgressIndicator(color: AppColor.DEFAULT,),
-                        )
-                        : InkWell(
-                            onTap: () {
-                              print(_inputController.text);
-                              context.read<AuthenticationBloc>().add(SendEmailAuthRequest(_inputController.text));
-                            },
-                            child: const Row(
-                              children: [
-                                Text(
-                                  "Lấy mã xác thực",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: AppColor.DEFAULT,
-                                    fontWeight: FontWeight.bold
-                                  ),
+                  SizedBox(height: 4,),
+                  Row(
+                    children: [
+                      Spacer(),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: AppColor.WHITE
+                          ),
+                          child: isSending == true
+                            ? const Center(
+                              child: CircularProgressIndicator(color: AppColor.DEFAULT,),
+                            )
+                            : InkWell(
+                                onTap: () {
+                                  print(_inputController.text);
+                                  context.read<AuthenticationBloc>().add(SendEmailAuthRequest(_inputController.text));
+                                },
+                                child: const Row(
+                                  children: [
+                                    Text(
+                                      "Lấy mã xác thực",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: AppColor.DEFAULT,
+                                        fontWeight: FontWeight.bold
+                                      ),
+                                    ),
+                                    Icon(Icons.arrow_forward, color: AppColor.DEFAULT, size: 16,)
+                                  ],
                                 ),
-                                Icon(Icons.arrow_forward, color: AppColor.DEFAULT, size: 16,)
-                              ],
                             ),
                         ),
-                    ),
+                      ),
+                    ],
                   )
                 ],
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
