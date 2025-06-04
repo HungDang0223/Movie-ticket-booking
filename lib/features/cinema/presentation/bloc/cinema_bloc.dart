@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movie_tickets/features/venues/domain/repositories/cinema_repository.dart';
-import 'package:movie_tickets/features/venues/presentation/bloc/cinema_event.dart';
-import 'package:movie_tickets/features/venues/presentation/bloc/cinema_state.dart';
-import 'package:movie_tickets/features/venues/presentation/pages/cinema_page.dart' as cinema_page;
+import 'package:movie_tickets/features/cinema/domain/repositories/cinema_repository.dart';
+import 'package:movie_tickets/features/cinema/presentation/bloc/cinema_event.dart';
+import 'package:movie_tickets/features/cinema/presentation/bloc/cinema_state.dart';
+import 'package:movie_tickets/features/cinema/presentation/pages/cinema_page.dart' as cinema_page;
 
 class CinemaBloc extends Bloc<CinemaEvent, CinemaState> {
   final CinemaRepository _cinemaRepository;

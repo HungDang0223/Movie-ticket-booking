@@ -12,12 +12,17 @@ class MovieLoading extends MovieState {
   const MovieLoading();
 }
 
-class MovieLoaded extends MovieState {
+class MovieLoadedSuccess extends MovieState {
   final List<MovieModel> movies;
-  const MovieLoaded(this.movies);
+  const MovieLoadedSuccess(this.movies);
 }
 
 class MovieLoadedFailed extends MovieState {
   final String errorMessage;
   const MovieLoadedFailed(this.errorMessage);
+}
+
+class GetMovieDetailSuccess extends MovieState{
+  final MovieModel movie;
+  const GetMovieDetailSuccess(this.movie);
 }

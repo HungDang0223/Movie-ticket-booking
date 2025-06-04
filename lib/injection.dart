@@ -42,10 +42,10 @@ import 'package:movie_tickets/features/setting/data/datasources/settings_local_d
 import 'package:movie_tickets/features/setting/data/repositories/settings_repository_impl.dart';
 import 'package:movie_tickets/features/setting/domain/repositories/settings_repository.dart';
 import 'package:movie_tickets/features/setting/presentation/bloc/settings_bloc.dart';
-import 'package:movie_tickets/features/venues/data/datasouces/cinema_remote_data_source.dart';
-import 'package:movie_tickets/features/venues/data/repositories/cinema_repository_impl.dart';
-import 'package:movie_tickets/features/venues/domain/repositories/cinema_repository.dart';
-import 'package:movie_tickets/features/venues/presentation/bloc/cinema_bloc.dart';
+import 'package:movie_tickets/features/cinema/data/datasouces/cinema_remote_data_source.dart';
+import 'package:movie_tickets/features/cinema/data/repositories/cinema_repository_impl.dart';
+import 'package:movie_tickets/features/cinema/domain/repositories/cinema_repository.dart';
+import 'package:movie_tickets/features/cinema/presentation/bloc/cinema_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final GetIt sl = GetIt.instance;

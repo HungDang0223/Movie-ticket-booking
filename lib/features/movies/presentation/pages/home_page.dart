@@ -8,6 +8,7 @@ import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
 import 'package:movie_tickets/features/movies/presentation/bloc/movie_bloc/movie_bloc.dart';
 import 'package:movie_tickets/features/movies/presentation/bloc/movie_bloc/movie_event.dart';
 import 'package:movie_tickets/features/movies/presentation/bloc/movie_bloc/movie_state.dart';
+import 'package:movie_tickets/features/movies/presentation/pages/promotion_page.dart';
 import 'package:movie_tickets/features/movies/presentation/widgets/home_app_bar.dart';
 import 'package:movie_tickets/features/movies/presentation/widgets/movie_card.dart';
 import 'package:movie_tickets/features/movies/presentation/widgets/persistent_header.dart';
@@ -36,6 +37,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   // Tạo biến để giữ reference đến MovieBloc
   late MovieBloc _movieBloc;
+
+  // Danh sách hình ảnh khuyến mãi
+  final List<String> _promotionBanners = [
+    'assets/images/banners/banner1.jpg',
+    'assets/images/banners/banner2.png',
+    'assets/images/banners/banner3.jpg',
+    'assets/images/banners/banner4.jpg',
+  ];
 
   @override
   void initState() {
@@ -87,7 +96,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     // Sử dụng MovieBloc đã lưu trữ
     final subscription = _movieBloc.stream.listen((state) {
       log('Refresh state received: $state');
-      if (state is MovieLoaded || state is MovieLoadedFailed) {
+      if (state is MovieLoadedSuccess || state is MovieLoadedFailed) {
         if (!completer.isCompleted) {
           completer.complete();
         }
@@ -112,11 +121,139 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
+  // Widget để build section khuyến mãi
+  Widget _buildPromotionSection() {
+    return Container(
+      margin: const EdgeInsets.only(top: 20),
+      decoration: const BoxDecoration(
+        color: AppColor.WHITE,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20)
+        )
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header của section
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Khuyến mãi',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    // Navigate to all promotions page
+                  },
+                  child: const Text(
+                    'Xem tất cả',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColor.DEFAULT,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Grid view các banner khuyến mãi
+          SizedBox(
+            height: 120, // Cố định chiều cao cho ListView
+            child: ListView.builder(
+              physics: const BouncingScrollPhysics(),
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              itemCount: _promotionBanners.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: EdgeInsets.only(
+                    right: index < _promotionBanners.length - 1 ? 15 : 0,
+                  ),
+                  child: GestureDetector(
+                    onTap: () {
+                      // Handle promotion banner tap
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PromotionPage())
+                      );
+                      log('Promotion banner ${index + 1} tapped');
+                    },
+                    child: Container(
+                      width: 200,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          _promotionBanners[index],
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            // Fallback nếu không tìm thấy asset
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.local_offer,
+                                    size: 30,
+                                    color: Colors.grey[600],
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    'Khuyến mãi ${index + 1}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 30),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
           backgroundColor: Colors.transparent,
+          extendBodyBehindAppBar: true,
+          appBar: HomeAppBar(),
           body: RefreshIndicator(
             onRefresh: _handleRefresh,
             color: AppColor.DEFAULT,
@@ -150,7 +287,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       colors: [
                         Colors.black.withOpacity(0.7),
                         Colors.black.withOpacity(0.5),
-                        Colors.black.withOpacity(0.3),
+                        Colors.black.withOpacity(0.1),
                       ],
                     ),
                   ),
@@ -161,8 +298,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   physics: const AlwaysScrollableScrollPhysics(),
                   controller: _scrollController,
                   slivers: [
-                    HomeAppBar(isScrolled: _isScrolled),
-                    PersistentHeader(isScrolled: _isScrolled),
 
                     SliverToBoxAdapter(
                       child: BlocProvider.value(
@@ -175,8 +310,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             },
                             listener: (context, state) {
                               // Cập nhật trạng thái đã load
-                              if (state is MovieLoaded) {
-                                log('BlocConsumer detected MovieLoaded state');
+                              if (state is MovieLoadedSuccess) {
+                                log('BlocConsumer detected MovieLoadedSuccess state');
                                 setState(() {
                                   _isMoviesLoaded = true;
                                 });
@@ -220,7 +355,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 );
                               }
 
-                              if (state is MovieLoaded) {
+                              if (state is MovieLoadedSuccess) {
                                 final movies = state.movies;
                                 log('Movies loaded: ${movies.length}');
 
@@ -235,6 +370,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
                                 return Column(
                                   children: [
+                                    SizedBox(height: 60,),
                                     // Banner quảng cáo
                                     CarouselSlider(
                                       options: CarouselOptions(
@@ -245,15 +381,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           enlargeCenterPage: true,
                                           enlargeStrategy: CenterPageEnlargeStrategy.height
                                       ),
-                                      items: List.generate(3, (index) {
+                                      items: List.generate(4, (index) {
                                         return Builder(
                                           builder: (context) {
                                             return Container(
                                               margin: const EdgeInsets.symmetric(horizontal: 5.0),
                                               decoration: BoxDecoration(
                                                 borderRadius: BorderRadius.circular(10),
-                                                image: const DecorationImage(
-                                                  image: NetworkImage("https://images.unsplash.com/photo-1741091742846-99cca6f6437b?q=80&w=1372&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+                                                image: DecorationImage(
+                                                  image: AssetImage(_promotionBanners[index]),
                                                   fit: BoxFit.cover,
                                                 ),
                                               ),
@@ -320,16 +456,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       ),
                                     ),
 
-                                    Container(
-                                      height: 200,
-                                      decoration: const BoxDecoration(
-                                          color: AppColor.DEFAULT,
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(10),
-                                              topRight: Radius.circular(10)
-                                          )
-                                      ),
-                                    )
+                                    // Section Khuyến mãi thay thế cho container màu DEFAULT
+                                    _buildPromotionSection(),
                                   ],
                                 );
                               }

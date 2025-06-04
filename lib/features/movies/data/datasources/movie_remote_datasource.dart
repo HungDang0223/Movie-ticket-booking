@@ -13,7 +13,9 @@ abstract class MovieRemoteDatasource {
   factory MovieRemoteDatasource(Dio dio) = _MovieRemoteDatasource;
   
   @GET("")
-  Future<HttpResponse<List<MovieModel>>> getListShowingMovies();
+  Future<HttpResponse<List<MovieModel>>> getListMovies(
+    // @Query("stauts") String? status, // upcoming, showing, ended
+  );
   
   @GET("/{id}")
   Future<HttpResponse<MovieModel>> getMovieById(

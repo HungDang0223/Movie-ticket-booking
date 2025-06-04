@@ -9,9 +9,10 @@ class MovieEvent extends Equatable {
 
 class GetListShowingMoviesEvent extends MovieEvent {
   const GetListShowingMoviesEvent();
+}
 
-  @override
-  List<Object?> get props => [];
+class GetListUpcomingMoviesEvent extends MovieEvent {
+  const GetListUpcomingMoviesEvent();
 }
 
 class GetMovieDetailEvent extends MovieEvent {
@@ -20,5 +21,13 @@ class GetMovieDetailEvent extends MovieEvent {
   const GetMovieDetailEvent(this.id);
 
   @override
-  List<Object?> get props => [id];
+  List<Object> get props => [id];
+}
+
+class RefreshShowingMoviesEvent extends MovieEvent {
+  const RefreshShowingMoviesEvent();
+}
+
+class RefreshUpcomingMoviesEvent extends MovieEvent {
+  const RefreshUpcomingMoviesEvent();
 }

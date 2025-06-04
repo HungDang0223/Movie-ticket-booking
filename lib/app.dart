@@ -13,6 +13,7 @@ import 'package:movie_tickets/features/booking/presentation/bloc/booking_seat_bl
 import 'package:movie_tickets/features/booking/presentation/bloc/showing_movie_bloc/showing_movie_bloc.dart';
 import 'package:movie_tickets/features/movies/presentation/bloc/bloc.dart';
 import 'package:movie_tickets/features/movies/presentation/pages/home_page.dart';
+import 'package:movie_tickets/features/movies/presentation/pages/movie_page.dart';
 import 'package:movie_tickets/features/payment/presentation/bloc/payment_bloc.dart';
 import 'package:movie_tickets/features/payment/presentation/pages/payment_page.dart';
 import 'package:movie_tickets/features/sc_splash.dart';
@@ -20,7 +21,7 @@ import 'package:movie_tickets/features/setting/presentation/bloc/settings_bloc.d
 import 'package:movie_tickets/features/setting/presentation/bloc/setting_event.dart';
 import 'package:movie_tickets/features/setting/presentation/bloc/settings_state.dart';
 import 'package:movie_tickets/features/setting/presentation/pages/setting_page.dart';
-import 'package:movie_tickets/features/venues/presentation/pages/cinema_page.dart';
+import 'package:movie_tickets/features/cinema/presentation/pages/cinema_page.dart';
 import 'package:movie_tickets/injection.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/login_bloc/bloc.dart';
 import 'package:movie_tickets/features/authentication/presentation/bloc/signup_bloc/bloc.dart';
@@ -133,17 +134,18 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const HomePage(),
+    const MoviePage(),
     const CinemaPage(),
-    const PaymentPage(
-      movieTitle: "movieTitle",
-      theaterName: "theaterName",
-      showDate: "23/02/2025",
-      showTime: "10:00",
-      selectedSeats: ["1", "2", "3"],
-      ticketPrice: 10000,
-      selectedSnacks: {"Snack1": 10000, "Snack2": 10000},
-      snacksPrice: 10000),
-    ChatScreen(user: UserModel.empty()),
+    // const PaymentPage(
+    //   movieTitle: "movieTitle",
+    //   theaterName: "theaterName",
+    //   showDate: "23/02/2025",
+    //   showTime: "10:00",
+    //   selectedSeats: ["1", "2", "3"],
+    //   ticketPrice: 10000,
+    //   selectedSnacks: {"Snack1": 10000, "Snack2": 10000},
+    //   snacksPrice: 10000),
+    // ChatScreen(user: UserModel.empty()),
     const SettingPage(),
   ];
 

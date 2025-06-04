@@ -4,7 +4,7 @@ import 'package:movie_tickets/core/constants/app_color.dart';
 import 'package:movie_tickets/features/booking/presentation/pages/booking_showing_movie.dart';
 import 'dart:math' as math;
 
-import 'package:movie_tickets/features/venues/data/models/cinema.dart';
+import 'package:movie_tickets/features/cinema/data/models/cinema.dart';
 
 class CinemaDetailPage extends StatefulWidget {
   final Cinema cinema;
@@ -115,13 +115,12 @@ class _CinemaDetailPageState extends State<CinemaDetailPage>
                 position: _slideAnimation,
                 child: Column(
                   children: [
-                    _buildCinemaHeader(),
+                    const SizedBox(height: 10,),
                     _buildQuickActions(),
                     _buildCinemaInfo(),
                     _buildLocationSection(),
                     _buildContactSection(),
-                    _buildShowingMoviesButton(),
-                    const SizedBox(height: 100), // Space for floating button
+                    const SizedBox(height: 50), // Space for floating button
                   ],
                 ),
               ),
@@ -312,79 +311,6 @@ class _CinemaDetailPageState extends State<CinemaDetailPage>
     );
   }
 
-  Widget _buildCinemaHeader() {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColor.DEFAULT, AppColor.DEFAULT_2],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(
-                    Icons.local_movies,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.cinema.cinemaName,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Premium Experience',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                _buildRatingWidget(),
-              ],
-            ),
-            const SizedBox(height: 20),
-            _buildFeaturesList(),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildRatingWidget() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -420,46 +346,6 @@ class _CinemaDetailPageState extends State<CinemaDetailPage>
     );
   }
 
-  Widget _buildFeaturesList() {
-    final features = [
-      {'icon': Icons.chair, 'label': 'Premium Seats'},
-      {'icon': Icons.surround_sound, 'label': 'Dolby Atmos'},
-      {'icon': Icons.local_parking, 'label': 'Free Parking'},
-      {'icon': Icons.restaurant, 'label': 'Food Court'},
-    ];
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: features.map((feature) {
-        return Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColor.DEFAULT.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                feature['icon'] as IconData,
-                color: AppColor.DEFAULT,
-                size: 24,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              feature['label'] as String,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        );
-      }).toList(),
-    );
-  }
-
   Widget _buildQuickActions() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -467,9 +353,9 @@ class _CinemaDetailPageState extends State<CinemaDetailPage>
         children: [
           Expanded(
             child: _buildActionCard(
-              icon: Icons.directions,
-              title: 'Directions',
-              subtitle: '2.5 km away',
+              icon: Icons.fax,
+              title: 'Fax',
+              subtitle: '0964 930 777',
               onTap: () => _openMaps(),
             ),
           ),
@@ -477,7 +363,7 @@ class _CinemaDetailPageState extends State<CinemaDetailPage>
           Expanded(
             child: _buildActionCard(
               icon: Icons.phone,
-              title: 'Call',
+              title: 'Hotline',
               subtitle: widget.cinema.hotline,
               onTap: () => _makeCall(),
             ),
@@ -571,7 +457,7 @@ class _CinemaDetailPageState extends State<CinemaDetailPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'About Cinema',
+            'Giới thiệu',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -580,7 +466,7 @@ class _CinemaDetailPageState extends State<CinemaDetailPage>
           ),
           const SizedBox(height: 16),
           Text(
-            'Experience the ultimate movie viewing with state-of-the-art technology, premium seating, and exceptional service. Our cinema offers the perfect environment for an unforgettable entertainment experience.',
+            'Trải nghiệm xem phim đỉnh cao với công nghệ hiện đại, chỗ ngồi cao cấp và dịch vụ đặc biệt. Rạp chiếu phim của chúng tôi cung cấp môi trường hoàn hảo cho trải nghiệm giải trí khó quên.',
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey[700],
@@ -609,7 +495,7 @@ class _CinemaDetailPageState extends State<CinemaDetailPage>
               Icon(Icons.access_time, color: AppColor.DEFAULT, size: 20),
               SizedBox(width: 8),
               Text(
-                'Operating Hours',
+                'Mở cửa',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -619,9 +505,9 @@ class _CinemaDetailPageState extends State<CinemaDetailPage>
             ],
           ),
           const SizedBox(height: 12),
-          _buildHourRow('Monday - Thursday', '10:00 AM - 11:00 PM'),
-          _buildHourRow('Friday - Sunday', '9:00 AM - 12:00 AM'),
-          _buildHourRow('Public Holidays', '9:00 AM - 12:00 AM'),
+          _buildHourRow('Thứ 2 - Thứ 6', '10:00 AM - 11:00 PM'),
+          _buildHourRow('Cuối tuần', '8:00 AM - 12:00 AM'),
+          _buildHourRow('Ngày lễ', '8:00 AM - 12:00 AM'),
         ],
       ),
     );
@@ -857,84 +743,12 @@ class _CinemaDetailPageState extends State<CinemaDetailPage>
     );
   }
 
-  Widget _buildShowingMoviesButton() {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      width: double.infinity,
-      height: 70,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColor.DEFAULT, AppColor.DEFAULT_2],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColor.DEFAULT.withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => ShowingMovieBookingScreen(
-                cinema: widget.cinema,
-                movie: null,
-              ),
-            ),
-          ),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.movie_filter,
-                  color: Colors.white,
-                  size: 28,
-                ),
-                const SizedBox(width: 16),
-                const Text(
-                  'View Showing Movies',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.arrow_forward,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildFloatingActionButton() {
     return ScaleTransition(
       scale: _scaleAnimation,
       child: Container(
-        width: 200,
-        height: 56,
+        width: 300,
+        height: 46,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [AppColor.DEFAULT_2, AppColor.DEFAULT],
@@ -963,14 +777,8 @@ class _CinemaDetailPageState extends State<CinemaDetailPage>
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.local_movies,
-                color: Colors.white,
-                size: 24,
-              ),
-              SizedBox(width: 12),
               Text(
-                'Book Tickets',
+                'Mua vé',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,

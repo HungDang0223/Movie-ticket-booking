@@ -17,7 +17,11 @@ class MovieModel extends Movie with EquatableMixin {
     required super.genre,
     required super.showingDate,
     required super.endDate,
+<<<<<<< HEAD
     required super.showingStatus,
+=======
+    required super.showingStatus, // upcoming, showing, ended
+>>>>>>> 32bc590bda4bb23396a8e21652ce4e328417ad15
     required super.favouritesCount,
     required super.isFavourited
   });

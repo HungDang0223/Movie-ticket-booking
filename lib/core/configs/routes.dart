@@ -15,8 +15,8 @@ import 'package:movie_tickets/features/setting/presentation/pages/change_passwor
 import 'package:movie_tickets/features/setting/presentation/pages/password_verification_page.dart';
 import 'package:movie_tickets/features/setting/presentation/pages/setting_page.dart';
 import 'package:movie_tickets/features/setting/presentation/pages/user_info_page.dart';
-import 'package:movie_tickets/features/venues/data/models/cinema.dart';
-import 'package:movie_tickets/features/venues/presentation/pages/cinema_detail_page.dart';
+import 'package:movie_tickets/features/cinema/data/models/cinema.dart';
+import 'package:movie_tickets/features/cinema/presentation/pages/cinema_detail_page.dart';
 
 class Routes {
   static const String home = '/home';

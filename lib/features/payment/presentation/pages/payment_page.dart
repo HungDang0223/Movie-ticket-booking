@@ -417,10 +417,11 @@ class _PaymentPageState extends State<PaymentPage> {
           _infoRow('Giờ chiếu', widget.showTime),
           _infoRow('Ghế', widget.selectedSeats.join(', ')),
           
-          Divider(color: Colors.grey.shade700, height: 30),
+          // Divider(color: Colors.grey.shade700, height: 30),
           
           // Pricing details          _priceRow('payment.ticket_price'.i18n(), widget.ticketPrice),
           if (widget.snacksPrice > 0)
+            Divider(color: Colors.grey.shade700, height: 30),
             _priceRow('payment.snacks'.i18n(), widget.snacksPrice),
           if (discountAmount > 0)
             _priceRow('payment.discount'.i18n(), -discountAmount, textColor: Colors.greenAccent),

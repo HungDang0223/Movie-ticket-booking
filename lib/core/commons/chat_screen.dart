@@ -16,11 +16,11 @@ import 'package:movie_tickets/features/movies/domain/repositories/movie_reposito
 import 'package:movie_tickets/injection.dart';
 
 class ChatScreen extends StatefulWidget {
-  final UserModel user;
+  final UserModel? user;
 
   const ChatScreen({
     Key? key,
-    required this.user,
+    this.user,
   }) : super(key: key);
 
   @override
@@ -283,7 +283,7 @@ class _ChatScreenState extends State<ChatScreen> {
             'movie': await _loadMovieData(int.parse(parameters['movieId']!)),
             'showingMovie': await _loadShowingData(int.parse(parameters['showingId']!)),
             'websocketUrl': parameters['websocketUrl'] ?? 'ws://localhost:5000/ws/seat-reservation',
-            'userId': widget.user.userId,
+            'userId': widget.user!.userId,
           };
         }
         break;
@@ -389,8 +389,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Movie Bot 🤖'),
-        backgroundColor: AppColor.DEFAULT_2,
+        title: const Text('TICBOT', style: TextStyle(color: AppColor.DEFAULT_2),),
+        backgroundColor: AppColor.WHITE,
         foregroundColor: Colors.white,
       ),
       body: Column(

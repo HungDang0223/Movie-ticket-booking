@@ -9,7 +9,7 @@ import 'package:movie_tickets/core/utils/snackbar_utilies.dart';
 import 'package:movie_tickets/features/booking/data/models/models.dart';
 import 'package:movie_tickets/features/booking/presentation/pages/booking_seat.dart';
 import 'package:movie_tickets/features/movies/data/models/movie_model.dart';
-import 'package:movie_tickets/features/venues/data/models/cinema.dart';
+import 'package:movie_tickets/features/cinema/data/models/cinema.dart';
 import 'package:movie_tickets/injection.dart';
 
 import '../bloc/bloc.dart';

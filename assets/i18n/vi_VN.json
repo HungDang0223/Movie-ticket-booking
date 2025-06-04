@@ -67,7 +67,7 @@
   },  
   "settings": {
     "settings": "Cài Đặt",
-    "accountSettings": "Cài Đặt Tài Khoản",
+    "accountSettings": "Cài Đặt Người Dùng",
     "profileInformation": "Thông Tin Cá Nhân",
     "changePassword": "Đổi Mật Khẩu",
     "notifications": "Thông Báo",
@@ -104,7 +104,8 @@
     "selectDate": "Chọn ngày",
     "email": "Email",
     "verifyEmail": "Xác thực Email",
-    "notVerified": "Chưa xác thực"
+    "notVerified": "Chưa xác thực",
+    "tickets": "Vé đã mua"
   },
   "notifications": {
     "notificationSettings": "Cài Đặt Thông Báo",
@@ -125,6 +126,11 @@
     "cinemaDetails": "Chi Tiết Rạp Chiếu",
     "noCinemasFound": "Không tìm thấy rạp chiếu phim nào",
     "cinemaName": "Tên Rạp"
+  },
+  "payment": {
+    "snacks": "Đồ ăn/nước uống",
+    "discount": "Giảm giá",
+    "total": "Tổng tiền"
   },
   "common": {
     "cancel": "Hủy",

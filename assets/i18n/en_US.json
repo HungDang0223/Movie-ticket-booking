@@ -104,7 +104,8 @@
     "selectDate": "Select Date",
     "email": "Email",
     "verifyEmail": "Verify Email",
-    "notVerified": "Not Verified"
+    "notVerified": "Not Verified",
+    "tickets": "Tickets purchased"
   },
   "notifications": {
     "notificationSettings": "Notification Settings",

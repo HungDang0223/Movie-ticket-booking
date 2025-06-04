@@ -69,7 +69,7 @@ class MovieDescription extends StatelessWidget {
                                       style: MultiDevices.getStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
-                                        color: AppColor.WHITE,
+                                        color: Colors.white
                                       ),
                                     ),
                                   ],
