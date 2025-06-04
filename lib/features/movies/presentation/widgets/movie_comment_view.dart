@@ -112,12 +112,18 @@ class _EnhancedMovieCommentViewState extends State<EnhancedMovieCommentView>
       itemCount: state.reviews.length,
       itemBuilder: (context, index) {
         final review = state.reviews[index];
-        return EnhancedReviewItem(
+        return review.isCurrentUser
+          ? EnhancedReviewItem(
           review: review,
           onLike: () => _reviewHandler.handleLikeReview(review.reviewId),
-          onDislike: () => _reviewHandler.handleUnlikeReview(review.reviewId),
           onDelete: () => _reviewHandler.handleDeleteReview(review.reviewId),
           // onReport: () => _reviewHandler.handleReportReview(review.reviewId),
+        )
+          : EnhancedReviewItem(
+          review: review,
+          onLike: () => _reviewHandler.handleLikeReview(review.reviewId),
+          // onDelete: () => _reviewHandler.handleDeleteReview(review.reviewId),
+          onReport: () => _reviewHandler.handleReportReview(review.reviewId),
         );
       },
     );

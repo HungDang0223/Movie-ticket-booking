@@ -11,12 +11,14 @@ class MovieReview extends Review with EquatableMixin {
     required super.reviewContent,
     required super.reviewDate,
     required super.likes,
-    required super.unlikes,
     required super.userId,
+    required super.isCurrentUser,
+    required super.isLikedByCurrentUser
   });
 
   factory MovieReview.fromJson(Map<String, dynamic> json) {
     return MovieReview(
+      isCurrentUser: json['isCurrentUser'] ?? false,
       reviewId: json['reviewId'],
       userId: json['userId'],
       fullName: json['fullName'],
@@ -26,7 +28,7 @@ class MovieReview extends Review with EquatableMixin {
       reviewContent: json['reviewContent'],
       reviewDate: DateTime.parse(json['reviewDate']),
       likes: json['likes'],
-      unlikes: json['unlikes'],
+      isLikedByCurrentUser: json['isLiked']
     );
   }
   Map<String, dynamic> toJson() {
@@ -40,7 +42,7 @@ class MovieReview extends Review with EquatableMixin {
       'reviewContent': reviewContent,
       'reviewDate': reviewDate.toIso8601String(),
       'likes': likes,
-      'unlikes': unlikes,
+      'isCurrentUser': isCurrentUser
     };
   }
   
@@ -55,7 +57,6 @@ class MovieReview extends Review with EquatableMixin {
         reviewContent,
         reviewDate,
         likes,
-        unlikes,
       ];
 }
 

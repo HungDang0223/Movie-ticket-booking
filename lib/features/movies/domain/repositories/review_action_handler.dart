@@ -62,21 +62,6 @@ class ReviewActionHandler {
     context.read<ReviewBloc>().add(LikeMovieReview(reviewId: reviewId));
   }
 
-  /// Xử lý unlike review
-  Future<void> handleUnlikeReview(int reviewId) async {
-    final isAuthenticated = await AuthenticationHelper.requireAuthentication(context);
-    if (!isAuthenticated) {
-      SnackbarUtils.showAuthRequiredSnackbar(
-        context,
-        'Bạn cần đăng nhập để bỏ thích đánh giá',
-      );
-      return;
-    }
-
-    if (!context.mounted) return;
-    context.read<ReviewBloc>().add(UnlikeMovieReview(reviewId: reviewId));
-  }
-
   /// Xử lý xóa review
   Future<void> handleDeleteReview(int reviewId) async {
     final isAuthenticated = await AuthenticationHelper.requireAuthentication(context);

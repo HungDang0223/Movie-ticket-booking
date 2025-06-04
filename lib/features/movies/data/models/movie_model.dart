@@ -18,7 +18,6 @@ class MovieModel extends Movie with EquatableMixin {
     required super.showingDate,
     required super.endDate,
     required super.showingStatus,
-    required super.isSpecial,
     required super.favouritesCount,
     required super.isFavourited
   });
@@ -40,7 +39,6 @@ class MovieModel extends Movie with EquatableMixin {
       showingDate: DateTime.parse(json['showingDate']),
       endDate: DateTime.parse(json['endDate']),
       showingStatus: json['showingStatus'],
-      isSpecial: json['isSpecial'],
       favouritesCount: json['favouritesCount'],
       isFavourited: json['isFavourited']
     );
@@ -63,7 +61,6 @@ class MovieModel extends Movie with EquatableMixin {
       'showingDate': showingDate.toIso8601String(),
       'endDate': endDate.toIso8601String(),
       'showingStatus': showingStatus,
-      'isSpecial': isSpecial,
     };
   }
 
@@ -93,9 +90,8 @@ class MovieModel extends Movie with EquatableMixin {
       showingDate: DateTime.now(),
       endDate: DateTime.now(),
       showingStatus: '',
-      isSpecial: false,
       favouritesCount: 0,
-      isFavourited: false
+      isFavourited: false,
     );
   }
 
@@ -116,6 +112,5 @@ class MovieModel extends Movie with EquatableMixin {
         showingDate,
         endDate,
         showingStatus,
-        isSpecial,
       ];
 }

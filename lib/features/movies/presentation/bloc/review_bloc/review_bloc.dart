@@ -14,7 +14,6 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     on<LoadMovieReviews>(_onLoadMovieReviews);
     on<LoadAllMovieReviews>(_onLoadAllMovieReviews);
     on<LikeMovieReview>(_onLikeMovieReview);
-    on<UnlikeMovieReview>(_onUnlikeMovieReview);
     on<DeleteMovieReview>(_onDeleteMovieReview);
     on<PostMovieReview>(_onPostMovieReview);
     on<UpdateMovieReview>(_onUpdateMovieReview);
@@ -144,8 +143,9 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
                   reviewContent: review.reviewContent,
                   reviewDate: review.reviewDate,
                   likes: review.likes + 1,
-                  unlikes: review.unlikes,
                   userId: review.userId,
+                  isCurrentUser: review.isCurrentUser,
+                  isLikedByCurrentUser: review.isLikedByCurrentUser
                 );
               }
               return review;
@@ -166,53 +166,6 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
               // You might want to reload reviews or maintain the previous state
             }
           });
-        },
-      );
-    } catch (e) {
-      emit(ReviewActionError(e.toString()));
-    }
-  }
-
-  Future<void> _onUnlikeMovieReview(
-    UnlikeMovieReview event,
-    Emitter<ReviewState> emit,
-  ) async {
-    try {
-      final result = await reviewRepository.unlikeMovieReview(event.reviewId);
-      
-      result.when(
-        success: (success) {
-          emit(ReviewActionSuccess());
-          if (success && state is ReviewLoaded) {
-            final currentState = state as ReviewLoaded;
-            final updatedReviews = currentState.reviews.map((review) {
-              if (review.reviewId == event.reviewId) {
-                // Create a new review with updated unlikes count
-                return MovieReview(
-                  reviewId: review.reviewId,
-                  fullName: review.fullName,
-                  photoPath: review.photoPath,
-                  movieId: review.movieId,
-                  rating: review.rating,
-                  reviewContent: review.reviewContent,
-                  reviewDate: review.reviewDate,
-                  likes: review.likes,
-                  unlikes: review.unlikes + 1,
-                  userId: review.userId,
-                );
-              }
-              return review;
-            }).toList();
-
-            emit(ReviewLoaded(
-              reviews: updatedReviews,
-              hasMoreData: currentState.hasMoreData,
-              currentPage: currentState.currentPage,
-            ));
-          }
-        },
-        failure: (failure) {
-          emit(ReviewActionError(failure.message));
         },
       );
     } catch (e) {

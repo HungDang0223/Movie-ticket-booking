@@ -43,6 +43,12 @@ class _ChatScreenState extends State<ChatScreen> {
     _initializeChat();
   }
 
+  @override
+  dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
+
   Future<void> _initializeChat() async {
     _chatService.initialize(language: 'vi');
     

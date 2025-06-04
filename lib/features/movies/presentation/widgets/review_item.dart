@@ -1,20 +1,22 @@
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
+
 import 'package:flutter/material.dart';
+import 'package:movie_tickets/core/constants/app_color.dart';
 import 'package:movie_tickets/features/movies/data/models/review_model.dart';
 
 class EnhancedReviewItem extends StatelessWidget {
   final MovieReview review;
   final VoidCallback onLike;
-  final VoidCallback onDislike;
   final VoidCallback? onDelete;
   final VoidCallback? onEdit;
+  final VoidCallback? onReport;
 
   const EnhancedReviewItem({
     super.key,
     required this.review,
     required this.onLike,
-    required this.onDislike,
     this.onDelete,
-    this.onEdit,
+    this.onEdit, this.onReport,
   });
 
   Widget _buildRatingStars(int rating) {
@@ -31,11 +33,9 @@ class EnhancedReviewItem extends StatelessWidget {
   }
 
   Widget _buildActionButton({
-    required IconData icon,
-    required String label,
     required int count,
+    bool isLiked = false,
     required VoidCallback onPressed,
-    Color? iconColor,
   }) {
     return InkWell(
       onTap: onPressed,
@@ -49,14 +49,23 @@ class EnhancedReviewItem extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Text(
+              count.toString(),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[700],
+              ),
+            ),
+            const SizedBox(width: 4),
             Icon(
-              icon,
+              isLiked ? Icons.favorite : Icons.favorite_border_outlined,
               size: 16,
-              color: iconColor ?? Colors.grey[600],
+              color: isLiked ? AppColor.DEFAULT_2 : AppColor.GRAY1,
             ),
             const SizedBox(width: 4),
             Text(
-              count.toString(),
+              "Yêu thích",
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
@@ -111,7 +120,7 @@ class EnhancedReviewItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      review.fullName,
+                      review.isCurrentUser ? "Bạn" : review.fullName,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -134,6 +143,7 @@ class EnhancedReviewItem extends StatelessWidget {
                   ],
                 ),
               ),
+              _buildActionButton(count: review.likes, onPressed: onLike),
               // Menu for edit/delete actions
               if (onEdit != null || onDelete != null)
                 PopupMenuButton<String>(
@@ -144,6 +154,9 @@ class EnhancedReviewItem extends StatelessWidget {
                         break;
                       case 'delete':
                         onDelete?.call();
+                        break;
+                      case 'report':
+                        onReport?.call();
                         break;
                     }
                   },
@@ -170,6 +183,17 @@ class EnhancedReviewItem extends StatelessWidget {
                           ],
                         ),
                       ),
+                    if (onReport != null)
+                      const PopupMenuItem<String>(
+                        value: 'report',
+                        child: Row(
+                          children: [
+                            Icon(Icons.report_gmailerrorred_outlined, size: 16, color: Colors.red),
+                            SizedBox(width: 8),
+                            Text('Report', style: TextStyle(color: Colors.red)),
+                          ],
+                        ),
+                      ),
                   ],
                   child: Icon(
                     Icons.more_vert,
@@ -189,29 +213,6 @@ class EnhancedReviewItem extends StatelessWidget {
               height: 1.5,
               color: Colors.grey[800],
             ),
-          ),
-          
-          const SizedBox(height: 12),
-          
-          // Action buttons
-          Row(
-            children: [
-              _buildActionButton(
-                icon: Icons.thumb_up,
-                label: 'Like',
-                count: review.likes,
-                onPressed: onLike,
-                iconColor: Colors.blue,
-              ),
-              const SizedBox(width: 12),
-              _buildActionButton(
-                icon: Icons.thumb_down,
-                label: 'Unlike',
-                count: review.unlikes,
-                onPressed: onDislike,
-                iconColor: Colors.red,
-              ),
-            ],
           ),
         ],
       ),

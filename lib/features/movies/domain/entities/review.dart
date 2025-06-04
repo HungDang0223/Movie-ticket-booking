@@ -8,7 +8,8 @@ abstract class Review {
   final String reviewContent;
   final DateTime reviewDate;
   final int likes;
-  final int unlikes;
+  bool isCurrentUser = false;
+  bool isLikedByCurrentUser = false;
 
   Review(
       {required this.reviewId,
@@ -20,5 +21,6 @@ abstract class Review {
       required this.reviewContent,
       required this.reviewDate,
       required this.likes,
-      required this.unlikes});
+      required this.isCurrentUser,
+      required this.isLikedByCurrentUser});
 }
